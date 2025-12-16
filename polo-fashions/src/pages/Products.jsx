@@ -45,7 +45,11 @@ const DEFAULT_METERS = {
   kurta: 2.5,
 };
 
-export default function Products({ setCurrentPage }) {
+import { useNavigate } from "react-router-dom";
+
+export default function Products() {
+  const navigate = useNavigate();
+
   const { currentUser, addOrder } = useAuth();
   const [products, setProducts] = useState(null); // fabrics
   const [loading, setLoading] = useState(true);
@@ -203,7 +207,7 @@ export default function Products({ setCurrentPage }) {
             setOrderSuccess("Rental order placed successfully!");
             setTimeout(() => {
               closeModal();
-              setCurrentPage("dashboard");
+              navigate("/dashboard");
             }, 1200);
           } else {
             setOrderError(result.message || "Failed to place rental order");
@@ -235,7 +239,7 @@ export default function Products({ setCurrentPage }) {
             setOrderSuccess("Product purchased successfully!");
             setTimeout(() => {
               closeModal();
-              setCurrentPage("dashboard");
+              navigate("/dashboard");
             }, 1200);
           } else {
             setOrderError(result.message || "Failed to buy product");
@@ -278,7 +282,7 @@ export default function Products({ setCurrentPage }) {
           setOrderSuccess("Order placed successfully!");
           setTimeout(() => {
             closeModal();
-            setCurrentPage("dashboard");
+            navigate("/dashboard");
           }, 1200);
         } else {
           setOrderError(result.message || "Failed to place order");
@@ -326,7 +330,7 @@ export default function Products({ setCurrentPage }) {
           setOrderSuccess("Order placed successfully!");
           setTimeout(() => {
             closeModal();
-            setCurrentPage("dashboard");
+            navigate("/dashboard");
           }, 1200);
         } else {
           setOrderError(result.message || "Failed to place order");
@@ -376,7 +380,7 @@ export default function Products({ setCurrentPage }) {
           setOrderSuccess("Order placed successfully!");
           setTimeout(() => {
             closeModal();
-            setCurrentPage("dashboard");
+            navigate("/dashboard");
           }, 1200);
         } else {
           setOrderError(result.message || "Failed to place order");
@@ -730,7 +734,7 @@ export default function Products({ setCurrentPage }) {
                               size="sm"
                               onClick={() => {
                                 closeModal();
-                                setCurrentPage("booking");
+                                navigate("/booking");
                               }}
                             >
                               Book Now

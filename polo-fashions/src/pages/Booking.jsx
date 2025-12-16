@@ -2,8 +2,12 @@ import React, { useState } from 'react';
 import { Container, Row, Col, Card, Form, Button, Alert } from 'react-bootstrap';
 import { Calendar, Clock, User, Phone } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import { useNavigate } from 'react-router-dom';
 
-export default function Booking({ setCurrentPage }) {
+
+export default function Booking() {
+  const navigate = useNavigate();
+
   const { currentUser, addBooking } = useAuth();
   const [formData, setFormData] = useState({
     name: currentUser?.username || '',
@@ -43,7 +47,7 @@ export default function Booking({ setCurrentPage }) {
       setFormData({ ...formData, date: '', time: '' });
       
       setTimeout(() => {
-        setCurrentPage('dashboard');
+         navigate('/dashboard');
       }, 2000);
     }
   };
@@ -56,7 +60,7 @@ export default function Booking({ setCurrentPage }) {
             <Alert variant="warning" className="text-center">
               <h4>Login Required</h4>
               <p>Please login to book an appointment for measurements</p>
-              <Button variant="primary" onClick={() => setCurrentPage('login')}>
+              <Button variant="primary" onClick={() => navigate('/login')}>
                 Go to Login
               </Button>
             </Alert>
@@ -87,7 +91,7 @@ export default function Booking({ setCurrentPage }) {
                 <Alert variant="info" className="text-center">
                   <h5>You're all set!</h5>
                   <p>Your measurements are already on file. You can start shopping for custom tailored clothes!</p>
-                  <Button variant="primary" onClick={() => setCurrentPage('products')}>
+                  <Button variant="primary" onClick={() => navigate('/products')}>
                     Browse Products
                   </Button>
                 </Alert>

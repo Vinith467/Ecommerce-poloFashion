@@ -1,31 +1,34 @@
-import React, { useState } from 'react';
-import { Container, Row, Col, Card, Form, Button, Alert } from 'react-bootstrap';
-import { LogIn } from 'lucide-react';
-import { useAuth } from '../context/AuthContext';
+import React, { useState } from "react";
+import { Container, Row, Col, Card, Form, Button, Alert } from "react-bootstrap";
+import { LogIn } from "lucide-react";
+import { useAuth } from "../context/AuthContext";
+import { useNavigate } from "react-router-dom";
 
-export default function Login({ setCurrentPage }) {
+export default function Login() {
   const { login } = useAuth();
-  const [formData, setFormData] = useState({ email: '', password: '' });
-  const [error, setError] = useState('');
+  const navigate = useNavigate();
+
+  const [formData, setFormData] = useState({ email: "", password: "" });
+  const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
-  const handleSubmit = async (e) => {  // ✅ CHANGED: Added async
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    setError('');
+    setError("");
     setLoading(true);
 
-    const result = await login(formData.email, formData.password);  // ✅ CHANGED: Added await
-    
+    const result = await login(formData.email, formData.password);
+
     if (result.success) {
-      if (result.redirectTo === 'admin') {
-        setCurrentPage('admin');
+      if (result.redirectTo === "admin") {
+        navigate("/admin");
       } else {
-        setCurrentPage('dashboard');
+        navigate("/dashboard");
       }
     } else {
       setError(result.message);
     }
-    
+
     setLoading(false);
   };
 
@@ -50,7 +53,9 @@ export default function Login({ setCurrentPage }) {
                     type="email"
                     placeholder="Enter your email"
                     value={formData.email}
-                    onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                    onChange={(e) =>
+                      setFormData({ ...formData, email: e.target.value })
+                    }
                     required
                   />
                 </Form.Group>
@@ -61,28 +66,33 @@ export default function Login({ setCurrentPage }) {
                     type="password"
                     placeholder="Enter your password"
                     value={formData.password}
-                    onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                    onChange={(e) =>
+                      setFormData({
+                        ...formData,
+                        password: e.target.value,
+                      })
+                    }
                     required
                   />
                 </Form.Group>
 
-                <Button 
-                  variant="primary" 
-                  type="submit" 
+                <Button
+                  variant="primary"
+                  type="submit"
                   className="w-100 mb-3"
                   disabled={loading}
                 >
-                  {loading ? 'Logging in...' : 'Login'}
+                  {loading ? "Logging in..." : "Login"}
                 </Button>
               </Form>
 
               <div className="text-center">
                 <p className="mb-0 text-muted">
-                  Don't have an account?{' '}
-                  <Button 
-                    variant="link" 
+                  Don&apos;t have an account?{" "}
+                  <Button
+                    variant="link"
                     className="p-0"
-                    onClick={() => setCurrentPage('register')}
+                    onClick={() => navigate("/register")}
                   >
                     Register here
                   </Button>
@@ -94,8 +104,12 @@ export default function Login({ setCurrentPage }) {
               <div className="text-center">
                 <small className="text-muted">Demo Credentials:</small>
                 <div className="mt-2">
-                  <small className="d-block"><strong>Customer:</strong> customer@test.com / customer123</small>
-                  <small className="d-block"><strong>Admin:</strong> admin@polofashions.com / admin123</small>
+                  <small className="d-block">
+                    <strong>Customer:</strong> customer@test.com / customer123
+                  </small>
+                  <small className="d-block">
+                    <strong>Admin:</strong> admin@polofashions.com / admin123
+                  </small>
                 </div>
               </div>
             </Card.Body>

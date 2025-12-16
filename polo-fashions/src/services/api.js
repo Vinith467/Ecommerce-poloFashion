@@ -5,9 +5,6 @@ const API_BASE_URL = 'http://127.0.0.1:8000/api';
 // Create axios instance with base configuration
 const api = axios.create({
   baseURL: API_BASE_URL,
-  headers: {
-    'Content-Type': 'application/json',
-  },
 });
 
 // Add token to requests if it exists
@@ -79,19 +76,15 @@ export const authAPI = {
     const response = await api.get('/accounts/users/');
     return response.data;
   },
-
   updateMeasurement: async (userId, formData) => {
     const response = await api.patch(
       `/accounts/users/${userId}/update_measurement/`,
-      formData,
-      {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
-      }
+      formData
     );
     return response.data;
   },
+
+
 };
 // RAI apis
 // ------------------- RENTALS -------------------

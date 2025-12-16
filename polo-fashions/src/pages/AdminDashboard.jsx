@@ -35,6 +35,8 @@ export default function AdminDashboard() {
   const [selectedUser, setSelectedUser] = useState(null);
   const [measurements, setMeasurements] = useState(null); // Changed from object to null
   const [successMessage, setSuccessMessage] = useState("");
+  const [showImageModal, setShowImageModal] = useState(false);
+  const [selectedImage, setSelectedImage] = useState(null);
 
   const customerUsers = users.filter((u) => u.role === "customer");
   const pendingBookings = bookings.filter((b) => b.status === "pending");
@@ -42,8 +44,8 @@ export default function AdminDashboard() {
 
   const handleOpenMeasurementModal = (user) => {
     setSelectedUser(user);
-    if (user.measurementPhoto) {
-      setMeasurements(user.measurementPhoto);
+    if (user.measurement_photo) {
+      setMeasurements(user.measurement_photo);
     } else {
       setMeasurements(null);
     }
@@ -51,8 +53,14 @@ export default function AdminDashboard() {
     setSuccessMessage("");
   };
 
-  const handleSaveMeasurements = () => {
-    updateUserMeasurement(selectedUser.id, measurements);
+  const handleSaveMeasurements = async () => {
+    if (!measurements) return;
+
+    const formData = new FormData();
+    formData.append("measurement_photo", measurements); // field name MUST match backend
+
+    await updateUserMeasurement(selectedUser.id, formData);
+
     setSuccessMessage("Measurements updated successfully!");
     setTimeout(() => {
       setShowMeasurementModal(false);
@@ -62,6 +70,15 @@ export default function AdminDashboard() {
 
   const handleUpdateBookingStatus = (bookingId, status) => {
     updateBookingStatus(bookingId, status);
+  };
+  const openImageModal = (image) => {
+    setSelectedImage(image);
+    setShowImageModal(true);
+  };
+
+  const closeImageModal = () => {
+    setSelectedImage(null);
+    setShowImageModal(false);
   };
 
   return (
@@ -136,7 +153,7 @@ export default function AdminDashboard() {
                       {bookings.map((booking) => (
                         <tr key={booking.id}>
                           <td>#{booking.id}</td>
-                          <td>{booking.customerName}</td>
+                          <td>{booking.customer_name}</td>
                           <td>{booking.email}</td>
                           <td>{booking.phone}</td>
                           <td>{booking.date}</td>
@@ -230,9 +247,11 @@ export default function AdminDashboard() {
                         <th>Email</th>
                         <th>Phone</th>
                         <th>Measurement Status</th>
+                        <th>Measurement Image</th>
                         <th>Actions</th>
                       </tr>
                     </thead>
+
                     <tbody>
                       {customerUsers.map((user) => (
                         <tr key={user.id}>
@@ -250,6 +269,26 @@ export default function AdminDashboard() {
                               <Badge bg="warning">Pending</Badge>
                             )}
                           </td>
+                          <td>
+                            {user.measurement_photo ? (
+                              <Button
+                                variant="outline-info"
+                                size="sm"
+                                onClick={() =>
+                                  openImageModal(
+                                    user.measurement_photo.startsWith("http")
+                                      ? user.measurement_photo
+                                      : `http://127.0.0.1:8000${user.measurement_photo}`
+                                  )
+                                }
+                              >
+                                View
+                              </Button>
+                            ) : (
+                              <span className="text-muted">—</span>
+                            )}
+                          </td>
+
                           <td>
                             <Button
                               variant="primary"
@@ -302,12 +341,12 @@ export default function AdminDashboard() {
                       {orders.map((order) => (
                         <tr key={order.id}>
                           <td>#{order.id}</td>
-                          <td>{order.customerName}</td>
+                          <td>{order.customer_name}</td>
                           <td>
-                            <div>{order.productName}</div>
-                            {order.fabricName && (
+                            <div>{order.product_name}</div>
+                            {order.fabric_name && (
                               <small className="text-muted">
-                                Fabric: {order.fabricName}
+                                Fabric: {order.fabric_name}
                               </small>
                             )}
                             {order.size && (
@@ -319,19 +358,19 @@ export default function AdminDashboard() {
                           <td>
                             <Badge
                               bg={
-                                order.productType === "custom"
+                                order.stitch_type === "custom"
                                   ? "primary"
                                   : "success"
                               }
                             >
-                              {order.productType}
+                              {order.stitch_type}
                             </Badge>
                           </td>
                           <td>{order.quantity}</td>
                           <td className="text-primary fw-bold">
-                            ₹{order.totalPrice}
+                            ₹{order.total_price}
                           </td>
-                          <td>{order.orderDate}</td>
+                          <td>{order.order_date}</td>
                           <td>
                             <Badge bg="info">{order.status}</Badge>
                           </td>
@@ -366,11 +405,11 @@ export default function AdminDashboard() {
             measurements are completed.
           </Alert>
 
-          {selectedUser?.measurementPhoto && (
+          {selectedUser?.measurement_photo && (
             <div className="mb-3">
               <h6>Current Measurement Photo:</h6>
               <img
-                src={selectedUser.measurementPhoto}
+                src={selectedUser.measurement_photo}
                 alt="Current measurements"
                 className="img-fluid rounded border"
                 style={{ maxHeight: "400px", objectFit: "contain" }}
@@ -386,11 +425,7 @@ export default function AdminDashboard() {
               onChange={(e) => {
                 const file = e.target.files[0];
                 if (file) {
-                  const reader = new FileReader();
-                  reader.onloadend = () => {
-                    setMeasurements(reader.result);
-                  };
-                  reader.readAsDataURL(file);
+                  setMeasurements(file); // ✅ store File object
                 }
               }}
             />
@@ -398,20 +433,17 @@ export default function AdminDashboard() {
               Accepted formats: JPG, PNG, HEIC. Maximum size: 5MB
             </Form.Text>
           </Form.Group>
-
-          {measurements &&
-            typeof measurements === "string" &&
-            measurements.startsWith("data:image") && (
-              <div className="mt-3">
-                <h6>Preview:</h6>
-                <img
-                  src={measurements}
-                  alt="Preview"
-                  className="img-fluid rounded border"
-                  style={{ maxHeight: "400px", objectFit: "contain" }}
-                />
-              </div>
-            )}
+          {measurements instanceof File && (
+            <div className="mt-3">
+              <h6>Preview:</h6>
+              <img
+                src={URL.createObjectURL(measurements)}
+                alt="Preview"
+                className="img-fluid rounded border"
+                style={{ maxHeight: "400px", objectFit: "contain" }}
+              />
+            </div>
+          )}
         </Modal.Body>
         <Modal.Footer>
           <Button
@@ -430,6 +462,26 @@ export default function AdminDashboard() {
             Save Measurement Photo
           </Button>
         </Modal.Footer>
+      </Modal>
+      {/* Full Screen Measurement Image Modal */}
+      <Modal show={showImageModal} onHide={closeImageModal} fullscreen>
+        <Modal.Header closeButton className="bg-dark text-white">
+          <Modal.Title>Measurement Image</Modal.Title>
+        </Modal.Header>
+
+        <Modal.Body className="bg-dark d-flex justify-content-center align-items-center">
+          {selectedImage && (
+            <img
+              src={selectedImage}
+              alt="Measurement"
+              style={{
+                maxWidth: "100%",
+                maxHeight: "100%",
+                objectFit: "contain",
+              }}
+            />
+          )}
+        </Modal.Body>
       </Modal>
     </Container>
   );

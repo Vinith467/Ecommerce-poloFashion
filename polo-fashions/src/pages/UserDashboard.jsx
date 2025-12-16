@@ -18,8 +18,10 @@ import {
   Clock,
 } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
+import { useNavigate } from "react-router-dom";
 
-export default function UserDashboard({ setCurrentPage }) {
+export default function UserDashboard() {
+  const navigate = useNavigate();
   const { currentUser, bookings = [], orders = [] } = useAuth();
 
   // -----------------------------
@@ -205,7 +207,7 @@ export default function UserDashboard({ setCurrentPage }) {
                 <Button
                   variant="primary"
                   size="sm"
-                  onClick={() => setCurrentPage("products")}
+                  onClick={() => navigate("/products")}
                 >
                   Browse Products
                 </Button>

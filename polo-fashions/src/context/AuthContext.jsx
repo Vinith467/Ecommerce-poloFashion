@@ -9,7 +9,7 @@ export function AuthProvider({ children }) {
   const [users, setUsers] = useState([]);
   const [bookings, setBookings] = useState([]);
   const [orders, setOrders] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [authLoading, setAuthLoading] = useState(true);
 
   // ========================================
   // Initialize user from token on refresh
@@ -32,7 +32,7 @@ export function AuthProvider({ children }) {
           localStorage.removeItem("refresh_token");
         }
       }
-      setLoading(false);
+      setAuthLoading(false);
     };
 
     initializeAuth();
@@ -91,10 +91,10 @@ export function AuthProvider({ children }) {
       }
     };
 
-    if (!loading) {
+    if (!authLoading) {
       fetchData();
     }
-  }, [currentUser, loading]);
+  }, [currentUser, authLoading]);
 
   // ========================================
   // LOGIN
@@ -247,7 +247,7 @@ export function AuthProvider({ children }) {
     users,
     bookings,
     orders,
-    loading,
+    authLoading,
     login,
     register,
     logout,

@@ -1,8 +1,11 @@
-import React from 'react';
-import { Container, Row, Col, Card, Button } from 'react-bootstrap';
-import { Scissors, Calendar, Package, Ruler } from 'lucide-react';
+import React from "react";
+import { Container, Row, Col, Card, Button } from "react-bootstrap";
+import { Scissors, Calendar, Package, Ruler } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
-export default function Home({ setCurrentPage }) {
+export default function Home() {
+  const navigate = useNavigate();
+
   return (
     <div>
       {/* Hero Section */}
@@ -10,10 +13,10 @@ export default function Home({ setCurrentPage }) {
         <Container>
           <h1>Welcome to Polo Fashions</h1>
           <p>Where Traditional Craftsmanship Meets Modern Convenience</p>
-          <Button 
-            variant="light" 
+          <Button
+            variant="light"
             size="lg"
-            onClick={() => setCurrentPage('products')}
+            onClick={() => navigate("/products")}
           >
             Explore Our Collection
           </Button>
@@ -122,20 +125,21 @@ export default function Home({ setCurrentPage }) {
       <Container className="py-5 text-center">
         <h2 className="mb-4">Ready to Get Started?</h2>
         <p className="lead text-muted mb-4">
-          Join hundreds of satisfied customers who trust Polo Fashions for their tailoring needs
+          Join hundreds of satisfied customers who trust Polo Fashions for their
+          tailoring needs
         </p>
-        <Button 
-          variant="primary" 
-          size="lg" 
+        <Button
+          variant="primary"
+          size="lg"
           className="me-3"
-          onClick={() => setCurrentPage('register')}
+          onClick={() => navigate("/register")}
         >
           Register Now
         </Button>
-        <Button 
-          variant="outline-primary" 
+        <Button
+          variant="outline-primary"
           size="lg"
-          onClick={() => setCurrentPage('booking')}
+          onClick={() => navigate("/booking")}
         >
           Book Appointment
         </Button>

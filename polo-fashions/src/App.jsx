@@ -1,63 +1,87 @@
-import { useState } from 'react';
-import { AuthProvider, useAuth } from './context/AuthContext';
-import NavigationBar from './components/Navbar';
-import Footer from './components/Footer';
-import Home from './pages/Home';
-import Login from './pages/Login';
-import Register from './pages/Register';
-import Products from './pages/Products';
-import Booking from './pages/Booking';
-import UserDashboard from './pages/UserDashboard';
-import AdminDashboard from './pages/AdminDashboard';
-import './App.css';
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { AuthProvider, useAuth } from "./context/AuthContext";
+import NavigationBar from "./components/Navbar";
+import Footer from "./components/Footer";
 
-function AppContent() {
-  const [currentPage, setCurrentPage] = useState('home');
-  const { currentUser } = useAuth();
+import Home from "./pages/Home";
+import Login from "./pages/Login";
+import Register from "./pages/Register";
+import Products from "./pages/Products";
+import Booking from "./pages/Booking";
+import UserDashboard from "./pages/UserDashboard";
+import AdminDashboard from "./pages/AdminDashboard";
 
-  const renderPage = () => {
-    switch (currentPage) {
-      case 'home':
-        return <Home setCurrentPage={setCurrentPage} />;
-      case 'login':
-        return <Login setCurrentPage={setCurrentPage} />;
-      case 'register':
-        return <Register setCurrentPage={setCurrentPage} />;
-      case 'products':
-        return <Products setCurrentPage={setCurrentPage} />;
-      case 'booking':
-        return <Booking setCurrentPage={setCurrentPage} />;
-      case 'dashboard':
-        return <UserDashboard setCurrentPage={setCurrentPage} />;
-      case 'admin':
-        // Protect admin route - only admins can access
-        return currentUser?.role === 'admin' ? (
-          <AdminDashboard />
-        ) : (
-          <Home setCurrentPage={setCurrentPage} />
-        );
-      default:
-        return <Home setCurrentPage={setCurrentPage} />;
-    }
-  };
+import "./App.css";
+function ProtectedRoute({ children, role }) {
+  const { currentUser, authLoading } = useAuth();
 
+  if (authLoading) {
+    return (
+      <div className="text-center py-5">
+        Loading...
+      </div>
+    );
+  }
+
+  if (!currentUser) {
+    return <Navigate to="/login" replace />;
+  }
+
+  if (role && currentUser.role !== role) {
+    return <Navigate to="/" replace />;
+  }
+
+  return children;
+}
+
+
+function AppLayout() {
   return (
     <div className="d-flex flex-column min-vh-100">
-      <NavigationBar currentPage={currentPage} setCurrentPage={setCurrentPage} />
+      <NavigationBar />
       <main className="flex-grow-1">
-        {renderPage()}
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/products" element={<Products />} />
+
+          <Route
+            path="/booking"
+            element={
+              <ProtectedRoute role="customer">
+                <Booking />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
+
+          <Route
+            path="/dashboard"
+            element={
+              <ProtectedRoute role="customer">
+                <UserDashboard />
+              </ProtectedRoute>
+            }
+          />
+
+         <Route path="/admin" element={ <ProtectedRoute role="admin"> <AdminDashboard /> </ProtectedRoute> } />
+
+          {/* Fallback */}
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Routes>
       </main>
       <Footer />
     </div>
   );
 }
 
-function App() {
+export default function App() {
   return (
     <AuthProvider>
-      <AppContent />
+      <BrowserRouter>
+        <AppLayout />
+      </BrowserRouter>
     </AuthProvider>
   );
 }
-
-export default App;
