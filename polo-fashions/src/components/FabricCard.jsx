@@ -1,52 +1,71 @@
-import React from 'react';
-import { Card } from 'react-bootstrap';
-import { Check } from 'lucide-react';
+import React from "react";
+import { Card, Typography, Badge } from "antd";
+import { CheckOutlined } from "@ant-design/icons";
+
+const { Title, Text } = Typography;
 
 export default function FabricCard({ fabric, isSelected, onClick }) {
   return (
-    <Card 
-      className={`fabric-card h-100 ${isSelected ? 'selected' : ''}`}
+    <Card
+      hoverable
       onClick={() => onClick(fabric)}
-      style={{ cursor: 'pointer', position: 'relative' }}
-    >
-      {isSelected && (
-        <div 
+      style={{
+        height: "100%",
+        cursor: "pointer",
+        borderRadius: 12,
+        border: isSelected ? "2px solid #1677ff" : undefined,
+        position: "relative",
+      }}
+      cover={
+        <img
+          src={fabric.image}
+          alt={fabric.name}
           style={{
-            position: 'absolute',
-            top: '10px',
-            right: '10px',
+            height: 200,
+            objectFit: "cover",
+          }}
+        />
+      }
+    >
+      {/* SELECTED CHECK ICON */}
+      {isSelected && (
+        <div
+          style={{
+            position: "absolute",
+            top: 12,
+            right: 12,
+            background: "#1677ff",
+            borderRadius: "50%",
+            width: 32,
+            height: 32,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
             zIndex: 10,
-            background: '#667eea',
-            borderRadius: '50%',
-            width: '30px',
-            height: '30px',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center'
           }}
         >
-          <Check size={20} color="white" />
+          <CheckOutlined style={{ color: "#fff", fontSize: 18 }} />
         </div>
       )}
-      
-      <Card.Img 
-        variant="top" 
-        src={fabric.image} 
-        alt={fabric.name}
-        style={{ height: '200px', objectFit: 'cover' }}
-      />
-      <Card.Body>
-        <Card.Title>{fabric.name}</Card.Title>
-        <div className="mb-2">
-          <small className="text-muted">Type: </small>
-          <strong>{fabric.type}</strong>
-        </div>
-        <div className="mb-2">
-          <small className="text-muted">Color: </small>
-          <strong>{fabric.color}</strong>
-        </div>
-        <h5 className="text-primary mb-0">₹{fabric.price}</h5>
-      </Card.Body>
+
+      {/* CONTENT */}
+      <Title level={5} style={{ marginBottom: 8 }}>
+        {fabric.name}
+      </Title>
+
+      <div style={{ marginBottom: 6 }}>
+        <Text type="secondary">Type: </Text>
+        <Text strong>{fabric.type}</Text>
+      </div>
+
+      <div style={{ marginBottom: 10 }}>
+        <Text type="secondary">Color: </Text>
+        <Text strong>{fabric.color}</Text>
+      </div>
+
+      <Title level={5} style={{ color: "#1677ff", margin: 0 }}>
+        ₹{fabric.price}
+      </Title>
     </Card>
   );
 }

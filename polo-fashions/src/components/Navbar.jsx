@@ -1,23 +1,31 @@
 import React from "react";
-import { Navbar, Nav, Container, Button } from "react-bootstrap";
-import { Scissors, User, LogOut } from "lucide-react";
+import { Layout, Menu, Button, Space } from "antd";
+import {
+  HomeOutlined,
+  ShoppingOutlined,
+  UserOutlined,
+  LogoutOutlined,
+  LoginOutlined,
+  CalendarOutlined,
+} from "@ant-design/icons";
+import { Scissors } from "lucide-react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+
+const { Header } = Layout;
 
 export default function NavigationBar() {
   const { currentUser, bookings, logout } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
 
-  // Filter only this user's bookings
+  // 🔒 SAME LOGIC — unchanged
   const userBookings =
     bookings?.filter((b) => b.user === currentUser?.id) || [];
 
-  // Determine latest booking (if any)
   const latestBooking =
     userBookings.length > 0 ? userBookings[userBookings.length - 1] : null;
 
-  // Show Book Appointment ONLY if no booking or latest is cancelled
   const showBookAppointment =
     !latestBooking || latestBooking.status === "cancelled";
 
@@ -26,89 +34,116 @@ export default function NavigationBar() {
     navigate("/");
   };
 
-  const isActive = (path) => location.pathname === path;
+  // 🎯 Menu items (role-aware)
+  const menuItems = [
+    {
+      key: "/",
+      icon: <HomeOutlined />,
+      label: <Link to="/">Home</Link>,
+    },
+    {
+      key: "/products",
+      icon: <ShoppingOutlined />,
+      label: <Link to="/products">Products</Link>,
+    },
+  ];
+
+  if (currentUser && showBookAppointment) {
+    menuItems.push({
+      key: "/booking",
+      icon: <CalendarOutlined />,
+      label: <Link to="/booking">Book Appointment</Link>,
+    });
+  }
+
+  if (currentUser) {
+    menuItems.push({
+      key: currentUser.role === "admin" ? "/admin" : "/dashboard",
+      icon: <UserOutlined />,
+      label: (
+        <Link to={currentUser.role === "admin" ? "/admin" : "/dashboard"}>
+          {currentUser.role === "admin" ? "Admin Panel" : "My Account"}
+        </Link>
+      ),
+    });
+  }
 
   return (
-    <Navbar bg="dark" variant="dark" expand="lg" sticky="top">
-      <Container>
-        <Navbar.Brand
-          as={Link}
-          to="/"
-          className="d-flex align-items-center"
-        >
-          <Scissors className="me-2" size={28} />
-          Polo Fashions
-        </Navbar.Brand>
+    <Header
+      style={{
+        position: "sticky",
+        top: 0,
+        zIndex: 1000,
+        display: "flex",
+        alignItems: "center",
+        paddingInline: 24,
+       background: "#001529",
+        boxShadow: "0 2px 8px rgba(0,0,0,0.15)",
+      }}
+    >
+      {/* Brand */}
+      <div
+        style={{
+          color: "#ffffff",
+          fontSize: 18,
+          fontWeight: 600,
+          display: "flex",
+          alignItems: "center",
+          marginRight: 32,
+          whiteSpace: "nowrap",
+          letterSpacing: "0.4px",
+        }}
+      >
+        <Scissors size={26} style={{ marginRight: 8 }} />
+        Polo Fashions
+      </div>
 
-        <Navbar.Toggle aria-controls="basic-navbar-nav" />
+      {/* Menu */}
+      <Menu
+        mode="horizontal"
+        selectedKeys={[location.pathname]}
+        items={menuItems}
+        style={{
+          flex: 1,
+          background: "transparent",
+          color: "#ffffff",
+        }}
+        theme="dark"
+      />
 
-        <Navbar.Collapse id="basic-navbar-nav">
-          <Nav className="ms-auto align-items-center">
-            <Nav.Link as={Link} to="/" active={isActive("/")}>
-              Home
-            </Nav.Link>
-
-            <Nav.Link as={Link} to="/products" active={isActive("/products")}>
-              Products
-            </Nav.Link>
-
-            {!currentUser && (
-              <>
-                <Nav.Link as={Link} to="/login" active={isActive("/login")}>
-                  Login
-                </Nav.Link>
-
-                <Button
-                  as={Link}
-                  to="/register"
-                  variant="primary"
-                  size="sm"
-                  className="ms-2"
-                >
-                  Register
-                </Button>
-              </>
-            )}
-
-            {currentUser && (
-              <>
-                {showBookAppointment && (
-                  <Nav.Link
-                    as={Link}
-                    to="/booking"
-                    active={isActive("/booking")}
-                  >
-                    Book Appointment
-                  </Nav.Link>
-                )}
-
-                <Nav.Link
-                  as={Link}
-                  to={currentUser.role === "admin" ? "/admin" : "/dashboard"}
-                  active={
-                    isActive("/dashboard") || isActive("/admin")
-                  }
-                >
-                  <User size={18} className="me-1" />
-                  {currentUser.role === "admin"
-                    ? "Admin Panel"
-                    : "My Account"}
-                </Nav.Link>
-
-                <Button
-                  variant="outline-light"
-                  size="sm"
-                  className="ms-2"
-                  onClick={handleLogout}
-                >
-                  <LogOut size={16} className="me-1" />
-                  Logout
-                </Button>
-              </>
-            )}
-          </Nav>
-        </Navbar.Collapse>
-      </Container>
-    </Navbar>
+      {/* Auth Buttons */}
+      {!currentUser ? (
+        <Space>
+          <Button
+            icon={<LoginOutlined />}
+            style={{
+              color: "#E5E7EB",
+              borderColor: "#E5E7EB",
+              background: "transparent",
+            }}
+          >
+            <Link to="/login" style={{ color: "#E5E7EB" }}>
+              Login
+            </Link>
+          </Button>
+          <Button
+            style={{
+              background: "linear-gradient(135deg, #facc15, #eab308)",
+              border: "none",
+              color: "#1f2937",
+              fontWeight: 600,
+            }}
+          >
+            <Link to="/register" style={{ color: "#1f2937" }}>
+              Register
+            </Link>
+          </Button>
+        </Space>
+      ) : (
+        <Button style={{color: "#001529"}} icon={<LogoutOutlined />} onClick={handleLogout}>
+          Logout
+        </Button>
+      )}
+    </Header>
   );
 }

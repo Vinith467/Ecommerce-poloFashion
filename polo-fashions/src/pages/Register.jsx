@@ -1,70 +1,65 @@
 import React, { useState } from "react";
-import { Container, Row, Col, Card, Form, Button, Alert } from "react-bootstrap";
-import { UserPlus } from "lucide-react";
+import {
+  Row,
+  Col,
+  Card,
+  Form,
+  Input,
+  Button,
+  Alert,
+  Typography,
+} from "antd";
+import {
+  UserAddOutlined,
+  MailOutlined,
+  PhoneOutlined,
+  LockOutlined,
+} from "@ant-design/icons";
 import { useAuth } from "../context/AuthContext";
 import { useNavigate } from "react-router-dom";
+
+const { Title, Text } = Typography;
 
 export default function Register() {
   const { register } = useAuth();
   const navigate = useNavigate();
 
-  const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    phone: "",
-    password: "",
-    confirmPassword: "",
-  });
-
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [loading, setLoading] = useState(false);
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  const [form] = Form.useForm();
+
+  const handleSubmit = async (values) => {
     setError("");
     setSuccess("");
     setLoading(true);
 
-    // Validation
-    if (formData.password !== formData.confirmPassword) {
+    // Extra safety (even though AntD validates)
+    if (values.password !== values.confirmPassword) {
       setError("Passwords do not match");
       setLoading(false);
       return;
     }
 
-    if (formData.password.length < 6) {
-      setError("Password must be at least 6 characters long");
-      setLoading(false);
-      return;
-    }
-
-    if (formData.phone.length !== 10) {
-      setError("Phone number must be 10 digits");
-      setLoading(false);
-      return;
-    }
-
-    // Split name for Django API
-    const nameParts = formData.name.trim().split(" ");
+    // Split name (UNCHANGED LOGIC)
+    const nameParts = values.name.trim().split(" ");
     const firstName = nameParts[0] || "";
     const lastName = nameParts.slice(1).join(" ") || "";
 
     const result = await register({
-      username: formData.email.split("@")[0],
-      email: formData.email,
-      phone: formData.phone,
-      password: formData.password,
-      password2: formData.confirmPassword,
+      username: values.email.split("@")[0],
+      email: values.email,
+      phone: values.phone,
+      password: values.password,
+      password2: values.confirmPassword,
       first_name: firstName,
       last_name: lastName,
     });
 
     if (result.success) {
       setSuccess(result.message);
-      setTimeout(() => {
-        navigate("/login");
-      }, 2000);
+      setTimeout(() => navigate("/login"), 2000);
     } else {
       setError(result.message);
     }
@@ -73,120 +68,116 @@ export default function Register() {
   };
 
   return (
-    <Container className="py-5">
-      <Row className="justify-content-center">
-        <Col md={7} lg={6}>
-          <Card className="shadow-sm">
-            <Card.Body className="p-5">
-              <div className="text-center mb-4">
-                <UserPlus size={48} className="text-primary mb-3" />
-                <h2>Create Account</h2>
-                <p className="text-muted">Join Polo Fashions today</p>
-              </div>
+    <Row justify="center" style={{ padding: 80 }}>
+      <Col span={10}>
+        <Card>
+          <div style={{ textAlign: "center", marginBottom: 24 }}>
+            <UserAddOutlined style={{ fontSize: 42, color: "#1677ff" }} />
+            <Title level={3} style={{ marginTop: 12 }}>
+              Create Account
+            </Title>
+            <Text type="secondary">Join Polo Fashions today</Text>
+          </div>
 
-              {error && <Alert variant="danger">{error}</Alert>}
-              {success && <Alert variant="success">{success}</Alert>}
+          {error && <Alert type="error" showIcon message={error} />}
+          {success && <Alert type="success" showIcon message={success} />}
 
-              <Form onSubmit={handleSubmit}>
-                <Form.Group className="mb-3">
-                  <Form.Label>Full Name</Form.Label>
-                  <Form.Control
-                    type="text"
-                    placeholder="Enter your full name"
-                    value={formData.name}
-                    onChange={(e) =>
-                      setFormData({ ...formData, name: e.target.value })
+          <Form
+            form={form}
+            layout="vertical"
+            onFinish={handleSubmit}
+          >
+            <Form.Item
+              label="Full Name"
+              name="name"
+              rules={[{ required: true, message: "Enter your full name" }]}
+            >
+              <Input prefix={<UserAddOutlined />} />
+            </Form.Item>
+
+            <Form.Item
+              label="Email Address"
+              name="email"
+              rules={[
+                { required: true, message: "Enter your email" },
+                { type: "email", message: "Enter a valid email" },
+              ]}
+            >
+              <Input prefix={<MailOutlined />} />
+            </Form.Item>
+
+            <Form.Item
+              label="Phone Number"
+              name="phone"
+              rules={[
+                { required: true, message: "Enter phone number" },
+                {
+                  pattern: /^[0-9]{10}$/,
+                  message: "Phone number must be 10 digits",
+                },
+              ]}
+            >
+              <Input prefix={<PhoneOutlined />} maxLength={10} />
+            </Form.Item>
+
+            <Form.Item
+              label="Password"
+              name="password"
+              rules={[
+                { required: true, message: "Enter password" },
+                { min: 6, message: "Minimum 6 characters required" },
+              ]}
+              hasFeedback
+            >
+              <Input.Password prefix={<LockOutlined />} />
+            </Form.Item>
+
+            <Form.Item
+              label="Confirm Password"
+              name="confirmPassword"
+              dependencies={["password"]}
+              hasFeedback
+              rules={[
+                { required: true, message: "Confirm your password" },
+                ({ getFieldValue }) => ({
+                  validator(_, value) {
+                    if (!value || getFieldValue("password") === value) {
+                      return Promise.resolve();
                     }
-                    required
-                  />
-                </Form.Group>
+                    return Promise.reject(
+                      new Error("Passwords do not match")
+                    );
+                  },
+                }),
+              ]}
+            >
+              <Input.Password prefix={<LockOutlined />} />
+            </Form.Item>
 
-                <Form.Group className="mb-3">
-                  <Form.Label>Email Address</Form.Label>
-                  <Form.Control
-                    type="email"
-                    placeholder="Enter your email"
-                    value={formData.email}
-                    onChange={(e) =>
-                      setFormData({ ...formData, email: e.target.value })
-                    }
-                    required
-                  />
-                </Form.Group>
+            <Button
+              type="primary"
+              htmlType="submit"
+              block
+              size="large"
+              loading={loading}
+            >
+              Register
+            </Button>
+          </Form>
 
-                <Form.Group className="mb-3">
-                  <Form.Label>Phone Number</Form.Label>
-                  <Form.Control
-                    type="tel"
-                    placeholder="Enter 10-digit phone number"
-                    value={formData.phone}
-                    onChange={(e) =>
-                      setFormData({ ...formData, phone: e.target.value })
-                    }
-                    maxLength="10"
-                    pattern="[0-9]{10}"
-                    required
-                  />
-                </Form.Group>
-
-                <Form.Group className="mb-3">
-                  <Form.Label>Password</Form.Label>
-                  <Form.Control
-                    type="password"
-                    placeholder="Create a password (min. 6 characters)"
-                    value={formData.password}
-                    onChange={(e) =>
-                      setFormData({
-                        ...formData,
-                        password: e.target.value,
-                      })
-                    }
-                    required
-                  />
-                </Form.Group>
-
-                <Form.Group className="mb-4">
-                  <Form.Label>Confirm Password</Form.Label>
-                  <Form.Control
-                    type="password"
-                    placeholder="Confirm your password"
-                    value={formData.confirmPassword}
-                    onChange={(e) =>
-                      setFormData({
-                        ...formData,
-                        confirmPassword: e.target.value,
-                      })
-                    }
-                    required
-                  />
-                </Form.Group>
-
-                <Button
-                  variant="primary"
-                  type="submit"
-                  className="w-100 mb-3"
-                  disabled={loading}
-                >
-                  {loading ? "Creating Account..." : "Register"}
-                </Button>
-              </Form>
-
-              <div className="text-center">
-                <p className="mb-0 text-muted">
-                  Already have an account?{" "}
-                  <Button
-                    variant="link"
-                    className="p-0"
-                    onClick={() => navigate("/login")}
-                  >
-                    Login here
-                  </Button>
-                </p>
-              </div>
-            </Card.Body>
-          </Card>
-        </Col>
-      </Row>
-    </Container>
+          <div style={{ textAlign: "center", marginTop: 16 }}>
+            <Text type="secondary">
+              Already have an account?{" "}
+              <Button
+                type="link"
+                onClick={() => navigate("/login")}
+              >
+                Login here
+              </Button>
+            </Text>
+          </div>
+        </Card>
+      </Col>
+    </Row>
   );
 }

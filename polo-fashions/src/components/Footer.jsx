@@ -1,59 +1,92 @@
-import React from 'react';
-import { Container, Row, Col } from 'react-bootstrap';
-import { MapPin, Phone, Mail, Clock } from 'lucide-react';
+import React from "react";
+import { Row, Col, Typography, Divider } from "antd";
+import {
+  EnvironmentOutlined,
+  PhoneOutlined,
+  MailOutlined,
+  ClockCircleOutlined,
+} from "@ant-design/icons";
+
+const { Title, Text } = Typography;
 
 export default function Footer() {
   return (
-    <footer className="bg-dark text-white py-5 mt-5">
-      <Container>
-        <Row>
-          <Col md={4} className="mb-4">
-            <h5 className="mb-3">Polo Fashions</h5>
-            <p className="text-light opacity-75">
-              Your trusted partner for custom tailoring and premium ready-made traditional wear.
-            </p>
-          </Col>
-          
-          <Col md={4} className="mb-4">
-            <h5 className="mb-3">Contact Info</h5>
-            <div className="d-flex align-items-start mb-2">
-              <MapPin size={18} className="me-2 mt-1 flex-shrink-0" />
-              <span className="text-light opacity-75">
-                123 Fashion Street, Bangalore, Karnataka 560001
-              </span>
+    <footer
+      style={{
+        background: "#001529",
+        color: "#fff",
+        padding: "48px 40px",
+        marginTop: 64,
+      }}
+    >
+      <Row gutter={[32, 32]}>
+        {/* BRAND */}
+        <Col xs={24} md={8}>
+          <Title level={4} style={{ color: "#fff" }}>
+            Polo Fashions
+          </Title>
+          <Text style={{ color: "rgba(255,255,255,0.75)" }}>
+            Your trusted partner for custom tailoring and premium ready-made
+            traditional wear.
+          </Text>
+        </Col>
+
+        {/* CONTACT */}
+        <Col xs={24} md={8}>
+          <Title level={5} style={{ color: "#fff" }}>
+            Contact Info
+          </Title>
+
+          <div style={{ marginBottom: 8 }}>
+            <EnvironmentOutlined style={{ marginRight: 8 }} />
+            <Text style={{ color: "rgba(255,255,255,0.75)" }}>
+              123 Fashion Street, Bangalore, Karnataka 560001
+            </Text>
+          </div>
+
+          <div style={{ marginBottom: 8 }}>
+            <PhoneOutlined style={{ marginRight: 8 }} />
+            <Text style={{ color: "rgba(255,255,255,0.75)" }}>
+              +91 98765 43210
+            </Text>
+          </div>
+
+          <div>
+            <MailOutlined style={{ marginRight: 8 }} />
+            <Text style={{ color: "rgba(255,255,255,0.75)" }}>
+              info@polofashions.com
+            </Text>
+          </div>
+        </Col>
+
+        {/* BUSINESS HOURS */}
+        <Col xs={24} md={8}>
+          <Title level={5} style={{ color: "#fff" }}>
+            Business Hours
+          </Title>
+
+          <div style={{ display: "flex", gap: 8 }}>
+            <ClockCircleOutlined />
+            <div>
+              <Text style={{ color: "rgba(255,255,255,0.75)" }}>
+                Monday - Saturday: 10:00 AM - 8:00 PM
+              </Text>
+              <br />
+              <Text style={{ color: "rgba(255,255,255,0.75)" }}>
+                Sunday: 11:00 AM - 6:00 PM
+              </Text>
             </div>
-            <div className="d-flex align-items-center mb-2">
-              <Phone size={18} className="me-2" />
-              <span className="text-light opacity-75">+91 98765 43210</span>
-            </div>
-            <div className="d-flex align-items-center mb-2">
-              <Mail size={18} className="me-2" />
-              <span className="text-light opacity-75">info@polofashions.com</span>
-            </div>
-          </Col>
-          
-          <Col md={4} className="mb-4">
-            <h5 className="mb-3">Business Hours</h5>
-            <div className="d-flex align-items-start mb-2">
-              <Clock size={18} className="me-2 mt-1 flex-shrink-0" />
-              <div className="text-light opacity-75">
-                <div>Monday - Saturday: 10:00 AM - 8:00 PM</div>
-                <div>Sunday: 11:00 AM - 6:00 PM</div>
-              </div>
-            </div>
-          </Col>
-        </Row>
-        
-        <hr className="my-4 bg-light opacity-25" />
-        
-        <Row>
-          <Col className="text-center">
-            <p className="mb-0 text-light opacity-75">
-              © {new Date().getFullYear()} Polo Fashions. All rights reserved.
-            </p>
-          </Col>
-        </Row>
-      </Container>
+          </div>
+        </Col>
+      </Row>
+
+      <Divider style={{ borderColor: "rgba(255,255,255,0.2)", margin: "32px 0" }} />
+
+      <Row justify="center">
+        <Text style={{ color: "rgba(255,255,255,0.65)" }}>
+          © {new Date().getFullYear()} Polo Fashions. All rights reserved.
+        </Text>
+      </Row>
     </footer>
   );
 }

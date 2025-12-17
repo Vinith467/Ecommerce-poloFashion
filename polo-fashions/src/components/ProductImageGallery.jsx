@@ -1,9 +1,8 @@
-import React, { useState , useMemo } from "react";
-import { Modal } from "react-bootstrap";
-import "./ProductImageGallery.css"; // Create this CSS file also
+import React, { useState, useMemo } from "react";
+import { Modal } from "antd";
+import "./ProductImageGallery.css";
 
 export default function ProductImageGallery({ product }) {
-
   // ✅ Memoize images so reference does NOT change every render
   const images = useMemo(() => {
     if (product.images?.length > 0) {
@@ -21,8 +20,6 @@ export default function ProductImageGallery({ product }) {
   // ✅ Initialize once
   const [selectedImage, setSelectedImage] = useState(() => images[0]);
   const [fullScreen, setFullScreen] = useState(false);
-
-
 
   return (
     <>
@@ -53,19 +50,36 @@ export default function ProductImageGallery({ product }) {
 
       {/* FULLSCREEN VIEWER */}
       <Modal
-        show={fullScreen}
-        onHide={() => setFullScreen(false)}
-        size="xl"
+        open={fullScreen}
+        onCancel={() => setFullScreen(false)}
+        footer={null}
+        width="100vw"
         centered
+        closable={false}
+        transitionName="" // remove animation delay
+        maskTransitionName=""
+        styles={{
+          body: {
+            padding: 0,
+            background: "#000",
+            height: "100vh",
+          },
+        }}
       >
-        <div className="fullscreen-wrapper">
+        <div className="ecom-fullscreen">
           <button
-            className="close-fullscreen"
+            className="ecom-close"
             onClick={() => setFullScreen(false)}
+            aria-label="Close"
           >
-            ✖
+            ✕
           </button>
-          <img src={selectedImage} className="fullscreen-image" alt="" />
+
+          <img
+            src={selectedImage}
+            alt="Product"
+            className="ecom-fullscreen-image"
+          />
         </div>
       </Modal>
     </>

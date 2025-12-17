@@ -1,8 +1,22 @@
 import React, { useState } from "react";
-import { Modal, Button, Form, Alert, Row, Col } from "react-bootstrap";
-import { ShoppingBag, X } from "lucide-react";
+import {
+  Modal,
+  Button,
+  Alert,
+  Row,
+  Col,
+  Typography,
+  Radio,
+  Select,
+  Divider,
+  Space,
+  List,
+} from "antd";
+import { ShoppingOutlined } from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
 import ProductImageGallery from "../ProductImageGallery";
+
+const { Title, Text, Paragraph } = Typography;
 
 const STITCHING_CHARGES = {
   shirt: 350,
@@ -10,8 +24,15 @@ const STITCHING_CHARGES = {
   both: 550,
 };
 
-export default function TraditionalModal({ show, onHide, selectedProduct, currentUser, addOrder }) {
+export default function TraditionalModal({
+  show,
+  onHide,
+  selectedProduct,
+  currentUser,
+  addOrder,
+}) {
   const navigate = useNavigate();
+
   const [wantStitching, setWantStitching] = useState(false);
   const [stitchType, setStitchType] = useState("");
   const [selectedSize, setSelectedSize] = useState("");
@@ -77,161 +98,176 @@ export default function TraditionalModal({ show, onHide, selectedProduct, curren
   };
 
   return (
-    <Modal show={show} onHide={onHide} size="lg">
-      <Modal.Header closeButton>
-        <Modal.Title>{selectedProduct?.name}</Modal.Title>
-      </Modal.Header>
+    <Modal
+      open={show}
+      onCancel={onHide}
+      footer={null}
+      width={900}
+      title={selectedProduct?.name}
+    >
+      {orderSuccess && (
+        <Alert
+          type="success"
+          message={orderSuccess}
+          showIcon
+          style={{ marginBottom: 16 }}
+        />
+      )}
 
-      <Modal.Body>
-        {orderSuccess && <Alert variant="success">{orderSuccess}</Alert>}
-        {orderError && <Alert variant="danger">{orderError}</Alert>}
+      {orderError && (
+        <Alert
+          type="error"
+          message={orderError}
+          showIcon
+          style={{ marginBottom: 16 }}
+        />
+      )}
 
-        {selectedProduct && (
-          <Row>
-            <Col md={5}>
-              <ProductImageGallery product={selectedProduct} />
-              <div className="mt-3">
-                <div>
-                  <strong>Price:</strong>
-                  <span className="text-primary ms-2">
-                    ₹{selectedProduct.price}
-                  </span>
-                </div>
-                <div className="text-muted mt-2">
-                  {selectedProduct.description}
-                </div>
-              </div>
-            </Col>
+      {selectedProduct && (
+        <Row gutter={24}>
+          {/* LEFT */}
+          <Col span={10}>
+            <ProductImageGallery product={selectedProduct} />
 
-            <Col md={7}>
-              <hr />
-              <h6 className="mb-2">What's inside the box</h6>
+            <Divider />
 
-              {Array.isArray(selectedProduct.box_items) &&
-              selectedProduct.box_items.length > 0 ? (
-                <ul className="text-muted mb-3">
-                  {selectedProduct.box_items.map((item, index) => (
-                    <li key={index}>{item}</li>
-                  ))}
-                </ul>
-              ) : (
-                <p className="text-muted mb-3">
-                  Box contents will be revealed after order.
-                </p>
-              )}
+            <Text strong>
+              Price:{" "}
+              <Text type="primary">₹{selectedProduct.price}</Text>
+            </Text>
 
-              <Form.Group className="mb-3">
-                <Form.Label>Do you want stitching?</Form.Label>
-                <div>
-                  <Button
-                    variant={
-                      wantStitching ? "primary" : "outline-primary"
-                    }
-                    size="sm"
-                    className="me-2"
-                    onClick={() => setWantStitching(true)}
+            <Paragraph type="secondary" style={{ marginTop: 8 }}>
+              {selectedProduct.description}
+            </Paragraph>
+          </Col>
+
+          {/* RIGHT */}
+          <Col span={14}>
+            <Title level={5}>What’s inside the box</Title>
+
+            {Array.isArray(selectedProduct.box_items) &&
+            selectedProduct.box_items.length > 0 ? (
+              <List
+                size="small"
+                bordered
+                dataSource={selectedProduct.box_items}
+                renderItem={(item) => <List.Item>{item}</List.Item>}
+                style={{ marginBottom: 16 }}
+              />
+            ) : (
+              <Text type="secondary">
+                Box contents will be revealed after order.
+              </Text>
+            )}
+
+            <Divider />
+
+            <Text strong>Do you want stitching?</Text>
+            <Radio.Group
+              value={wantStitching}
+              onChange={(e) => {
+                setWantStitching(e.target.value);
+                if (!e.target.value) {
+                  setStitchType("");
+                  setSelectedSize("");
+                }
+              }}
+              style={{ marginBottom: 16 }}
+            >
+              <Radio value={true}>Yes</Radio>
+              <Radio value={false}>No</Radio>
+            </Radio.Group>
+
+            {wantStitching && (
+              <>
+                <div style={{ marginBottom: 16 }}>
+                  <Text>What do you want stitched?</Text>
+                  <Select
+                    style={{ width: "100%" }}
+                    value={stitchType}
+                    onChange={setStitchType}
+                    placeholder="Select"
                   >
-                    Yes
-                  </Button>
-                  <Button
-                    variant={
-                      !wantStitching ? "primary" : "outline-primary"
-                    }
-                    size="sm"
-                    onClick={() => {
-                      setWantStitching(false);
-                      setStitchType("");
-                      setSelectedSize("");
-                    }}
-                  >
-                    No
-                  </Button>
+                    <Select.Option value="shirt">Shirt</Select.Option>
+                    <Select.Option value="dhoti">Dhoti</Select.Option>
+                    <Select.Option value="both">Both</Select.Option>
+                  </Select>
                 </div>
-              </Form.Group>
+
+                <div style={{ marginBottom: 16 }}>
+                  <Text>Select Size</Text>
+                  <Select
+                    style={{ width: "100%" }}
+                    value={selectedSize}
+                    onChange={setSelectedSize}
+                    placeholder="Select size"
+                  >
+                    <Select.Option value="S">S</Select.Option>
+                    <Select.Option value="M">M</Select.Option>
+                    <Select.Option value="L">L</Select.Option>
+                    <Select.Option value="XL">XL</Select.Option>
+                    <Select.Option value="XXL">XXL</Select.Option>
+                  </Select>
+                </div>
+              </>
+            )}
+
+            <Divider />
+
+            <Space
+              direction="vertical"
+              style={{ width: "100%" }}
+            >
+              <Space
+                style={{ width: "100%", justifyContent: "space-between" }}
+              >
+                <Text>Traditional Set</Text>
+                <Text>₹{selectedProduct.price}</Text>
+              </Space>
 
               {wantStitching && (
-                <>
-                  <Form.Group className="mb-3">
-                    <Form.Label>
-                      What do you want stitched?
-                    </Form.Label>
-                    <Form.Select
-                      value={stitchType}
-                      onChange={(e) => setStitchType(e.target.value)}
-                    >
-                      <option value="">Select</option>
-                      <option value="shirt">Shirt</option>
-                      <option value="dhoti">Dhoti</option>
-                      <option value="both">Both</option>
-                    </Form.Select>
-                  </Form.Group>
-
-                  <Form.Group className="mb-3">
-                    <Form.Label>Select Size</Form.Label>
-                    <Form.Select
-                      value={selectedSize}
-                      onChange={(e) =>
-                        setSelectedSize(e.target.value)
-                      }
-                    >
-                      <option value="">Select size</option>
-                      <option>S</option>
-                      <option>M</option>
-                      <option>L</option>
-                      <option>XL</option>
-                      <option>XXL</option>
-                    </Form.Select>
-                  </Form.Group>
-                </>
+                <Space
+                  style={{
+                    width: "100%",
+                    justifyContent: "space-between",
+                  }}
+                >
+                  <Text>Stitching</Text>
+                  <Text>₹{calcStitchCharge()}</Text>
+                </Space>
               )}
 
-              <div className="p-3 bg-light rounded mb-3">
-                <h6>Order Summary</h6>
-                <div className="d-flex justify-content-between">
-                  <span>Traditional Set</span>
-                  <span>₹{selectedProduct.price}</span>
-                </div>
+              <Divider style={{ margin: "8px 0" }} />
 
-                {wantStitching && (
-                  <div className="d-flex justify-content-between">
-                    <span>Stitching</span>
-                    <span>₹{calcStitchCharge()}</span>
-                  </div>
-                )}
+              <Space
+                style={{ width: "100%", justifyContent: "space-between" }}
+              >
+                <Text strong>Total</Text>
+                <Text strong type="primary">
+                  ₹
+                  {Number(selectedProduct.price) +
+                    (wantStitching ? calcStitchCharge() : 0)}
+                </Text>
+              </Space>
+            </Space>
+          </Col>
+        </Row>
+      )}
 
-                <hr />
-                <div className="d-flex justify-content-between">
-                  <strong>Total</strong>
-                  <strong className="text-primary">
-                    ₹
-                    {Number(selectedProduct.price) +
-                      (wantStitching ? calcStitchCharge() : 0)}
-                  </strong>
-                </div>
-              </div>
-            </Col>
-          </Row>
-        )}
-      </Modal.Body>
+      <Divider />
 
-      <Modal.Footer>
-        <Button variant="secondary" onClick={onHide}>
-          <X size={18} className="me-1" />
-          Close
-        </Button>
+      <Space style={{ width: "100%", justifyContent: "flex-end" }}>
+        <Button onClick={onHide}>Close</Button>
         <Button
-          variant="primary"
+          type="primary"
+          icon={<ShoppingOutlined />}
+          loading={placing}
+          disabled={!selectedProduct || (wantStitching && !selectedSize)}
           onClick={handlePlaceOrder}
-          disabled={
-            placing ||
-            !selectedProduct ||
-            (wantStitching && !selectedSize)
-          }
         >
-          <ShoppingBag size={18} className="me-1" />
           Place Order
         </Button>
-      </Modal.Footer>
+      </Space>
     </Modal>
   );
 }

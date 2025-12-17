@@ -1,62 +1,95 @@
 import React from "react";
-import { Card, Badge } from "react-bootstrap";
-import Carousel from "react-bootstrap/Carousel";
+import { Card, Badge, Carousel, Typography, Space } from "antd";
+
+const { Title, Text, Paragraph } = Typography;
 
 export default function ProductCard({ product, onClick }) {
   return (
-    <Card className="product-card h-100" onClick={() => onClick(product)}>
-      <Carousel indicators={false} interval={2000}>
-        {product.images && product.images.length > 0 ? (
-          product.images.map((img) => (
-            <Carousel.Item key={img.id}>
+    <Card
+      hoverable
+      onClick={() => onClick(product)}
+      style={{
+        height: "100%",
+        borderRadius: 12,
+        overflow: "hidden",
+      }}
+      cover={
+        <Carousel autoplay dots={false}>
+          {product.images && product.images.length > 0 ? (
+            product.images.map((img) => (
+              <div key={img.id}>
+                <img
+                  src={img.image}
+                  alt="product"
+                  style={{
+                    height: 220,
+                    width: "100%",
+                    objectFit: "cover",
+                  }}
+                />
+              </div>
+            ))
+          ) : (
+            <div>
               <img
-                className="d-block w-100"
-                src={img.image}
+                src={product.image}
                 alt="product"
                 style={{
-                  height: "220px",
+                  height: 220,
+                  width: "100%",
                   objectFit: "cover",
-                  borderRadius: "10px",
                 }}
               />
-            </Carousel.Item>
-          ))
-        ) : (
-          <Carousel.Item>
-            <img
-              src={product.image}
-              className="d-block w-100"
-              style={{ height: "220px", objectFit: "cover" }}
-            />
-          </Carousel.Item>
-        )}
-      </Carousel>
-      <Card.Body>
-        <div className="d-flex justify-content-between align-items-start mb-2">
-          <Card.Title className="mb-0">{product.name}</Card.Title>
-          {product.type === "readymade" && (
-            <Badge bg="success">Ready-made</Badge>
+            </div>
           )}
-          {product.type === "custom" && <Badge bg="primary">Custom</Badge>}
-        </div>
+        </Carousel>
+      }
+    >
+      {/* HEADER */}
+      <Space
+        align="start"
+        style={{ width: "100%", justifyContent: "space-between" }}
+      >
+        <Title level={5} style={{ margin: 0 }}>
+          {product.name}
+        </Title>
 
-        <Card.Text className="text-muted">{product.description}</Card.Text>
-
-        {product.brand && (
-          <div className="mb-2">
-            <small className="text-muted">Brand: </small>
-            <strong>{product.brand}</strong>
-          </div>
+        {product.type === "readymade" && (
+          <Badge color="green" text="Ready-made" />
         )}
-
-        {product.price && (
-          <h5 className="text-primary mb-0">₹{product.price}</h5>
-        )}
-
         {product.type === "custom" && (
-          <small className="text-muted">Price varies by fabric selection</small>
+          <Badge color="blue" text="Custom" />
         )}
-      </Card.Body>
+      </Space>
+
+      {/* DESCRIPTION */}
+      <Paragraph
+        type="secondary"
+        ellipsis={{ rows: 2 }}
+        style={{ marginTop: 8 }}
+      >
+        {product.description}
+      </Paragraph>
+
+      {/* BRAND */}
+      {product.brand && (
+        <Text type="secondary">
+          Brand: <Text strong>{product.brand}</Text>
+        </Text>
+      )}
+
+      {/* PRICE */}
+      {product.price && (
+        <Title level={5} style={{ marginTop: 12, color: "#1677ff" }}>
+          ₹{product.price}
+        </Title>
+      )}
+
+      {product.type === "custom" && (
+        <Text type="secondary" style={{ fontSize: 12 }}>
+          Price varies by fabric selection
+        </Text>
+      )}
     </Card>
   );
 }

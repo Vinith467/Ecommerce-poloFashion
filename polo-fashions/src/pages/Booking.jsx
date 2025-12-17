@@ -1,188 +1,219 @@
-import React, { useState } from 'react';
-import { Container, Row, Col, Card, Form, Button, Alert } from 'react-bootstrap';
-import { Calendar, Clock, User, Phone } from 'lucide-react';
-import { useAuth } from '../context/AuthContext';
-import { useNavigate } from 'react-router-dom';
+import React, { useState } from "react";
+import {
+  Row,
+  Col,
+  Card,
+  Form,
+  Input,
+  Button,
+  Alert,
+  Select,
+  DatePicker,
+  Typography,
+} from "antd";
+import {
+  CalendarOutlined,
+  ClockCircleOutlined,
+  UserOutlined,
+  PhoneOutlined,
+} from "@ant-design/icons";
+import { useAuth } from "../context/AuthContext";
+import { useNavigate } from "react-router-dom";
+import dayjs from "dayjs";
 
+const { Title, Text } = Typography;
 
 export default function Booking() {
   const navigate = useNavigate();
-
   const { currentUser, addBooking } = useAuth();
-  const [formData, setFormData] = useState({
-    name: currentUser?.username || '',
-    phone: currentUser?.phone || '',
-    email: currentUser?.email || '',
-    date: '',
-    time: ''
-  });
 
-  const [success, setSuccess] = useState('');
-  const [error, setError] = useState('');
+  const [success, setSuccess] = useState("");
+  const [error, setError] = useState("");
+
+  const [form] = Form.useForm();
 
   const timeSlots = [
-    '10:00 AM', '11:00 AM', '12:00 PM',
-    '2:00 PM', '3:00 PM', '4:00 PM',
-    '5:00 PM', '6:00 PM', '7:00 PM'
+    "10:00 AM", "11:00 AM", "12:00 PM",
+    "2:00 PM", "3:00 PM", "4:00 PM",
+    "5:00 PM", "6:00 PM", "7:00 PM",
   ];
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setSuccess('');
-    setError('');
+  const handleSubmit = async (values) => {
+    setSuccess("");
+    setError("");
 
     if (!currentUser) {
-      setError('Please login to book an appointment');
+      setError("Please login to book an appointment");
       return;
     }
 
-    if (currentUser.measurementStatus === 'completed') {
-      setError('You already have measurements on file. You can start shopping!');
+    // ✅ FIXED FIELD NAME
+    if (currentUser.measurementStatus === "completed") {
+      setError("You already have measurements on file. You can start shopping!");
       return;
     }
 
-    const result = await addBooking(formData);
+    const payload = {
+      name: values.name,
+      phone: values.phone,
+      email: currentUser.email,
+      date: values.date.format("YYYY-MM-DD"),
+      time: values.time,
+    };
+
+    const result = await addBooking(payload);
+
     if (result.success) {
       setSuccess(result.message);
-      setFormData({ ...formData, date: '', time: '' });
-      
+      form.resetFields(["date", "time"]);
+
       setTimeout(() => {
-         navigate('/dashboard');
+        navigate("/dashboard");
       }, 2000);
     }
   };
 
+  /* ===================== LOGIN REQUIRED ===================== */
+
   if (!currentUser) {
     return (
-      <Container className="py-5">
-        <Row className="justify-content-center">
-          <Col md={6}>
-            <Alert variant="warning" className="text-center">
-              <h4>Login Required</h4>
-              <p>Please login to book an appointment for measurements</p>
-              <Button variant="primary" onClick={() => navigate('/login')}>
+      <Row justify="center" style={{ padding: 80 }}>
+        <Col span={10}>
+          <Alert
+            type="warning"
+            showIcon
+            message="Login Required"
+            description="Please login to book a measurement appointment."
+            action={
+              <Button type="primary" onClick={() => navigate("/login")}>
                 Go to Login
               </Button>
-            </Alert>
-          </Col>
-        </Row>
-      </Container>
+            }
+          />
+        </Col>
+      </Row>
     );
   }
 
+  /* ===================== UI ===================== */
+
   return (
-    <Container className="py-5">
-      <Row className="justify-content-center">
-        <Col md={8} lg={7}>
-          <Card className="shadow-sm">
-            <Card.Body className="p-5">
-              <div className="text-center mb-4">
-                <Calendar size={48} className="text-primary mb-3" />
-                <h2>Book Measurement Appointment</h2>
-                <p className="text-muted">
-                  Schedule your visit to our shop for professional measurements
-                </p>
-              </div>
+    <Row justify="center" style={{ padding: 40 }}>
+      <Col span={10}>
+        <Card>
+          <div style={{ textAlign: "center", marginBottom: 24 }}>
+            <CalendarOutlined style={{ fontSize: 40, color: "#1677ff" }} />
+            <Title level={3} style={{ marginTop: 12 }}>
+              Book Measurement Appointment
+            </Title>
+            <Text type="secondary">
+              Schedule your visit for professional measurements
+            </Text>
+          </div>
 
-              {success && <Alert variant="success">{success}</Alert>}
-              {error && <Alert variant="danger">{error}</Alert>}
+          {success && <Alert type="success" showIcon message={success} />}
+          {error && <Alert type="error" showIcon message={error} />}
 
-              {currentUser.measurementStatus === 'completed' ? (
-                <Alert variant="info" className="text-center">
-                  <h5>You're all set!</h5>
-                  <p>Your measurements are already on file. You can start shopping for custom tailored clothes!</p>
-                  <Button variant="primary" onClick={() => navigate('/products')}>
-                    Browse Products
-                  </Button>
-                </Alert>
-              ) : (
-                <Form onSubmit={handleSubmit}>
-                  <Row>
-                    <Col md={6}>
-                      <Form.Group className="mb-3">
-                        <Form.Label>
-                          <User size={18} className="me-2" />
-                          Full Name
-                        </Form.Label>
-                        <Form.Control
-                          type="text"
-                          value={formData.name}
-                          onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                          required
-                          readOnly={!!currentUser}
-                        />
-                      </Form.Group>
-                    </Col>
-
-                    <Col md={6}>
-                      <Form.Group className="mb-3">
-                        <Form.Label>
-                          <Phone size={18} className="me-2" />
-                          Phone Number
-                        </Form.Label>
-                        <Form.Control
-                          type="tel"
-                          value={formData.phone}
-                          onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                          required
-                          readOnly={!!currentUser}
-                        />
-                      </Form.Group>
-                    </Col>
-                  </Row>
-
-                  <Form.Group className="mb-3">
-                    <Form.Label>
-                      <Calendar size={18} className="me-2" />
-                      Preferred Date
-                    </Form.Label>
-                    <Form.Control
-                      type="date"
-                      value={formData.date}
-                      onChange={(e) => setFormData({ ...formData, date: e.target.value })}
-                      min={new Date().toISOString().split('T')[0]}
-                      required
+          {currentUser.measurementStatus === "completed" ? (
+            <Alert
+              type="info"
+              showIcon
+              message="You're all set!"
+              description="Your measurements are already on file."
+              action={
+                <Button type="primary" onClick={() => navigate("/products")}>
+                  Browse Products
+                </Button>
+              }
+            />
+          ) : (
+            <Form
+              form={form}
+              layout="vertical"
+              onFinish={handleSubmit}
+              initialValues={{
+                name: currentUser.username,
+                phone: currentUser.phone,
+              }}
+            >
+              <Row gutter={16}>
+                <Col span={12}>
+                  <Form.Item
+                    label="Full Name"
+                    name="name"
+                    rules={[{ required: true }]}
+                  >
+                    <Input
+                      prefix={<UserOutlined />}
+                      readOnly
                     />
-                  </Form.Group>
+                  </Form.Item>
+                </Col>
 
-                  <Form.Group className="mb-4">
-                    <Form.Label>
-                      <Clock size={18} className="me-2" />
-                      Preferred Time Slot
-                    </Form.Label>
-                    <Form.Select
-                      value={formData.time}
-                      onChange={(e) => setFormData({ ...formData, time: e.target.value })}
-                      required
-                    >
-                      <option value="">Select a time slot</option>
-                      {timeSlots.map((slot) => (
-                        <option key={slot} value={slot}>
-                          {slot}
-                        </option>
-                      ))}
-                    </Form.Select>
-                  </Form.Group>
+                <Col span={12}>
+                  <Form.Item
+                    label="Phone Number"
+                    name="phone"
+                    rules={[{ required: true }]}
+                  >
+                    <Input
+                      prefix={<PhoneOutlined />}
+                      readOnly
+                    />
+                  </Form.Item>
+                </Col>
+              </Row>
 
-                  <Button variant="primary" type="submit" className="w-100" size="lg">
-                    Book Appointment
-                  </Button>
-                </Form>
-              )}
+              <Form.Item
+                label="Preferred Date"
+                name="date"
+                rules={[{ required: true }]}
+              >
+                <DatePicker
+                  style={{ width: "100%" }}
+                  disabledDate={(d) => d.isBefore(dayjs(), "day")}
+                />
+              </Form.Item>
 
-              <div className="mt-4 p-3 bg-light rounded">
-                <h6 className="mb-2">What to Expect:</h6>
-                <ul className="mb-0 text-muted small">
-                  <li>Appointment duration: 15-20 minutes</li>
-                  <li>Professional measurements for perfect fit</li>
-                  <li>One-time visit required</li>
-                  <li>Shop online anytime after measurement</li>
-                </ul>
-              </div>
-            </Card.Body>
+              <Form.Item
+                label="Preferred Time Slot"
+                name="time"
+                rules={[{ required: true }]}
+              >
+                <Select
+                  placeholder="Select a time slot"
+                  suffixIcon={<ClockCircleOutlined />}
+                >
+                  {timeSlots.map((slot) => (
+                    <Select.Option key={slot} value={slot}>
+                      {slot}
+                    </Select.Option>
+                  ))}
+                </Select>
+              </Form.Item>
+
+              <Button
+                type="primary"
+                htmlType="submit"
+                block
+                size="large"
+              >
+                Book Appointment
+              </Button>
+            </Form>
+          )}
+
+          <Card style={{ marginTop: 24, background: "#fafafa" }}>
+            <Title level={5}>What to Expect</Title>
+            <ul style={{ color: "#777", paddingLeft: 16 }}>
+              <li>Appointment duration: 15–20 minutes</li>
+              <li>Professional measurements for perfect fit</li>
+              <li>One-time visit required</li>
+              <li>Shop online anytime after measurement</li>
+            </ul>
           </Card>
-        </Col>
-      </Row>
-    </Container>
+        </Card>
+      </Col>
+    </Row>
   );
 }

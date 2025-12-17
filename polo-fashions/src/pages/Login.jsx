@@ -1,23 +1,37 @@
 import React, { useState } from "react";
-import { Container, Row, Col, Card, Form, Button, Alert } from "react-bootstrap";
-import { LogIn } from "lucide-react";
+import {
+  Row,
+  Col,
+  Card,
+  Form,
+  Input,
+  Button,
+  Alert,
+  Typography,
+  Divider,
+} from "antd";
+import {
+  LoginOutlined,
+  MailOutlined,
+  LockOutlined,
+} from "@ant-design/icons";
 import { useAuth } from "../context/AuthContext";
 import { useNavigate } from "react-router-dom";
+
+const { Title, Text } = Typography;
 
 export default function Login() {
   const { login } = useAuth();
   const navigate = useNavigate();
 
-  const [formData, setFormData] = useState({ email: "", password: "" });
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  const handleSubmit = async (values) => {
     setError("");
     setLoading(true);
 
-    const result = await login(formData.email, formData.password);
+    const result = await login(values.email, values.password);
 
     if (result.success) {
       if (result.redirectTo === "admin") {
@@ -33,89 +47,86 @@ export default function Login() {
   };
 
   return (
-    <Container className="py-5">
-      <Row className="justify-content-center">
-        <Col md={6} lg={5}>
-          <Card className="shadow-sm">
-            <Card.Body className="p-5">
-              <div className="text-center mb-4">
-                <LogIn size={48} className="text-primary mb-3" />
-                <h2>Login</h2>
-                <p className="text-muted">Welcome back to Polo Fashions</p>
-              </div>
+    <Row justify="center" style={{ padding: 80 }}>
+      <Col span={10}>
+        <Card>
+          <div style={{ textAlign: "center", marginBottom: 24 }}>
+            <LoginOutlined style={{ fontSize: 42, color: "#1677ff" }} />
+            <Title level={3} style={{ marginTop: 12 }}>
+              Login
+            </Title>
+            <Text type="secondary">
+              Welcome back to Polo Fashions
+            </Text>
+          </div>
 
-              {error && <Alert variant="danger">{error}</Alert>}
+          {error && <Alert type="error" showIcon message={error} />}
 
-              <Form onSubmit={handleSubmit}>
-                <Form.Group className="mb-3">
-                  <Form.Label>Email Address</Form.Label>
-                  <Form.Control
-                    type="email"
-                    placeholder="Enter your email"
-                    value={formData.email}
-                    onChange={(e) =>
-                      setFormData({ ...formData, email: e.target.value })
-                    }
-                    required
-                  />
-                </Form.Group>
+          <Form
+            layout="vertical"
+            onFinish={handleSubmit}
+          >
+            <Form.Item
+              label="Email Address"
+              name="email"
+              rules={[
+                { required: true, message: "Enter your email" },
+                { type: "email", message: "Enter a valid email" },
+              ]}
+            >
+              <Input
+                prefix={<MailOutlined />}
+                placeholder="Enter your email"
+              />
+            </Form.Item>
 
-                <Form.Group className="mb-4">
-                  <Form.Label>Password</Form.Label>
-                  <Form.Control
-                    type="password"
-                    placeholder="Enter your password"
-                    value={formData.password}
-                    onChange={(e) =>
-                      setFormData({
-                        ...formData,
-                        password: e.target.value,
-                      })
-                    }
-                    required
-                  />
-                </Form.Group>
+            <Form.Item
+              label="Password"
+              name="password"
+              rules={[{ required: true, message: "Enter your password" }]}
+            >
+              <Input.Password
+                prefix={<LockOutlined />}
+                placeholder="Enter your password"
+              />
+            </Form.Item>
 
-                <Button
-                  variant="primary"
-                  type="submit"
-                  className="w-100 mb-3"
-                  disabled={loading}
-                >
-                  {loading ? "Logging in..." : "Login"}
-                </Button>
-              </Form>
+            <Button
+              type="primary"
+              htmlType="submit"
+              block
+              size="large"
+              loading={loading}
+            >
+              Login
+            </Button>
+          </Form>
 
-              <div className="text-center">
-                <p className="mb-0 text-muted">
-                  Don&apos;t have an account?{" "}
-                  <Button
-                    variant="link"
-                    className="p-0"
-                    onClick={() => navigate("/register")}
-                  >
-                    Register here
-                  </Button>
-                </p>
-              </div>
+          <div style={{ textAlign: "center", marginTop: 16 }}>
+            <Text type="secondary">
+              Don&apos;t have an account?{" "}
+              <Button type="link" onClick={() => navigate("/register")}>
+                Register here
+              </Button>
+            </Text>
+          </div>
 
-              <hr className="my-4" />
+          <Divider />
 
-              <div className="text-center">
-                <small className="text-muted">Demo Credentials:</small>
-                <div className="mt-2">
-                  <small className="d-block">
-                    <strong>Customer:</strong> customer@test.com / customer123
-                  </small>
-                  <small className="d-block">
-                    <strong>Admin:</strong> admin@polofashions.com / admin123
-                  </small>
-                </div>
-              </div>
-            </Card.Body>
-          </Card>
-        </Col>
-      </Row>
-    </Container>
+          <div style={{ textAlign: "center" }}>
+            <Text type="secondary">Demo Credentials</Text>
+            <div style={{ marginTop: 8 }}>
+              <Text>
+                <strong>Customer:</strong> customer@test.com / customer123
+              </Text>
+              <br />
+              <Text>
+                <strong>Admin:</strong> admin@polofashions.com / admin123
+              </Text>
+            </div>
+          </div>
+        </Card>
+      </Col>
+    </Row>
   );
 }

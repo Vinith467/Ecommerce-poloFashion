@@ -1,12 +1,31 @@
-
 import React, { useState } from "react";
-import { Modal, Button, Form, Alert, Row, Col } from "react-bootstrap";
-import { ShoppingBag, X } from "lucide-react";
+import {
+  Modal,
+  Button,
+  Alert,
+  Row,
+  Col,
+  Typography,
+  Select,
+  InputNumber,
+  Divider,
+  Space,
+} from "antd";
+import { ShoppingOutlined } from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
 import ProductImageGallery from "../ProductImageGallery";
 
-export default function ReadyMadeModal({ show, onHide, selectedProduct, currentUser, addOrder }) {
+const { Text, Paragraph } = Typography;
+
+export default function ReadyMadeModal({
+  show,
+  onHide,
+  selectedProduct,
+  currentUser,
+  addOrder,
+}) {
   const navigate = useNavigate();
+
   const [selectedSize, setSelectedSize] = useState("");
   const [quantity, setQuantity] = useState(1);
   const [orderError, setOrderError] = useState("");
@@ -36,9 +55,9 @@ export default function ReadyMadeModal({ show, onHide, selectedProduct, currentU
       productId: selectedProduct.id,
       productName: selectedProduct.name,
       orderType: "readymade",
-      quantity: quantity,
+      quantity,
       size: selectedSize,
-      totalPrice: selectedProduct.price * quantity,
+      totalPrice: selectedProduct.price * quantity, // 🔒 untouched
     };
 
     try {
@@ -55,99 +74,116 @@ export default function ReadyMadeModal({ show, onHide, selectedProduct, currentU
       } else {
         setOrderError(result.message || "Failed to place order");
       }
-    } catch (err) {
+    } catch {
       setPlacing(false);
       setOrderError("Failed to place order");
     }
   };
 
   return (
-    <Modal show={show} onHide={onHide} size="lg">
-      <Modal.Header closeButton>
-        <Modal.Title>{selectedProduct?.name}</Modal.Title>
-      </Modal.Header>
+    <Modal
+      open={show}
+      onCancel={onHide}
+      footer={null}
+      width={900}
+      title={selectedProduct?.name}
+    >
+      {orderSuccess && (
+        <Alert
+          type="success"
+          message={orderSuccess}
+          showIcon
+          style={{ marginBottom: 16 }}
+        />
+      )}
 
-      <Modal.Body>
-        {orderSuccess && <Alert variant="success">{orderSuccess}</Alert>}
-        {orderError && <Alert variant="danger">{orderError}</Alert>}
+      {orderError && (
+        <Alert
+          type="error"
+          message={orderError}
+          showIcon
+          style={{ marginBottom: 16 }}
+        />
+      )}
 
-        {selectedProduct && (
-          <Row>
-            <Col md={5}>
-              <ProductImageGallery product={selectedProduct} />
-              <div className="mt-3">
-                <div>
-                  <strong>Price:</strong>
-                  <span className="text-primary ms-2">
-                    ₹{selectedProduct.price}
-                  </span>
-                </div>
-                <div className="text-muted mt-2">
-                  {selectedProduct.description}
-                </div>
+      {selectedProduct && (
+        <Row gutter={24}>
+          {/* LEFT */}
+          <Col span={10}>
+            <ProductImageGallery product={selectedProduct} />
+
+            <Divider />
+
+            <Text strong>
+              Price:{" "}
+              <Text type="primary">₹{selectedProduct.price}</Text>
+            </Text>
+
+            <Paragraph type="secondary" style={{ marginTop: 8 }}>
+              {selectedProduct.description}
+            </Paragraph>
+          </Col>
+
+          {/* RIGHT */}
+          <Col span={14}>
+            {selectedProduct.sizes && (
+              <div style={{ marginBottom: 16 }}>
+                <Text>Select Size</Text>
+                <Select
+                  style={{ width: "100%" }}
+                  value={selectedSize}
+                  placeholder="Select size"
+                  onChange={setSelectedSize}
+                >
+                  {selectedProduct.sizes.map((size) => (
+                    <Select.Option key={size} value={size}>
+                      {size}
+                    </Select.Option>
+                  ))}
+                </Select>
               </div>
-            </Col>
+            )}
 
-            <Col md={7}>
-              <hr />
-              {selectedProduct.sizes && (
-                <Form.Group className="mb-3">
-                  <Form.Label>Select Size</Form.Label>
-                  <Form.Select
-                    value={selectedSize}
-                    onChange={(e) => setSelectedSize(e.target.value)}
-                  >
-                    {selectedProduct.sizes.map((size) => (
-                      <option key={size} value={size}>
-                        {size}
-                      </option>
-                    ))}
-                  </Form.Select>
-                </Form.Group>
-              )}
+            <div style={{ marginBottom: 16 }}>
+              <Text>Quantity</Text>
+              <InputNumber
+                min={1}
+                value={quantity}
+                onChange={setQuantity}
+                style={{ width: "100%" }}
+              />
+            </div>
 
-              <Form.Group className="mb-3">
-                <Form.Label>Quantity</Form.Label>
-                <Form.Control
-                  type="number"
-                  min="1"
-                  value={quantity}
-                  onChange={(e) => setQuantity(Number(e.target.value))}
-                  style={{ width: "120px" }}
-                />
-              </Form.Group>
+            <Divider />
 
-              <div className="p-3 bg-light rounded mb-3">
-                <h6>Order Summary</h6>
-                <div className="d-flex justify-content-between">
-                  <span>
-                    {quantity} × ₹{selectedProduct.price}
-                  </span>
-                  <strong className="text-primary">
-                    ₹{selectedProduct.price * quantity}
-                  </strong>
-                </div>
-              </div>
-            </Col>
-          </Row>
-        )}
-      </Modal.Body>
+            <Space
+              style={{ width: "100%", justifyContent: "space-between" }}
+            >
+              <Text>
+                {quantity} × ₹{selectedProduct.price}
+              </Text>
+              <Text strong type="primary">
+                ₹{selectedProduct.price * quantity}
+              </Text>
+            </Space>
+          </Col>
+        </Row>
+      )}
 
-      <Modal.Footer>
-        <Button variant="secondary" onClick={onHide}>
-          <X size={18} className="me-1" />
-          Close
-        </Button>
+      <Divider />
+
+      <Space style={{ width: "100%", justifyContent: "flex-end" }}>
+        <Button onClick={onHide}>Close</Button>
         <Button
-          variant="primary"
+          type="primary"
+          icon={<ShoppingOutlined />}
+          loading={placing}
+          disabled={!selectedSize}
           onClick={handlePlaceOrder}
-          disabled={placing || !selectedSize}
         >
-          <ShoppingBag size={18} className="me-1" />
           Place Order
         </Button>
-      </Modal.Footer>
+      </Space>
     </Modal>
   );
 }
-

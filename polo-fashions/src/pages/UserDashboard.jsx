@@ -1,22 +1,22 @@
 import React from "react";
 import {
-  Container,
+  Card,
   Row,
   Col,
-  Card,
   Table,
-  Badge,
-  Alert,
+  Tag,
   Button,
-} from "react-bootstrap";
+  Statistic,
+  Empty,
+  Space,
+} from "antd";
 import {
-  User,
-  Ruler,
-  Calendar,
-  Package,
-  CheckCircle,
-  Clock,
-} from "lucide-react";
+  UserOutlined,
+  CalendarOutlined,
+  ShoppingOutlined,
+  CheckCircleOutlined,
+  ClockCircleOutlined,
+} from "@ant-design/icons";
 import { useAuth } from "../context/AuthContext";
 import { useNavigate } from "react-router-dom";
 
@@ -24,13 +24,10 @@ export default function UserDashboard() {
   const navigate = useNavigate();
   const { currentUser, bookings = [], orders = [] } = useAuth();
 
-  // -----------------------------
-  // FIXED FILTERING (REAL FIX)
-  // -----------------------------
+  // ✅ SAME FIXED FILTERING (UNCHANGED)
   const userBookings = bookings.filter((b) => b.user === currentUser?.id);
   const userOrders = orders.filter((o) => o.user === currentUser?.id);
 
-  // Helper function for formatting dates
   const formatDate = (dateStr) => {
     if (!dateStr) return "";
     const date = new Date(dateStr);
@@ -41,225 +38,176 @@ export default function UserDashboard() {
     });
   };
 
+  /* ===================== TABLE COLUMNS ===================== */
+
+  const bookingColumns = [
+    {
+      title: "Booking ID",
+      dataIndex: "id",
+      render: (id) => `#${id}`,
+    },
+    {
+      title: "Date",
+      dataIndex: "date",
+      render: formatDate,
+    },
+    { title: "Time", dataIndex: "time" },
+    {
+      title: "Status",
+      dataIndex: "status",
+      render: (status) => (
+        <Tag
+          icon={
+            status === "completed" ? (
+              <CheckCircleOutlined />
+            ) : (
+              <ClockCircleOutlined />
+            )
+          }
+          color={
+            status === "completed"
+              ? "green"
+              : status === "confirmed"
+              ? "blue"
+              : status === "cancelled"
+              ? "red"
+              : "orange"
+          }
+        >
+          {status.toUpperCase()}
+        </Tag>
+      ),
+    },
+  ];
+
+  const orderColumns = [
+    {
+      title: "Order ID",
+      dataIndex: "id",
+      render: (id) => `#${id}`,
+    },
+    { title: "Product", dataIndex: "product_name" },
+    {
+      title: "Type",
+      dataIndex: "product_type",
+      render: (type) => (
+        <Tag color={type === "custom" ? "blue" : "green"}>
+          {type?.toUpperCase()}
+        </Tag>
+      ),
+    },
+    { title: "Qty", dataIndex: "quantity" },
+    {
+      title: "Total",
+      dataIndex: "total_price",
+      render: (v) => <strong>₹{v}</strong>,
+    },
+    {
+      title: "Date",
+      dataIndex: "order_date",
+      render: formatDate,
+    },
+    {
+      title: "Status",
+      dataIndex: "status",
+      render: (s) => <Tag color="blue">{s.toUpperCase()}</Tag>,
+    },
+  ];
+
+  /* ===================== UI ===================== */
+
   return (
-    <Container className="py-5">
-      <h2 className="mb-4 d-flex align-items-center">
-        <User size={32} className="me-2" />
-        My Dashboard
+    <div style={{ padding: 24 }}>
+      <h2 style={{ marginBottom: 24 }}>
+        <UserOutlined /> My Dashboard
       </h2>
 
-      <Row className="g-4 mb-4">
-        {/* PROFILE CARD */}
-        <Col md={4}>
-          <Card className="dashboard-card h-100">
-            <Card.Body>
-              <h5 className="mb-3 d-flex align-items-center">
-                <User size={20} className="me-2" />
-                Profile Information
-              </h5>
-
-              <div className="mb-2">
-                <strong>Name:</strong> {currentUser?.username}
-              </div>
-              <div className="mb-2">
-                <strong>Email:</strong> {currentUser?.email}
-              </div>
-              <div className="mb-2">
-                <strong>Phone:</strong> {currentUser?.phone}
-              </div>
-            </Card.Body>
+      {/* TOP CARDS */}
+      <Row gutter={16} style={{ marginBottom: 24 }}>
+        {/* PROFILE */}
+        <Col span={8}>
+          <Card title="Profile Information">
+            <p>
+              <strong>Name:</strong> {currentUser?.username}
+            </p>
+            <p>
+              <strong>Email:</strong> {currentUser?.email}
+            </p>
+            <p>
+              <strong>Phone:</strong> {currentUser?.phone}
+            </p>
           </Card>
         </Col>
 
-        {/* MEASUREMENT STATUS CARD */}
-        <Col md={4}>
-          <Card className="dashboard-card h-100">
-            <Card.Body>
-              <h5 className="mb-3 d-flex align-items-center">
-                <Ruler size={20} className="me-2" />
-                Measurement Status
-              </h5>
-
-              {currentUser?.measurement_status=== "completed" ? (
-                <>
-                  <div className="d-flex align-items-center mb-3">
-                    <CheckCircle size={24} className="text-success me-2" />
-                    <span className="status-badge status-completed">
-                      Completed
-                    </span>
-                  </div>
-                  <p className="text-muted mb-0">
-                    Your measurements are saved! You can order custom items.
-                  </p>
-                </>
-              ) : (
-                <>
-                  <div className="d-flex align-items-center mb-3">
-                    <Clock size={24} className="text-warning me-2" />
-                    <span className="status-badge status-pending">Pending</span>
-                  </div>
-                  <p className="text-muted mb-0">
-                    Book a measurement appointment to get started.
-                  </p>
-                </>
-              )}
-            </Card.Body>
+        {/* MEASUREMENT STATUS */}
+        <Col span={8}>
+          <Card title="Measurement Status">
+            {currentUser?.measurement_status === "completed" ? (
+              <Space direction="vertical">
+                <Tag icon={<CheckCircleOutlined />} color="green">
+                  Completed
+                </Tag>
+                <span>Your measurements are saved.</span>
+              </Space>
+            ) : (
+              <Space direction="vertical">
+                <Tag icon={<ClockCircleOutlined />} color="orange">
+                  Pending
+                </Tag>
+                <span>Book a measurement appointment.</span>
+              </Space>
+            )}
           </Card>
         </Col>
 
-        {/* QUICK STATS CARD */}
-        <Col md={4}>
-          <Card className="dashboard-card h-100">
-            <Card.Body>
-              <h5 className="mb-3">Quick Stats</h5>
-
-              <div className="mb-2">
-                <Calendar size={18} className="me-2" />
-                <strong>Bookings:</strong> {userBookings.length}
-              </div>
-
-              <div className="mb-2">
-                <Package size={18} className="me-2" />
-                <strong>Orders:</strong> {userOrders.length}
-              </div>
-            </Card.Body>
+        {/* QUICK STATS */}
+        <Col span={8}>
+          <Card title="Quick Stats">
+            <Statistic
+              title="Bookings"
+              value={userBookings.length}
+              prefix={<CalendarOutlined />}
+            />
+            <Statistic
+              title="Orders"
+              value={userOrders.length}
+              prefix={<ShoppingOutlined />}
+            />
           </Card>
         </Col>
       </Row>
 
-      {/* BOOKINGS SECTION */}
-      <Card className="dashboard-card mb-4">
-        <Card.Body>
-          <h5 className="mb-3 d-flex align-items-center">
-            <Calendar size={20} className="me-2" />
-            My Appointments
-          </h5>
-
-          {!bookings || bookings.length === 0 ? (
-            <Alert variant="info">Loading your appointments...</Alert>
-          ) : userBookings.length === 0 ? (
-            <Alert variant="info">
-              No appointments yet. Book one to get started!
-            </Alert>
-          ) : (
-            <div className="table-responsive">
-              <Table hover>
-                <thead>
-                  <tr>
-                    <th>Booking ID</th>
-                    <th>Date</th>
-                    <th>Time</th>
-                    <th>Status</th>
-                  </tr>
-                </thead>
-
-                <tbody>
-                  {userBookings.map((booking) => (
-                    <tr key={booking.id}>
-                      <td>#{booking.id}</td>
-                      <td>{formatDate(booking.date)}</td>
-                      <td>{booking.time}</td>
-                      <td>
-                        <Badge
-                          bg={
-                            booking.status === "completed"
-                              ? "success"
-                              : booking.status === "confirmed"
-                              ? "primary"
-                              : booking.status === "cancelled"
-                              ? "danger"
-                              : "warning"
-                          }
-                          className="text-capitalize d-flex align-items-center gap-1"
-                        >
-                          {booking.status === "completed" && (
-                            <CheckCircle size={14} />
-                          )}
-                          {booking.status === "confirmed" && (
-                            <CheckCircle size={14} />
-                          )}
-                          {booking.status === "pending" && <Clock size={14} />}
-                          {booking.status === "cancelled" && <X size={14} />}
-                          {booking.status}
-                        </Badge>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </Table>
-            </div>
-          )}
-        </Card.Body>
+      {/* BOOKINGS */}
+      <Card title="My Appointments" style={{ marginBottom: 24 }}>
+        {userBookings.length === 0 ? (
+          <Empty description="No appointments yet" />
+        ) : (
+          <Table
+            rowKey="id"
+            columns={bookingColumns}
+            dataSource={userBookings}
+          />
+        )}
       </Card>
 
-      {/* ORDERS SECTION */}
-      <Card className="dashboard-card">
-        <Card.Body>
-          <h5 className="mb-3 d-flex align-items-center">
-            <Package size={20} className="me-2" />
-            My Orders
-          </h5>
-
-          {userOrders.length === 0 ? (
-            <Alert variant="info">
-              No orders placed yet!
-              <div className="mt-2">
-                <Button
-                  variant="primary"
-                  size="sm"
-                  onClick={() => navigate("/products")}
-                >
-                  Browse Products
-                </Button>
-              </div>
-            </Alert>
-          ) : (
-            <div className="table-responsive">
-              <Table hover>
-                <thead>
-                  <tr>
-                    <th>Order ID</th>
-                    <th>Product</th>
-                    <th>Type</th>
-                    <th>Quantity</th>
-                    <th>Total</th>
-                    <th>Date</th>
-                    <th>Status</th>
-                  </tr>
-                </thead>
-
-                <tbody>
-                  {userOrders.map((order) => (
-                    <tr key={order.id}>
-                      <td>#{order.id}</td>
-                      <td>{order.product_name}</td>
-                      <td>
-                        <Badge
-                          bg={
-                            order.product_type === "custom"
-                              ? "primary"
-                              : "success"
-                          }
-                        >
-                          {order.product_type}
-                        </Badge>
-                      </td>
-                      <td>{order.quantity}</td>
-                      <td className="text-primary fw-bold">
-                        ₹{order.total_price}
-                      </td>
-                      <td>{formatDate(order.order_date)}</td>
-                      <td>
-                        <Badge bg="info">{order.status}</Badge>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </Table>
-            </div>
-          )}
-        </Card.Body>
+      {/* ORDERS */}
+      <Card title="My Orders">
+        {userOrders.length === 0 ? (
+          <Empty
+            description="No orders placed yet"
+          >
+            <Button type="primary" onClick={() => navigate("/products")}>
+              Browse Products
+            </Button>
+          </Empty>
+        ) : (
+          <Table
+            rowKey="id"
+            columns={orderColumns}
+            dataSource={userOrders}
+          />
+        )}
       </Card>
-    </Container>
+    </div>
   );
 }

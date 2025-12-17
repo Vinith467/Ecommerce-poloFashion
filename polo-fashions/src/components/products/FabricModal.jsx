@@ -1,8 +1,22 @@
 import React, { useState } from "react";
-import { Modal, Button, Form, Alert, Row, Col } from "react-bootstrap";
-import { ShoppingBag, X } from "lucide-react";
+import {
+  Modal,
+  Button,
+  Alert,
+  Row,
+  Col,
+  Typography,
+  Radio,
+  InputNumber,
+  Divider,
+  Space,
+  Tag,
+} from "antd";
+import { ShoppingOutlined } from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
 import ProductImageGallery from "../ProductImageGallery";
+
+const { Text, Paragraph, Title } = Typography;
 
 const STITCHING_CHARGES = {
   shirt: 350,
@@ -16,8 +30,15 @@ const DEFAULT_METERS = {
   kurta: 2.5,
 };
 
-export default function FabricModal({ show, onHide, selectedProduct, currentUser, addOrder }) {
+export default function FabricModal({
+  show,
+  onHide,
+  selectedProduct,
+  currentUser,
+  addOrder,
+}) {
   const navigate = useNavigate();
+
   const [wantStitching, setWantStitching] = useState(false);
   const [stitchType, setStitchType] = useState("");
   const [meters, setMeters] = useState(1);
@@ -51,9 +72,8 @@ export default function FabricModal({ show, onHide, selectedProduct, currentUser
     return STITCHING_CHARGES[stitchType] || 0;
   };
 
-  const calcTotal = () => {
-    return Number((calcFabricCost() + calcStitchCharge()).toFixed(2));
-  };
+  const calcTotal = () =>
+    Number((calcFabricCost() + calcStitchCharge()).toFixed(2));
 
   const handlePlaceOrder = async () => {
     setOrderError("");
@@ -109,196 +129,173 @@ export default function FabricModal({ show, onHide, selectedProduct, currentUser
       } else {
         setOrderError(result.message || "Failed to place order");
       }
-    } catch (err) {
+    } catch {
       setPlacing(false);
       setOrderError("Failed to place order");
     }
   };
 
   return (
-    <Modal show={show} onHide={onHide} size="lg">
-      <Modal.Header closeButton>
-        <Modal.Title>{selectedProduct?.name}</Modal.Title>
-      </Modal.Header>
+    <Modal
+      open={show}
+      onCancel={onHide}
+      footer={null}
+      width={950}
+      title={selectedProduct?.name}
+    >
+      {orderSuccess && (
+        <Alert
+          type="success"
+          message={orderSuccess}
+          showIcon
+          style={{ marginBottom: 16 }}
+        />
+      )}
 
-      <Modal.Body>
-        {orderSuccess && <Alert variant="success">{orderSuccess}</Alert>}
-        {orderError && <Alert variant="danger">{orderError}</Alert>}
+      {orderError && (
+        <Alert
+          type="error"
+          message={orderError}
+          showIcon
+          style={{ marginBottom: 16 }}
+        />
+      )}
 
-        {selectedProduct && (
-          <Row>
-            <Col md={5}>
-              <ProductImageGallery product={selectedProduct} />
-              <div className="mt-3">
-                <div>
-                  <strong>Price:</strong>
-                  <span className="text-primary ms-2">
-                    ₹{selectedProduct.price} / meter
-                  </span>
-                </div>
-                <div className="text-muted mt-2">
-                  {selectedProduct.description}
-                </div>
-              </div>
-            </Col>
+      {selectedProduct && (
+        <Row gutter={24}>
+          {/* LEFT */}
+          <Col span={10}>
+            <ProductImageGallery product={selectedProduct} />
 
-            <Col md={7}>
-              <hr />
-              <Form.Group className="mb-3">
-                <Form.Label>
-                  Do you want stitching with this fabric?
-                </Form.Label>
-                <div>
-                  <Button
-                    variant={
-                      wantStitching ? "primary" : "outline-primary"
-                    }
-                    className="me-2"
-                    size="sm"
-                    onClick={() => {
-                      setWantStitching(true);
-                      if (!stitchType) {
-                        setStitchType("shirt");
-                        setMeters((prev) =>
-                          prev < DEFAULT_METERS["shirt"]
-                            ? DEFAULT_METERS["shirt"]
-                            : prev
-                        );
-                      }
-                    }}
+            <Divider />
+
+            <Text strong>
+              Price:{" "}
+              <Text type="primary">
+                ₹{selectedProduct.price} / meter
+              </Text>
+            </Text>
+
+            <Paragraph type="secondary" style={{ marginTop: 8 }}>
+              {selectedProduct.description}
+            </Paragraph>
+          </Col>
+
+          {/* RIGHT */}
+          <Col span={14}>
+            <Title level={5}>Stitching Options</Title>
+
+            <Radio.Group
+              value={wantStitching}
+              onChange={(e) => {
+                setWantStitching(e.target.value);
+                if (!e.target.value) {
+                  setStitchType("");
+                  setMeters(1);
+                }
+              }}
+              style={{ marginBottom: 16 }}
+            >
+              <Radio value={true}>Yes, stitch it</Radio>
+              <Radio value={false}>No, just buy fabric</Radio>
+            </Radio.Group>
+
+            {wantStitching && (
+              <Space wrap style={{ marginBottom: 16 }}>
+                {Object.keys(STITCHING_CHARGES).map((type) => (
+                  <Tag.CheckableTag
+                    key={type}
+                    checked={stitchType === type}
+                    onChange={() => onSelectStitchType(type)}
                   >
-                    Yes, stitch it
-                  </Button>
+                    {type.toUpperCase()} — ₹{STITCHING_CHARGES[type]}
+                  </Tag.CheckableTag>
+                ))}
+              </Space>
+            )}
 
+            <Divider />
+
+            <Text>Meters Required</Text>
+            <InputNumber
+              min={0.1}
+              step={0.1}
+              value={meters}
+              onChange={(val) => setMeters(val)}
+              style={{ width: "100%", marginBottom: 16 }}
+            />
+
+            {wantStitching && !measurementDone && (
+              <Alert
+                type="warning"
+                message="Measurement Required"
+                description={
                   <Button
-                    variant={
-                      !wantStitching ? "primary" : "outline-primary"
-                    }
-                    size="sm"
-                    onClick={() => {
-                      setWantStitching(false);
-                      setStitchType("");
-                      setMeters(1);
-                    }}
-                  >
-                    No, just buy fabric
-                  </Button>
-                </div>
-              </Form.Group>
-
-              {wantStitching && (
-                <Form.Group className="mb-3">
-                  <Form.Label>Select Stitch Type</Form.Label>
-                  <div className="d-flex gap-2 flex-wrap">
-                    <Button
-                      variant={
-                        stitchType === "shirt"
-                          ? "primary"
-                          : "outline-primary"
-                      }
-                      onClick={() => onSelectStitchType("shirt")}
-                    >
-                      Shirt — ₹{STITCHING_CHARGES.shirt}
-                    </Button>
-
-                    <Button
-                      variant={
-                        stitchType === "pant"
-                          ? "primary"
-                          : "outline-primary"
-                      }
-                      onClick={() => onSelectStitchType("pant")}
-                    >
-                      Pant — ₹{STITCHING_CHARGES.pant}
-                    </Button>
-
-                    <Button
-                      variant={
-                        stitchType === "kurta"
-                          ? "primary"
-                          : "outline-primary"
-                      }
-                      onClick={() => onSelectStitchType("kurta")}
-                    >
-                      Kurta — ₹{STITCHING_CHARGES.kurta}
-                    </Button>
-                  </div>
-                </Form.Group>
-              )}
-
-              <Form.Group className="mb-3">
-                <Form.Label>Meters required</Form.Label>
-                <Form.Control
-                  type="number"
-                  step="0.1"
-                  min="0.1"
-                  value={meters}
-                  onChange={(e) => setMeters(Number(e.target.value))}
-                  style={{ width: "140px" }}
-                />
-              </Form.Group>
-
-              {wantStitching && !measurementDone && (
-                <Alert variant="warning" className="mb-3">
-                  <strong>Measurement Required:</strong> Please
-                  complete your measurement booking before ordering
-                  stitching.
-                  <Button
-                    variant="link"
-                    size="sm"
+                    type="link"
                     onClick={() => {
                       onHide();
                       navigate("/booking");
                     }}
                   >
-                    Book Now
+                    Complete measurement booking first
                   </Button>
-                </Alert>
+                }
+                showIcon
+                style={{ marginBottom: 16 }}
+              />
+            )}
+
+            <Divider />
+
+            <Space direction="vertical" style={{ width: "100%" }}>
+              <Space
+                style={{ width: "100%", justifyContent: "space-between" }}
+              >
+                <Text>Fabric ({meters} m)</Text>
+                <Text>₹{calcFabricCost()}</Text>
+              </Space>
+
+              {wantStitching && (
+                <Space
+                  style={{
+                    width: "100%",
+                    justifyContent: "space-between",
+                  }}
+                >
+                  <Text>Stitching ({stitchType})</Text>
+                  <Text>₹{calcStitchCharge()}</Text>
+                </Space>
               )}
 
-              <div className="p-3 bg-light rounded mb-3">
-                <h6>Order Summary</h6>
-                <div className="d-flex justify-content-between">
-                  <span>Fabric ({meters} m)</span>
-                  <span>₹{calcFabricCost()}</span>
-                </div>
-                {wantStitching && (
-                  <div className="d-flex justify-content-between">
-                    <span>Stitching ({stitchType})</span>
-                    <span>₹{calcStitchCharge()}</span>
-                  </div>
-                )}
-                <hr />
-                <div className="d-flex justify-content-between">
-                  <strong>Total:</strong>
-                  <strong className="text-primary">
-                    ₹{calcTotal()}
-                  </strong>
-                </div>
-              </div>
-            </Col>
-          </Row>
-        )}
-      </Modal.Body>
+              <Divider style={{ margin: "8px 0" }} />
 
-      <Modal.Footer>
-        <Button variant="secondary" onClick={onHide}>
-          <X size={18} className="me-1" />
-          Close
-        </Button>
+              <Space
+                style={{ width: "100%", justifyContent: "space-between" }}
+              >
+                <Text strong>Total</Text>
+                <Text strong type="primary">
+                  ₹{calcTotal()}
+                </Text>
+              </Space>
+            </Space>
+          </Col>
+        </Row>
+      )}
+
+      <Divider />
+
+      <Space style={{ width: "100%", justifyContent: "flex-end" }}>
+        <Button onClick={onHide}>Close</Button>
         <Button
-          variant="primary"
+          type="primary"
+          icon={<ShoppingOutlined />}
+          loading={placing}
+          disabled={!selectedProduct || !meters || Number(meters) <= 0}
           onClick={handlePlaceOrder}
-          disabled={
-            placing ||
-            !selectedProduct ||
-            (!meters || Number(meters) <= 0)
-          }
         >
-          <ShoppingBag size={18} className="me-1" />
           Place Order
         </Button>
-      </Modal.Footer>
+      </Space>
     </Modal>
   );
 }

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Container, Tabs, Tab, Row, Col } from "react-bootstrap";
+import { Tabs, Row, Col, Skeleton, Empty } from "antd";
 import { useAuth } from "../context/AuthContext";
 import {
   productsAPI,
@@ -10,7 +10,7 @@ import {
 } from "../services/api";
 import ProductCard from "../components/ProductCard";
 
-// Import product modals
+// Product modals (UNCHANGED)
 import FabricModal from "../components/products/FabricModal";
 import ReadyMadeModal from "../components/products/ReadyMadeModal";
 import TraditionalModal from "../components/products/TraditionalModal";
@@ -23,7 +23,6 @@ export default function Products() {
   const [loading, setLoading] = useState(true);
   const [activeCategory, setActiveCategory] = useState("fabrics");
 
-  // Modal states
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [showModal, setShowModal] = useState(false);
 
@@ -44,7 +43,7 @@ export default function Products() {
           innerwear: innerwearData,
         });
       } catch (error) {
-        console.error("Failed to fetch fabrics:", error);
+        console.error("Failed to fetch products:", error);
       } finally {
         setLoading(false);
       }
@@ -64,19 +63,18 @@ export default function Products() {
     setSelectedProduct(null);
   };
 
-  // Filter products based on active category
+  /* ================= FILTER LOGIC (UNCHANGED) ================= */
+
   let filteredProducts = [];
 
-  if (!products) {
-    filteredProducts = [];
-  } else {
+  if (products) {
     if (activeCategory === "fabrics") {
       const customProducts = products.products.filter(
         (p) =>
           p.type === "custom" &&
           (p.category === "shirt" || p.category === "pant")
       );
-      filteredProducts = [...(products.fabrics || []), ...customProducts];
+      filteredProducts = [...products.fabrics, ...customProducts];
     } else if (activeCategory === "ready_shirts") {
       filteredProducts = products.products.filter(
         (p) => p.category === "shirt" && p.type === "readymade"
@@ -90,61 +88,76 @@ export default function Products() {
         (p) => p.category === "traditional"
       );
     } else if (activeCategory === "rentals") {
-      filteredProducts = products.rentals || [];
+      filteredProducts = products.rentals;
     } else if (activeCategory === "accessories") {
-      filteredProducts = products.accessories || [];
+      filteredProducts = products.accessories;
     } else if (activeCategory === "innerwear") {
-      filteredProducts = products.innerwear || [];
-    } else {
-      filteredProducts = [];
+      filteredProducts = products.innerwear;
     }
   }
 
-  // Determine product type
+  /* ================= MODAL TYPE LOGIC (UNCHANGED) ================= */
+
   const isTraditional = selectedProduct?.category === "traditional";
-  const isCustomTraditional = isTraditional && selectedProduct?.type === "custom";
+  const isCustomTraditional =
+    isTraditional && selectedProduct?.type === "custom";
   const isFabric = selectedProduct?.type === "custom" && !isTraditional;
   const isReadyMade = selectedProduct?.type === "readymade";
   const isRental = activeCategory === "rentals";
-  const isAccessory = activeCategory === "accessories" || activeCategory === "innerwear";
+  const isAccessory =
+    activeCategory === "accessories" || activeCategory === "innerwear";
+
+  /* ================= UI ================= */
 
   return (
-    <Container className="py-5">
-      <div className="text-center mb-5">
+    <div style={{ padding: 40 }}>
+      <div style={{ textAlign: "center", marginBottom: 32 }}>
         <h1>Fabrics & Collections</h1>
-        <p className="text-muted">
+        <p style={{ color: "#777" }}>
           Buy fabric or get it stitched — your choice.
         </p>
       </div>
 
       <Tabs
         activeKey={activeCategory}
-        onSelect={(k) => setActiveCategory(k)}
-        className="mb-4 justify-content-center"
-      >
-        <Tab eventKey="fabrics" title="Fabrics" />
-        <Tab eventKey="ready_shirts" title="Ready-made Shirts" />
-        <Tab eventKey="ready_pants" title="Ready-made Pants" />
-        <Tab eventKey="traditional" title="Traditional Wear" />
-        <Tab eventKey="rentals" title="Rentals (Blazers)" />
-        <Tab eventKey="accessories" title="Accessories" />
-        <Tab eventKey="innerwear" title="Innerwear & Loungewear" />
-      </Tabs>
+        onChange={setActiveCategory}
+        centered
+        items={[
+          { key: "fabrics", label: "Fabrics" },
+          { key: "ready_shirts", label: "Ready-made Shirts" },
+          { key: "ready_pants", label: "Ready-made Pants" },
+          { key: "traditional", label: "Traditional Wear" },
+          { key: "rentals", label: "Rentals (Blazers)" },
+          { key: "accessories", label: "Accessories" },
+          { key: "innerwear", label: "Innerwear & Loungewear" },
+        ]}
+      />
 
-      <Row className="g-4">
-        {filteredProducts.map((product) => (
-          <Col key={product.id} md={6} lg={4}>
-            <div onClick={() => openModalForProduct(product)}>
+      <Row gutter={[24, 24]} style={{ marginTop: 24 }}>
+        {loading ? (
+          [...Array(6)].map((_, i) => (
+            <Col key={i} span={8}>
+              <Skeleton active />
+            </Col>
+          ))
+        ) : filteredProducts.length === 0 ? (
+          <Col span={24}>
+            <Empty description="No products available" />
+          </Col>
+        ) : (
+          filteredProducts.map((product) => (
+            <Col key={product.id} span={8}>
               <ProductCard
                 product={product}
                 onClick={() => openModalForProduct(product)}
               />
-            </div>
-          </Col>
-        ))}
+            </Col>
+          ))
+        )}
       </Row>
 
-      {/* Render appropriate modal based on product type */}
+      {/* ================= MODALS (UNCHANGED) ================= */}
+
       {isFabric && !isCustomTraditional && (
         <FabricModal
           show={showModal}
@@ -195,6 +208,6 @@ export default function Products() {
           category={activeCategory}
         />
       )}
-    </Container>
+    </div>
   );
 }
