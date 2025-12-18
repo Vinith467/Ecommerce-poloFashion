@@ -79,6 +79,14 @@ export default function UserDashboard() {
       ),
     },
   ];
+  const ORDER_TYPE_COLORS = {
+    "ready-made": "green",
+    custom: "blue",
+    fabric: "gold",
+    rental: "purple",
+    traditional: "cyan",
+    other: "default",
+  };
 
   const orderColumns = [
     {
@@ -90,12 +98,12 @@ export default function UserDashboard() {
     {
       title: "Type",
       dataIndex: "product_type",
-      render: (type) => (
-        <Tag color={type === "custom" ? "blue" : "green"}>
-          {type?.toUpperCase()}
-        </Tag>
-      ),
+      render: (type) => {
+        const color = ORDER_TYPE_COLORS[type] || "default";
+        return <Tag color={color}>{type?.toUpperCase().replace("-", " ")}</Tag>;
+      },
     },
+
     { title: "Qty", dataIndex: "quantity" },
     {
       title: "Total",
@@ -193,19 +201,13 @@ export default function UserDashboard() {
       {/* ORDERS */}
       <Card title="My Orders">
         {userOrders.length === 0 ? (
-          <Empty
-            description="No orders placed yet"
-          >
+          <Empty description="No orders placed yet">
             <Button type="primary" onClick={() => navigate("/products")}>
               Browse Products
             </Button>
           </Empty>
         ) : (
-          <Table
-            rowKey="id"
-            columns={orderColumns}
-            dataSource={userOrders}
-          />
+          <Table rowKey="id" columns={orderColumns} dataSource={userOrders} />
         )}
       </Card>
     </div>

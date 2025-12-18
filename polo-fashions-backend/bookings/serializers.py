@@ -9,7 +9,7 @@ class BookingSerializer(serializers.ModelSerializer):
     class Meta:
         model = Booking
         fields = ['id', 'user', 'customer_name', 'email', 'user_name', 'phone', 'date', 'time', 'status', 'notes', 'created_at', 'updated_at']  # ✅ Added 'user_name'
-        read_only_fields = ['id', 'user', 'customer_name', 'email', 'user_name', 'status', 'created_at', 'updated_at']
+        read_only_fields = ['id', 'user', 'customer_name', 'email', 'user_name', 'created_at', 'updated_at']
 
     def create(self, validated_data):
         request = self.context.get('request')

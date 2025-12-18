@@ -6,12 +6,14 @@ class OrderSerializer(serializers.ModelSerializer):
     user_name = serializers.CharField(source='user.get_full_name', read_only=True)
     product_details = serializers.SerializerMethodField()
     fabric_details = serializers.SerializerMethodField()
+    product_type = serializers.SerializerMethodField()
 
     class Meta:
         model = Order
         fields = [
             'id', 'user', 'customer_name', 'user_name',
-            'product', 'product_name', 
+            'product',
+            'product_type','product_name', 
             'fabric', 'fabric_name', 'fabric_price_per_meter',
             'stitch_type', 'meters', 'stitching_charge',
             'size', 'quantity', 'total_price', 'status',
@@ -44,6 +46,34 @@ class OrderSerializer(serializers.ModelSerializer):
                 'price': str(obj.fabric.price),
             }
         return None
+    def get_product_type(self, obj):
+   
+
+        # 1️⃣ Rental
+        if obj.rental_days and obj.rental_days > 0:
+            return "rental"
+
+        # 2️⃣ Fabric + stitching
+        if obj.stitch_type and obj.meters and float(obj.meters) > 0:
+            return "custom"
+
+        # 3️⃣ Fabric only
+        if obj.meters and float(obj.meters) > 0:
+            return "fabric"
+
+        # 4️⃣ Traditional wear
+        if obj.product and getattr(obj.product, "category", None) == "traditional":
+            return "traditional"
+
+        # 5️⃣ Ready-made
+        if obj.product:
+            return "ready-made"
+
+        return "other"
+
+    
+   
+        
 
     def create(self, validated_data):
         print("Creating...")

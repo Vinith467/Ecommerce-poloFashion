@@ -10,6 +10,14 @@ export function AuthProvider({ children }) {
   const [bookings, setBookings] = useState([]);
   const [orders, setOrders] = useState([]);
   const [authLoading, setAuthLoading] = useState(true);
+  const refreshOrders = async () => {
+    try {
+      const ordersData = await ordersAPI.getAll();
+      setOrders(ordersData);
+    } catch (error) {
+      console.error("Failed to refresh orders:", error);
+    }
+  };
 
   // ========================================
   // Initialize user from token on refresh
@@ -227,8 +235,8 @@ export function AuthProvider({ children }) {
   // ========================================
   const addOrder = async (orderData) => {
     try {
-      const newOrder = await ordersAPI.create(orderData);
-      setOrders([...orders, newOrder]);
+      await ordersAPI.create(orderData);
+      await refreshOrders(); // ✅ SINGLE SOURCE OF TRUTH
       return { success: true, message: "Order placed successfully!" };
     } catch (error) {
       console.error("Failed to create order:", error);
