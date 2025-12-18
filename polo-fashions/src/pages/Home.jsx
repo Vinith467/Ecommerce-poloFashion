@@ -17,7 +17,6 @@ export default function Home() {
   const navigate = useNavigate();
   const { currentUser, bookings = [] } = useAuth();
 
-  // Same booking logic as Navbar (VERY IMPORTANT)
   const userBookings =
     currentUser?.role === "customer"
       ? bookings.filter((b) => b.user === currentUser.id)
@@ -38,7 +37,7 @@ export default function Home() {
       {/* HERO SECTION */}
       <div
         style={{
-          background: "linear-gradient(135deg, #1677ff, #4096ff)",
+          background: "linear-gradient(135deg, #001529, #4096ff)",
           padding: "100px 20px",
           color: "#fff",
           textAlign: "center",
@@ -59,6 +58,12 @@ export default function Home() {
               Explore Collection
             </Button>
             <Button
+             style={{
+              background: "linear-gradient(135deg, #facc15, #eab308)",
+              border: "none",
+              color: "#1f2937",
+              fontWeight: 600,
+            }}
               type="primary"
               size="large"
               onClick={() => navigate("/register")}

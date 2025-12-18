@@ -19,7 +19,6 @@ export default function NavigationBar() {
   const location = useLocation();
   const navigate = useNavigate();
 
-  // 🔒 SAME LOGIC — unchanged
   const userBookings =
     bookings?.filter((b) => b.user === currentUser?.id) || [];
 
@@ -39,12 +38,14 @@ export default function NavigationBar() {
     {
       key: "/",
       icon: <HomeOutlined />,
-      label: <Link to="/">Home</Link>,
+      label: "Home",
+      onClick: () => navigate("/"),
     },
     {
       key: "/products",
       icon: <ShoppingOutlined />,
-      label: <Link to="/products">Products</Link>,
+      label: "Products",
+      onClick: () => navigate("/products"),
     },
   ];
 
@@ -52,7 +53,8 @@ export default function NavigationBar() {
     menuItems.push({
       key: "/booking",
       icon: <CalendarOutlined />,
-      label: <Link to="/booking">Book Appointment</Link>,
+      label: "Book Appointment",
+      onClick: () => navigate("/booking"),
     });
   }
 
@@ -60,11 +62,9 @@ export default function NavigationBar() {
     menuItems.push({
       key: currentUser.role === "admin" ? "/admin" : "/dashboard",
       icon: <UserOutlined />,
-      label: (
-        <Link to={currentUser.role === "admin" ? "/admin" : "/dashboard"}>
-          {currentUser.role === "admin" ? "Admin Panel" : "My Account"}
-        </Link>
-      ),
+      label: currentUser.role === "admin" ? "Admin Panel" : "My Account",
+      onClick: () =>
+        navigate(currentUser.role === "admin" ? "/admin" : "/dashboard"),
     });
   }
 
@@ -76,8 +76,9 @@ export default function NavigationBar() {
         zIndex: 1000,
         display: "flex",
         alignItems: "center",
-        paddingInline: 24,
-       background: "#001529",
+        padding: 10,
+        paddingInline: 25,
+        background: "#001529",
         boxShadow: "0 2px 8px rgba(0,0,0,0.15)",
       }}
     >
@@ -121,11 +122,11 @@ export default function NavigationBar() {
               borderColor: "#E5E7EB",
               background: "transparent",
             }}
+            onClick={() => navigate("/login")}
           >
-            <Link to="/login" style={{ color: "#E5E7EB" }}>
-              Login
-            </Link>
+            Login
           </Button>
+
           <Button
             style={{
               background: "linear-gradient(135deg, #facc15, #eab308)",
@@ -133,14 +134,13 @@ export default function NavigationBar() {
               color: "#1f2937",
               fontWeight: 600,
             }}
+            onClick={() => navigate("/register")}
           >
-            <Link to="/register" style={{ color: "#1f2937" }}>
-              Register
-            </Link>
+            Register
           </Button>
         </Space>
       ) : (
-        <Button style={{color: "#001529"}} icon={<LogoutOutlined />} onClick={handleLogout}>
+        <Button icon={<LogoutOutlined />} onClick={handleLogout} danger>
           Logout
         </Button>
       )}

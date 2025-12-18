@@ -16,7 +16,8 @@ import { ShoppingOutlined } from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
 import ProductImageGallery from "../ProductImageGallery";
 
-const { Title, Text } = Typography;
+const { Title, Text, Paragraph } = Typography;
+
 
 export default function RentalModal({
   show,
