@@ -140,7 +140,17 @@ export default function NavigationBar() {
           </Button>
         </Space>
       ) : (
-        <Button icon={<LogoutOutlined />} onClick={handleLogout} danger>
+        <Button
+          icon={<LogoutOutlined />}
+          style={{
+            background: "#7c0707ff",
+            border: "none",
+            color:"white" ,
+            fontWeight: 600,
+          }}
+          onClick={handleLogout}
+          danger
+        >
           Logout
         </Button>
       )}
