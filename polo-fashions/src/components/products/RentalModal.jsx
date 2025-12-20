@@ -18,7 +18,6 @@ import ProductImageGallery from "../ProductImageGallery";
 
 const { Title, Text, Paragraph } = Typography;
 
-
 export default function RentalModal({
   show,
   onHide,
@@ -38,8 +37,7 @@ export default function RentalModal({
   const rentalCost = () =>
     selectedProduct ? rentalDays * Number(selectedProduct.price_per_day) : 0;
 
-  const rentalDeposit = () =>
-    Number(selectedProduct?.deposit_amount || 0);
+  const rentalDeposit = () => Number(selectedProduct?.deposit_amount || 0);
 
   const rentalPayNow = () => rentalCost() + rentalDeposit();
 
@@ -67,8 +65,9 @@ export default function RentalModal({
           return;
         }
 
+        // ✅ FIX: Use rentalItemId instead of productId
         const orderData = {
-          productId: selectedProduct.id,
+          rentalItemId: selectedProduct.id, // ✅ Changed from productId
           productName: selectedProduct.name,
           orderType: "rental",
           rentalMode: "rent",
@@ -76,7 +75,7 @@ export default function RentalModal({
           rentalDays,
           rentalPricePerDay: selectedProduct.price_per_day,
           rentalDeposit: rentalDeposit(),
-          total_price: rentalCost(),
+          quantity: 1,
           totalPrice: rentalPayNow(),
         };
 
@@ -93,11 +92,14 @@ export default function RentalModal({
       }
 
       if (rentalMode === "buy") {
+        // ✅ FIX: Use rentalItemId for buy mode too
         const orderData = {
-          productId: selectedProduct.id,
+          rentalItemId: selectedProduct.id, // ✅ Changed from productId
           productName: selectedProduct.name,
           orderType: "rental_buy",
           size: selectedSize || null,
+          quantity: 1,
+          rentalDays: 0, // ✅ No rental days for buy
           totalPrice: selectedProduct.buy_price,
         };
 
@@ -112,7 +114,8 @@ export default function RentalModal({
           setOrderError(result.message);
         }
       }
-    } catch {
+    } catch (err) {
+      console.error("Order error:", err);
       setOrderError("Failed to place order");
     } finally {
       setPlacing(false);
@@ -189,12 +192,8 @@ export default function RentalModal({
                 <Divider />
 
                 <Space direction="vertical" style={{ width: "100%" }}>
-                  <Text>
-                    Rent: ₹{rentalCost()}
-                  </Text>
-                  <Text>
-                    Deposit: ₹{rentalDeposit()}
-                  </Text>
+                  <Text>Rent: ₹{rentalCost()}</Text>
+                  <Text>Deposit: ₹{rentalDeposit()}</Text>
                   <Text strong type="primary">
                     Pay Now: ₹{rentalPayNow()}
                   </Text>

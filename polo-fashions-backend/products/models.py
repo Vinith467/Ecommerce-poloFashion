@@ -127,7 +127,7 @@ class Fabric(models.Model):
     type = models.CharField(max_length=100)  # Cotton, Linen, Silk, etc.
     color = models.CharField(max_length=50)
     price = models.DecimalField(max_digits=10, decimal_places=2)
-    image = models.URLField(max_length=500)
+    image = models.ImageField(upload_to='fabrics/', blank=True, null=True)
     description = models.TextField(blank=True, null=True)
     is_active = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)

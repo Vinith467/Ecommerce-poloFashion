@@ -24,6 +24,22 @@ class Order(models.Model):
         ('pant', 'Pant'),
         ('kurta', 'Kurta'),
     )
+    ORDER_TYPE_CHOICES = (
+        ('fabric_only', 'Fabric Only'),
+        ('fabric_with_stitching', 'Fabric With Stitching'),
+        ('ready_made', 'Ready-made'),
+        ('rental', 'Rental'),
+        ('rental_buy', 'Rental Buy'),
+        ('accessory', 'Accessory'),
+        ('innerwear', 'Innerwear'),
+        ('traditional', 'Traditional'),
+    )
+
+    order_type = models.CharField(
+        max_length=30,
+        choices=ORDER_TYPE_CHOICES,
+        default='ready_made'
+    )
 
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
@@ -32,8 +48,17 @@ class Order(models.Model):
     )
     customer_name = models.CharField(max_length=200)
 
-    product = models.ForeignKey(Product, on_delete=models.CASCADE)
+    product = models.ForeignKey(Product, on_delete=models.CASCADE,null=True,blank=True)
     product_name = models.CharField(max_length=200)
+    
+     # ✅ ADD RENTAL ITEM REFERENCE
+    rental_item = models.ForeignKey(
+        'products.RentalItem',
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='orders'
+    )
 
     # ===============================
     # Fabric / Custom fields

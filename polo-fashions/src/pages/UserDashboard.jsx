@@ -24,7 +24,6 @@ export default function UserDashboard() {
   const navigate = useNavigate();
   const { currentUser, bookings = [], orders = [] } = useAuth();
 
-  // ✅ SAME FIXED FILTERING (UNCHANGED)
   const userBookings = bookings.filter((b) => b.user === currentUser?.id);
   const userOrders = orders.filter((o) => o.user === currentUser?.id);
 
@@ -79,6 +78,7 @@ export default function UserDashboard() {
       ),
     },
   ];
+
   const ORDER_TYPE_COLORS = {
     "ready-made": "green",
     custom: "blue",
@@ -95,6 +95,45 @@ export default function UserDashboard() {
       render: (id) => `#${id}`,
     },
     {
+      title: "Image",
+      key: "image",
+      render: (_, order) => {
+        const getImage = () => {
+          // ✅ Priority 1: Fabric details (for fabric/custom orders)
+          if (order.fabric_details?.image) {
+            return order.fabric_details.image;
+          }
+          // ✅ Priority 2: Rental item details
+          if (order.rental_item_details?.image) {
+            return order.rental_item_details.image;
+          }
+          // ✅ Priority 3: Product details (for ready-made/traditional)
+          if (order.product_details?.image) {
+            return order.product_details.image;
+          }
+          return "https://via.placeholder.com/50";
+        };
+
+        const img = getImage();
+        const fullUrl = img.startsWith("http")
+          ? img
+          : `http://127.0.0.1:8000${img}`;
+
+        return (
+          <img
+            src={fullUrl}
+            alt={order.product_name}
+            style={{
+              width: 50,
+              height: 50,
+              objectFit: "cover",
+              borderRadius: 4,
+            }}
+          />
+        );
+      },
+    },
+    {
       title: "Product",
       dataIndex: "product_name",
       render: (_, order) => (
@@ -109,8 +148,10 @@ export default function UserDashboard() {
         return <Tag color={color}>{type?.toUpperCase().replace("-", " ")}</Tag>;
       },
     },
-
-    { title: "Qty", dataIndex: "quantity" },
+    { 
+      title: "Qty", 
+      dataIndex: "quantity" 
+    },
     {
       title: "Total",
       dataIndex: "total_price",
@@ -218,4 +259,4 @@ export default function UserDashboard() {
       </Card>
     </div>
   );
-} 
+}

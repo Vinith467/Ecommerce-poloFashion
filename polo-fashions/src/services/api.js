@@ -142,7 +142,7 @@ export const bookingsAPI = {
 
   updateStatus: async (id, status) => {
     const response = await api.patch(
-      `/orders/${id}/update-status/`,
+      `/bookings/${id}/`,
       { status }
     );
     return response.data;
@@ -156,51 +156,57 @@ export const ordersAPI = {
     const response = await api.get('/orders/');
     return response.data;
   },
-
   create: async (orderData) => {
-    // --- REQUIRED FIELDS FOR ALL ORDERS ---
     const payload = {
-      product: orderData.productId,
-      order_type: orderData.orderType,     // fabric_only, fabric_with_stitching, rental, accessory
       quantity: orderData.quantity,
       total_price: orderData.totalPrice,
     };
 
-    // --- FABRIC PRICE ---
-    if (orderData.fabricPricePerMeter) {
-      payload.fabric_price_per_meter = orderData.fabricPricePerMeter;
-    }
-
-    // --- METERS (only for fabric orders) ---
-    if (orderData.meters) {
-      payload.meters = orderData.meters;
-    }
-
-    // --- STITCHING DETAILS ---
-    if (orderData.stitchType) {
-      payload.stitch_type = orderData.stitchType;
-      payload.stitching_charge = orderData.stitchingCharge;
-    }
-
-    // --- READYMADE SIZE ---
-    if (orderData.size) {
-      payload.size = orderData.size;
-    }
-
-    // --- RENTAL ---
-    if (orderData.rentalDays) {
+    // ✅ RENTAL ORDERS
+    if (orderData.rentalItemId) {
+      payload.rental_item = orderData.rentalItemId;  // ✅ Use rental_item field
       payload.rental_days = orderData.rentalDays;
       payload.rental_deposit = orderData.rentalDeposit;
       payload.rental_price_per_day = orderData.rentalPricePerDay;
+
+      if (orderData.size) {
+        payload.size = orderData.size;
+      }
+    }
+    // ✅ REGULAR PRODUCT ORDERS
+    else if (orderData.productId) {
+      payload.product = orderData.productId;
+
+      // Fabric price
+      if (orderData.fabricPricePerMeter) {
+        payload.fabric_price_per_meter = orderData.fabricPricePerMeter;
+      }
+
+      // Meters
+      if (orderData.meters) {
+        payload.meters = orderData.meters;
+      }
+
+      // Stitching
+      if (orderData.stitchType) {
+        payload.stitch_type = orderData.stitchType;
+        payload.stitching_charge = orderData.stitchingCharge;
+      }
+
+      // Size
+      if (orderData.size) {
+        payload.size = orderData.size;
+      }
     }
 
-    // Send request
     const response = await api.post('/orders/', payload);
     return response.data;
   },
 
   updateStatus: async (id, status) => {
-    const response = await api.patch(`/orders/${id}/`, { status });
+    const response = await api.patch(`/orders/${id}/update-status/`,
+      { status }  // Backend expects { status: "new_status" }
+    );
     return response.data;
   },
 };

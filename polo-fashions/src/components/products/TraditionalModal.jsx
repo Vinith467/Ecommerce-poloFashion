@@ -67,7 +67,7 @@ export default function TraditionalModal({
     const orderData = {
       productId: selectedProduct.id,
       productName: selectedProduct.name,
-      orderType: "traditional_custom",
+      orderType: "traditional",
       quantity: 1,
       stitchType: wantStitching ? stitchType : null,
       size: wantStitching ? selectedSize : null,

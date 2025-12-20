@@ -64,6 +64,28 @@ export default function OrderTracking() {
   ];
 
   const currentStep = getCurrentStepIndex(order);
+  const getOrderImage = (order) => {
+    // ✅ Priority 1: Fabric details (for fabric/custom orders)
+    if (order.fabric_details?.image) {
+      const img = order.fabric_details.image;
+      return img.startsWith("http") ? img : `http://127.0.0.1:8000${img}`;
+    }
+
+    // ✅ Priority 2: Rental item details
+    if (order.rental_item_details?.image) {
+      const img = order.rental_item_details.image;
+      return img.startsWith("http") ? img : `http://127.0.0.1:8000${img}`;
+    }
+
+    // ✅ Priority 3: Product details (for ready-made/traditional)
+    if (order.product_details?.image) {
+      const img = order.product_details.image;
+      return img.startsWith("http") ? img : `http://127.0.0.1:8000${img}`;
+    }
+
+    // ✅ Fallback
+    return "https://via.placeholder.com/120";
+  };
 
   return (
     <div style={{ padding: 24 }}>
@@ -81,11 +103,7 @@ export default function OrderTracking() {
         <div style={{ display: "flex", gap: 16, marginBottom: 24 }}>
           <Image
             width={120}
-            src={
-              order.product_details?.image
-                ? `http://127.0.0.1:8000${order.product_details.image}`
-                : "https://via.placeholder.com/120"
-            }
+            src={getOrderImage(order)} // ✅ Use helper function
             alt={order.product_name}
           />
 
