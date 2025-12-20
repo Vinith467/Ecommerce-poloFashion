@@ -106,15 +106,12 @@ export default function FabricModal({
 
     // ✅ FIXED: Determine if this is a Fabric or a Custom Product
     const isFabricItem = !selectedProduct.type || !selectedProduct.category;
-    
+
     const orderData = {
       // ✅ Use fabricId for actual fabrics, productId for custom products
-      ...(isFabricItem 
-        ? { fabricId: selectedProduct.id } 
-        : { productId: selectedProduct.id }
-      ),
-      productName: selectedProduct.name,
-      orderType: wantStitching ? "fabric_with_stitching" : "fabric_only",
+      ...(isFabricItem
+        ? { fabricId: selectedProduct.id }
+        : { productId: selectedProduct.id }),
       meters: Number(meters),
       stitchType: wantStitching ? stitchType : null,
       stitchingCharge: wantStitching ? calcStitchCharge() : 0,
@@ -122,6 +119,8 @@ export default function FabricModal({
       totalPrice: calcTotal(),
       quantity: 1,
     };
+
+    console.log("🟢 Fabric Order:", orderData);
 
     try {
       setPlacing(true);
@@ -137,9 +136,10 @@ export default function FabricModal({
       } else {
         setOrderError(result.message || "Failed to place order");
       }
-    } catch {
+    } catch (error) {
       setPlacing(false);
-      setOrderError("Failed to place order");
+      console.error("🔴 Fabric order error:", error);
+      setOrderError(error?.response?.data?.detail || "Failed to place order");
     }
   };
 
@@ -179,9 +179,7 @@ export default function FabricModal({
 
             <Text strong>
               Price:{" "}
-              <Text type="primary">
-                ₹{selectedProduct.price} / meter
-              </Text>
+              <Text type="primary">₹{selectedProduct.price} / meter</Text>
             </Text>
 
             <Paragraph type="secondary" style={{ marginTop: 8 }}>
@@ -256,9 +254,7 @@ export default function FabricModal({
             <Divider />
 
             <Space direction="vertical" style={{ width: "100%" }}>
-              <Space
-                style={{ width: "100%", justifyContent: "space-between" }}
-              >
+              <Space style={{ width: "100%", justifyContent: "space-between" }}>
                 <Text>Fabric ({meters} m)</Text>
                 <Text>₹{calcFabricCost()}</Text>
               </Space>
@@ -277,9 +273,7 @@ export default function FabricModal({
 
               <Divider style={{ margin: "8px 0" }} />
 
-              <Space
-                style={{ width: "100%", justifyContent: "space-between" }}
-              >
+              <Space style={{ width: "100%", justifyContent: "space-between" }}>
                 <Text strong>Total</Text>
                 <Text strong type="primary">
                   ₹{calcTotal()}

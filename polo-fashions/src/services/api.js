@@ -179,10 +179,26 @@ export const ordersAPI = {
     // ✅ RENTAL ORDERS
     else if (orderData.rentalItemId) {
       payload.rental_item = orderData.rentalItemId;
-      payload.rental_days = orderData.rentalDays;
-      payload.rental_deposit = orderData.rentalDeposit;
-      payload.rental_price_per_day = orderData.rentalPricePerDay;
+      payload.rental_days = orderData.rentalDays || 0;
+      payload.rental_deposit = orderData.rentalDeposit || 0;
+      payload.rental_price_per_day = orderData.rentalPricePerDay || 0;
 
+      if (orderData.size) {
+        payload.size = orderData.size;
+      }
+    }
+    // ✅ ACCESSORY ORDERS
+    else if (orderData.accessoryId) {
+      payload.accessory = orderData.accessoryId;
+      
+      if (orderData.size) {
+        payload.size = orderData.size;
+      }
+    }
+    // ✅ INNERWEAR ORDERS
+    else if (orderData.innerwearId) {
+      payload.innerwear = orderData.innerwearId;
+      
       if (orderData.size) {
         payload.size = orderData.size;
       }
@@ -211,26 +227,8 @@ export const ordersAPI = {
         payload.size = orderData.size;
       }
     }
-    // ✅ ACCESSORY ORDERS
-    else if (orderData.accessoryId) {
-      // For now, we'll use product FK with a flag
-      // You'll need to add accessory FK to Order model for proper separation
-      payload.product = orderData.accessoryId;
-      
-      if (orderData.size) {
-        payload.size = orderData.size;
-      }
-    }
-    // ✅ INNERWEAR ORDERS
-    else if (orderData.innerwearId) {
-      // For now, we'll use product FK with a flag
-      // You'll need to add innerwear FK to Order model for proper separation
-      payload.product = orderData.innerwearId;
-      
-      if (orderData.size) {
-        payload.size = orderData.size;
-      }
-    }
+
+    console.log('🔵 Order Payload:', payload); // Debug log
 
     const response = await api.post('/orders/', payload);
     return response.data;

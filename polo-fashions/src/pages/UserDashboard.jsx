@@ -9,6 +9,7 @@ import {
   Statistic,
   Empty,
   Space,
+  Image,
 } from "antd";
 import {
   UserOutlined,
@@ -35,6 +36,33 @@ export default function UserDashboard() {
       month: "short",
       day: "numeric",
     });
+  };
+
+  // ✅ HELPER: Get order image from any source
+  const getOrderImage = (order) => {
+    // Priority 1: Fabric details
+    if (order.fabric_details?.image) {
+      return order.fabric_details.image;
+    }
+    // Priority 2: Rental item details
+    if (order.rental_item_details?.image) {
+      return order.rental_item_details.image;
+    }
+    // Priority 3: Accessory details
+    if (order.accessory_details?.image) {
+      return order.accessory_details.image;
+    }
+    // Priority 4: Innerwear details
+    if (order.innerwear_details?.image) {
+      return order.innerwear_details.image;
+    }
+    // Priority 5: Product details
+    if (order.product_details?.image) {
+      return order.product_details.image;
+    }
+
+    // Fallback
+    return "https://via.placeholder.com/50?text=No+Image";
   };
 
   /* ===================== TABLE COLUMNS ===================== */
@@ -85,6 +113,8 @@ export default function UserDashboard() {
     fabric: "gold",
     rental: "purple",
     traditional: "cyan",
+    accessory: "magenta",
+    innerwear: "volcano",
     other: "default",
   };
 
@@ -98,44 +128,19 @@ export default function UserDashboard() {
       title: "Image",
       key: "image",
       render: (_, order) => {
-        const getImage = () => {
-          // ✅ Priority 1: Fabric details
-          if (order.fabric_details?.image) {
-            return order.fabric_details.image;
-          }
-          // ✅ Priority 2: Rental item details
-          if (order.rental_item_details?.image) {
-            return order.rental_item_details.image;
-          }
-          // ✅ Priority 3: Accessory details
-          if (order.accessory_details?.image) {
-            return order.accessory_details.image;
-          }
-          // ✅ Priority 4: Innerwear details
-          if (order.innerwear_details?.image) {
-            return order.innerwear_details.image;
-          }
-          // ✅ Priority 5: Product details
-          if (order.product_details?.image) {
-            return order.product_details.image;
-          }
-          return "https://via.placeholder.com/50";
-        };
-        const img = getImage();
-        const fullUrl = img.startsWith("http")
-          ? img
-          : `http://127.0.0.1:8000${img}`;
+        const imgSrc = getOrderImage(order);
+        const fullUrl = imgSrc.startsWith("http")
+          ? imgSrc
+          : `http://127.0.0.1:8000${imgSrc}`;
 
         return (
-          <img
+          <Image
             src={fullUrl}
             alt={order.product_name}
-            style={{
-              width: 50,
-              height: 50,
-              objectFit: "cover",
-              borderRadius: 4,
-            }}
+            width={50}
+            height={50}
+            style={{ objectFit: "cover", borderRadius: 4 }}
+            fallback="https://via.placeholder.com/50?text=No+Image"
           />
         );
       },
@@ -172,7 +177,7 @@ export default function UserDashboard() {
     {
       title: "Status",
       dataIndex: "status",
-      render: (s) => <Tag color="blue">{s.toUpperCase()}</Tag>,
+      render: (s) => <Tag color="blue">{s.toUpperCase().replace("_", " ")}</Tag>,
     },
   ];
 

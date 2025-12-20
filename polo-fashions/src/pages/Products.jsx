@@ -10,7 +10,7 @@ import {
 } from "../services/api";
 import ProductCard from "../components/ProductCard";
 
-// Product modals (UNCHANGED)
+// Product modals
 import FabricModal from "../components/products/FabricModal";
 import ReadyMadeModal from "../components/products/ReadyMadeModal";
 import TraditionalModal from "../components/products/TraditionalModal";
@@ -53,6 +53,8 @@ export default function Products() {
   }, []);
 
   const openModalForProduct = (product) => {
+    console.log('🔵 Opening modal for product:', product);
+    console.log('🔵 Active category:', activeCategory);
     setSelectedProduct(product);
     setShowModal(false);
     setTimeout(() => setShowModal(true), 10);
@@ -63,7 +65,7 @@ export default function Products() {
     setSelectedProduct(null);
   };
 
-  /* ================= FILTER LOGIC (UNCHANGED) ================= */
+  /* ================= FILTER LOGIC ================= */
 
   let filteredProducts = [];
 
@@ -96,16 +98,25 @@ export default function Products() {
     }
   }
 
-  /* ================= MODAL TYPE LOGIC (UNCHANGED) ================= */
+  /* ================= MODAL TYPE LOGIC (FIXED) ================= */
 
-  const isTraditional = selectedProduct?.category === "traditional";
-  const isCustomTraditional =
-    isTraditional && selectedProduct?.type === "custom";
-  const isFabric = selectedProduct?.type === "custom" && !isTraditional;
-  const isReadyMade = selectedProduct?.type === "readymade";
-  const isRental = activeCategory === "rentals";
-  const isAccessory =
-    activeCategory === "accessories" || activeCategory === "innerwear";
+  // ✅ SIMPLIFIED: If we're in fabrics tab, show fabric modal
+  const isFabricModal = activeCategory === "fabrics" && selectedProduct;
+
+  const isTraditional = activeCategory === "traditional" || selectedProduct?.category === "traditional";
+  const isReadyMade = (activeCategory === "ready_shirts" || activeCategory === "ready_pants") && selectedProduct;
+  const isRental = activeCategory === "rentals" && selectedProduct;
+  const isAccessory = (activeCategory === "accessories" || activeCategory === "innerwear") && selectedProduct;
+
+  console.log('🟢 Modal Logic:', {
+    isFabricModal,
+    isTraditional,
+    isReadyMade,
+    isRental,
+    isAccessory,
+    selectedProduct: selectedProduct?.name,
+    activeCategory
+  });
 
   /* ================= UI ================= */
 
@@ -156,9 +167,10 @@ export default function Products() {
         )}
       </Row>
 
-      {/* ================= MODALS (UNCHANGED) ================= */}
+      {/* ================= MODALS ================= */}
 
-      {isFabric && !isCustomTraditional && (
+      {/* ✅ Fabric Modal - Shows for fabrics tab (both pure fabrics AND custom products) */}
+      {isFabricModal && (
         <FabricModal
           show={showModal}
           onHide={closeModal}
@@ -168,6 +180,7 @@ export default function Products() {
         />
       )}
 
+      {/* Ready-made Modal */}
       {isReadyMade && (
         <ReadyMadeModal
           show={showModal}
@@ -178,7 +191,8 @@ export default function Products() {
         />
       )}
 
-      {isCustomTraditional && (
+      {/* Traditional Modal */}
+      {isTraditional && (
         <TraditionalModal
           show={showModal}
           onHide={closeModal}
@@ -188,6 +202,7 @@ export default function Products() {
         />
       )}
 
+      {/* Rental Modal */}
       {isRental && (
         <RentalModal
           show={showModal}
@@ -198,6 +213,7 @@ export default function Products() {
         />
       )}
 
+      {/* Accessory/Innerwear Modal */}
       {isAccessory && (
         <AccessoryModal
           show={showModal}
