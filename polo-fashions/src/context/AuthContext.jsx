@@ -246,6 +246,22 @@ export function AuthProvider({ children }) {
       };
     }
   };
+  const updateOrderStatus = async (orderId, newStatus) => {
+    try {
+      // ✅ send correct payload
+      await ordersAPI.updateStatus(orderId, newStatus);
+
+      // ✅ optimistic UI update (single source of truth)
+      setOrders((prev) =>
+        prev.map((o) => (o.id === orderId ? { ...o, status: newStatus } : o))
+      );
+
+      return { success: true };
+    } catch (error) {
+      console.error("Failed to update order status:", error);
+      throw error;
+    }
+  };
 
   // ========================================
   // CONTEXT VALUE
@@ -263,6 +279,8 @@ export function AuthProvider({ children }) {
     updateBookingStatus,
     updateUserMeasurement,
     addOrder,
+    refreshOrders,
+    updateOrderStatus,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

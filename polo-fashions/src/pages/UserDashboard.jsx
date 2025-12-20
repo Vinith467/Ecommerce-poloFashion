@@ -18,7 +18,7 @@ import {
   ClockCircleOutlined,
 } from "@ant-design/icons";
 import { useAuth } from "../context/AuthContext";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 export default function UserDashboard() {
   const navigate = useNavigate();
@@ -94,7 +94,13 @@ export default function UserDashboard() {
       dataIndex: "id",
       render: (id) => `#${id}`,
     },
-    { title: "Product", dataIndex: "product_name" },
+    {
+      title: "Product",
+      dataIndex: "product_name",
+      render: (_, order) => (
+        <Link to={`/orders/${order.id}`}>{order.product_name}</Link>
+      ),
+    },
     {
       title: "Type",
       dataIndex: "product_type",
@@ -212,4 +218,4 @@ export default function UserDashboard() {
       </Card>
     </div>
   );
-}
+} 

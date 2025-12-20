@@ -15,6 +15,7 @@ import {
   Empty,
   Space,
   message,
+  Select,
 } from "antd";
 import {
   UserOutlined,
@@ -26,6 +27,42 @@ import {
   ClockCircleOutlined,
 } from "@ant-design/icons";
 import { useAuth } from "../context/AuthContext";
+const ORDER_STATUS_LABELS = {
+  placed: "Placed",
+  processing: "Processing",
+  stitching: "Stitching",
+  buttoning: "Buttoning",
+  ironing: "Ironing",
+  ready_for_pickup: "Ready for Pickup",
+  picked_up: "Picked Up",
+  returned: "Returned",
+  deposit_refunded: "Deposit Refunded",
+  cancelled: "Cancelled",
+};
+
+const ORDER_STATUS_COLORS = {
+  placed: "default",
+  processing: "blue",
+  stitching: "purple",
+  buttoning: "cyan",
+  ironing: "gold",
+  ready_for_pickup: "orange",
+  picked_up: "green",
+  returned: "volcano",
+  deposit_refunded: "lime",
+  cancelled: "red",
+};
+
+const ORDER_STATUS_FLOW = {
+  placed: ["processing"],
+  processing: ["stitching", "ready_for_pickup"],
+  stitching: ["buttoning"],
+  buttoning: ["ironing"],
+  ironing: ["ready_for_pickup"],
+  ready_for_pickup: ["picked_up"],
+  picked_up: ["returned"],
+  returned: ["deposit_refunded"],
+};
 
 export default function AdminDashboard() {
   const {
@@ -34,6 +71,7 @@ export default function AdminDashboard() {
     orders,
     updateBookingStatus,
     updateUserMeasurement,
+    updateOrderStatus, // ✅ ADD
   } = useAuth();
 
   const [showMeasurementModal, setShowMeasurementModal] = useState(false);
@@ -45,8 +83,12 @@ export default function AdminDashboard() {
 
   // ✅ FIX: Filter customer users safely
   const customerUsers = (users || []).filter((u) => u.role === "customer");
-  const pendingBookings = (bookings || []).filter((b) => b.status === "pending");
-  const processingOrders = (orders || []).filter((o) => o.status === "processing");
+  const pendingBookings = (bookings || []).filter(
+    (b) => b.status === "pending"
+  );
+  const processingOrders = (orders || []).filter(
+    (o) => o.status === "processing"
+  );
 
   const handleOpenMeasurementModal = (user) => {
     setSelectedUser(user);
@@ -96,6 +138,27 @@ export default function AdminDashboard() {
       });
     } catch {
       return dateStr;
+    }
+  };
+  const getNextStatuses = (order) => {
+    let next = ORDER_STATUS_FLOW[order.status] || [];
+
+    // Rental-only protection
+    if (!order.rental_days || order.rental_days === 0) {
+      next = next.filter((s) => s !== "returned" && s !== "deposit_refunded");
+    }
+
+    return next;
+  };
+
+  const handleOrderStatusUpdate = async (orderId, newStatus) => {
+    try {
+      await updateOrderStatus(orderId, newStatus);
+      message.success("Order status updated successfully");
+    } catch (err) {
+      message.error(
+        err?.response?.data?.error || "Failed to update order status"
+      );
     }
   };
 
@@ -164,13 +227,17 @@ export default function AdminDashboard() {
               <Button
                 size="small"
                 type="primary"
-                onClick={() => handleUpdateBookingStatus(booking.id, "confirmed")}
+                onClick={() =>
+                  handleUpdateBookingStatus(booking.id, "confirmed")
+                }
               >
                 Confirm
               </Button>
               <Button
                 size="small"
-                onClick={() => handleUpdateBookingStatus(booking.id, "completed")}
+                onClick={() =>
+                  handleUpdateBookingStatus(booking.id, "completed")
+                }
               >
                 Complete
               </Button>
@@ -185,9 +252,7 @@ export default function AdminDashboard() {
               Complete
             </Button>
           )}
-          {booking.status === "completed" && (
-            <Tag color="green">Finished</Tag>
-          )}
+          {booking.status === "completed" && <Tag color="green">Finished</Tag>}
         </Space>
       ),
     },
@@ -224,7 +289,9 @@ export default function AdminDashboard() {
         const isCompleted = user.measurement_status === "completed";
         return (
           <Tag
-            icon={isCompleted ? <CheckCircleOutlined /> : <ClockCircleOutlined />}
+            icon={
+              isCompleted ? <CheckCircleOutlined /> : <ClockCircleOutlined />
+            }
             color={isCompleted ? "green" : "orange"}
           >
             {isCompleted ? "Completed" : "Pending"}
@@ -298,9 +365,7 @@ export default function AdminDashboard() {
       title: "Total",
       dataIndex: "total_price",
       key: "total_price",
-      render: (price) => (
-        <strong style={{ color: "#1677ff" }}>₹{price}</strong>
-      ),
+      render: (price) => <strong style={{ color: "#1677ff" }}>₹{price}</strong>,
     },
     {
       title: "Date",
@@ -310,21 +375,31 @@ export default function AdminDashboard() {
     },
     {
       title: "Status",
-      dataIndex: "status",
       key: "status",
-      render: (status) => {
-        const statusColors = {
-          processing: "blue",
-          confirmed: "cyan",
-          in_production: "purple",
-          ready: "orange",
-          completed: "green",
-          cancelled: "red",
-        };
+      render: (_, order) => {
+        const nextStatuses = getNextStatuses(order);
+
         return (
-          <Tag color={statusColors[status] || "default"}>
-            {status.toUpperCase().replace(/_/g, " ")}
-          </Tag>
+          <Space direction="vertical">
+            <Tag color={ORDER_STATUS_COLORS[order.status]}>
+              {ORDER_STATUS_LABELS[order.status]}
+            </Tag>
+
+            {nextStatuses.length > 0 && (
+              <Select
+                size="small"
+                placeholder="Update status"
+                style={{ width: 180 }}
+                onChange={(value) => handleOrderStatusUpdate(order.id, value)}
+              >
+                {nextStatuses.map((status) => (
+                  <Select.Option key={status} value={status}>
+                    {ORDER_STATUS_LABELS[status]}
+                  </Select.Option>
+                ))}
+              </Select>
+            )}
+          </Space>
         );
       },
     },

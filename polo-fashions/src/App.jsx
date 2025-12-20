@@ -10,17 +10,14 @@ import Products from "./pages/Products";
 import Booking from "./pages/Booking";
 import UserDashboard from "./pages/UserDashboard";
 import AdminDashboard from "./pages/AdminDashboard";
+import OrderTracking from "./pages/OrderTracking";
 
 import "./App.css";
 function ProtectedRoute({ children, role }) {
   const { currentUser, authLoading } = useAuth();
 
   if (authLoading) {
-    return (
-      <div className="text-center py-5">
-        Loading...
-      </div>
-    );
+    return <div className="text-center py-5">Loading...</div>;
   }
 
   if (!currentUser) {
@@ -33,7 +30,6 @@ function ProtectedRoute({ children, role }) {
 
   return children;
 }
-
 
 function AppLayout() {
   return (
@@ -64,8 +60,23 @@ function AppLayout() {
               </ProtectedRoute>
             }
           />
+          <Route
+            path="/orders/:id"
+            element={
+              <ProtectedRoute role="customer">
+                <OrderTracking />
+              </ProtectedRoute>
+            }
+          />
 
-         <Route path="/admin" element={ <ProtectedRoute role="admin"> <AdminDashboard /> </ProtectedRoute> } />
+          <Route
+            path="/admin"
+            element={
+              <ProtectedRoute role="admin">
+                <AdminDashboard />
+              </ProtectedRoute>
+            }
+          />
 
           {/* Fallback */}
           <Route path="*" element={<Navigate to="/" replace />} />

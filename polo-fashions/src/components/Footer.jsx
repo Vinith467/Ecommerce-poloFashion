@@ -28,6 +28,10 @@ export default function Footer() {
           <Text style={{ color: "rgba(255,255,255,0.75)" }}>
             Your trusted partner for custom tailoring and premium ready-made
             traditional wear.
+            <div>
+              Get Your Dress Ready in as soon as 1-2 Hours Only at Polo
+              Fashions!
+            </div>
           </Text>
         </Col>
 
@@ -40,21 +44,21 @@ export default function Footer() {
           <div style={{ marginBottom: 8 }}>
             <EnvironmentOutlined style={{ marginRight: 8 }} />
             <Text style={{ color: "rgba(255,255,255,0.75)" }}>
-              123 Fashion Street, Bangalore, Karnataka 560001
+              #GF-30, Anjuman-Eslamiya Complex, T.V.S. Road Kollegal-571 440
             </Text>
           </div>
 
           <div style={{ marginBottom: 8 }}>
             <PhoneOutlined style={{ marginRight: 8 }} />
             <Text style={{ color: "rgba(255,255,255,0.75)" }}>
-              +91 98765 43210
+              +91 9742445626
             </Text>
           </div>
 
           <div>
             <MailOutlined style={{ marginRight: 8 }} />
             <Text style={{ color: "rgba(255,255,255,0.75)" }}>
-              info@polofashions.com
+              vinuvinith0007@gmail.com
             </Text>
           </div>
         </Col>
@@ -69,18 +73,20 @@ export default function Footer() {
             <ClockCircleOutlined />
             <div>
               <Text style={{ color: "rgba(255,255,255,0.75)" }}>
-                Monday - Saturday: 10:00 AM - 8:00 PM
+                Monday - Saturday: 9:30 AM - 10:00 PM
               </Text>
               <br />
               <Text style={{ color: "rgba(255,255,255,0.75)" }}>
-                Sunday: 11:00 AM - 6:00 PM
+                Sunday: 10:00 AM - 6:00 PM
               </Text>
             </div>
           </div>
         </Col>
       </Row>
 
-      <Divider style={{ borderColor: "rgba(255,255,255,0.2)", margin: "32px 0" }} />
+      <Divider
+        style={{ borderColor: "rgba(255,255,255,0.2)", margin: "32px 0" }}
+      />
 
       <Row justify="center">
         <Text style={{ color: "rgba(255,255,255,0.65)" }}>

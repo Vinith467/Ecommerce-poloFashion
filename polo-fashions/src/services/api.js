@@ -141,9 +141,14 @@ export const bookingsAPI = {
   },
 
   updateStatus: async (id, status) => {
-    const response = await api.patch(`/bookings/${id}/`, { status });
+    const response = await api.patch(
+      `/orders/${id}/update-status/`,
+      { status }
+    );
     return response.data;
   },
+
+
 };
 // Orders APIs
 export const ordersAPI = {
@@ -156,7 +161,6 @@ export const ordersAPI = {
     // --- REQUIRED FIELDS FOR ALL ORDERS ---
     const payload = {
       product: orderData.productId,
-      product_name: orderData.productName,
       order_type: orderData.orderType,     // fabric_only, fabric_with_stitching, rental, accessory
       quantity: orderData.quantity,
       total_price: orderData.totalPrice,

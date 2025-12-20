@@ -1,6 +1,5 @@
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
-import { useContext } from "react";
-import { AuthContext } from "../context/AuthContext";
+import { useAuth } from "../context/AuthContext";
 
 import Home from "../pages/Home";
 import Products from "../pages/Products";
@@ -9,12 +8,20 @@ import Login from "../pages/Login";
 import Register from "../pages/Register";
 import UserDashboard from "../pages/UserDashboard";
 import AdminDashboard from "../pages/AdminDashboard";
+import OrderTracking from "../pages/OrderTracking";
 
-function PrivateRoute({ children, role }) {
-  const { user } = useContext(AuthContext);
+function PrivateRoute({ children, adminOnly = false }) {
+  const { currentUser, authLoading } = useAuth();
 
-  if (!user) return <Navigate to="/login" />;
-  if (role && user.role !== role) return <Navigate to="/" />;
+  if (authLoading) return null; // or spinner
+
+  if (!currentUser) {
+    return <Navigate to="/login" replace />;
+  }
+
+  if (adminOnly && !currentUser.isAdmin) {
+    return <Navigate to="/" replace />;
+  }
 
   return children;
 }
@@ -29,7 +36,7 @@ export default function AppRouter() {
         <Route
           path="/booking"
           element={
-            <PrivateRoute role="customer">
+            <PrivateRoute>
               <Booking />
             </PrivateRoute>
           }
@@ -41,16 +48,27 @@ export default function AppRouter() {
         <Route
           path="/dashboard"
           element={
-            <PrivateRoute role="customer">
+            <PrivateRoute>
               <UserDashboard />
             </PrivateRoute>
           }
         />
 
+        {/* ✅ CUSTOMER ORDER TRACKING */}
+        <Route
+          path="/orders/:id"
+          element={
+            <PrivateRoute>
+              <OrderTracking />
+            </PrivateRoute>
+          }
+        />
+
+        {/* ✅ ADMIN */}
         <Route
           path="/admin"
           element={
-            <PrivateRoute role="admin">
+            <PrivateRoute adminOnly>
               <AdminDashboard />
             </PrivateRoute>
           }

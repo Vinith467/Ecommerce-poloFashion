@@ -23,7 +23,9 @@ class OrderSerializer(serializers.ModelSerializer):
         ]
         read_only_fields = [
             'id', 'user', 'customer_name', 'user_name',
-            'status', 'order_date', 'product_details', 'fabric_details',
+            'status', 'order_date', 'product_details',
+            'product_name', 
+            'fabric_details',
             'created_at', 'updated_at'
         ]
 
@@ -74,14 +76,17 @@ class OrderSerializer(serializers.ModelSerializer):
     
    
         
-
     def create(self, validated_data):
-        print("Creating...")
-        request = self.context.get('request')
-        print(f"Request created by user : {request.user.username}")
-        print(f"Data : \n\t{validated_data}")
-        if request and hasattr(request, 'user'):
-            validated_data['user'] = request.user
-            validated_data['customer_name'] = request.user.get_full_name() or request.user.username
-        print("Order created")
+        request = self.context.get("request")
+
+        if request and hasattr(request, "user"):
+            validated_data["user"] = request.user
+            validated_data["customer_name"] = (
+                request.user.get_full_name() or request.user.username
+            )
+
+        product = validated_data.get("product")
+        if product:
+            validated_data["product_name"] = product.name  # 🔥 single source of truth
+
         return super().create(validated_data)
