@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Modal,
   Button,
@@ -35,6 +35,28 @@ export default function AccessoryModal({
 
   const isInnerwear = category === "innerwear";
 
+  // ✅ RESET STATE WHEN PRODUCT CHANGES
+  useEffect(() => {
+    if (selectedProduct) {
+      setQuantity(1);
+      setSelectedSize("");
+      setOrderError("");
+      setOrderSuccess("");
+      setPlacing(false);
+    }
+  }, [selectedProduct]);
+
+  // ✅ RESET STATE WHEN MODAL CLOSES
+  useEffect(() => {
+    if (!show) {
+      setQuantity(1);
+      setSelectedSize("");
+      setOrderError("");
+      setOrderSuccess("");
+      setPlacing(false);
+    }
+  }, [show]);
+
   const handlePlaceOrder = async () => {
     setOrderError("");
     setOrderSuccess("");
@@ -54,14 +76,20 @@ export default function AccessoryModal({
       return;
     }
 
+    // ✅ FIXED: Use correct ID field based on category
     const orderData = {
-      productId: selectedProduct.id,
+      ...(isInnerwear 
+        ? { innerwearId: selectedProduct.id }
+        : { accessoryId: selectedProduct.id }
+      ),
       productName: selectedProduct.name,
       orderType: isInnerwear ? "innerwear" : "accessory",
       quantity,
       size: isInnerwear ? selectedSize : null,
-      totalPrice: selectedProduct.price * quantity, // 🔒 untouched
+      totalPrice: selectedProduct.price * quantity,
     };
+
+    console.log('Submitting order:', orderData);  // ✅ Debug log
 
     try {
       setPlacing(true);
@@ -77,8 +105,9 @@ export default function AccessoryModal({
       } else {
         setOrderError(result.message || "Failed to place order");
       }
-    } catch {
+    } catch (error) {
       setPlacing(false);
+      console.error('Order error:', error);
       setOrderError("Failed to place order");
     }
   };
@@ -90,6 +119,7 @@ export default function AccessoryModal({
       footer={null}
       width={900}
       title={selectedProduct?.name}
+      destroyOnClose={true}  // ✅ Destroy modal content on close
     >
       {orderSuccess && (
         <Alert
@@ -112,7 +142,7 @@ export default function AccessoryModal({
       {selectedProduct && (
         <Row gutter={24}>
           <Col span={10}>
-            <ProductImageGallery product={selectedProduct} />
+            <ProductImageGallery product={selectedProduct} key={selectedProduct.id} />
 
             <Divider />
 

@@ -104,8 +104,15 @@ export default function FabricModal({
       return;
     }
 
+    // ✅ FIXED: Determine if this is a Fabric or a Custom Product
+    const isFabricItem = !selectedProduct.type || !selectedProduct.category;
+    
     const orderData = {
-      productId: selectedProduct.id,
+      // ✅ Use fabricId for actual fabrics, productId for custom products
+      ...(isFabricItem 
+        ? { fabricId: selectedProduct.id } 
+        : { productId: selectedProduct.id }
+      ),
       productName: selectedProduct.name,
       orderType: wantStitching ? "fabric_with_stitching" : "fabric_only",
       meters: Number(meters),
@@ -113,6 +120,7 @@ export default function FabricModal({
       stitchingCharge: wantStitching ? calcStitchCharge() : 0,
       fabricPricePerMeter: Number(selectedProduct.price),
       totalPrice: calcTotal(),
+      quantity: 1,
     };
 
     try {

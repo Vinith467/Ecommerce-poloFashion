@@ -65,22 +65,25 @@ export default function OrderTracking() {
 
   const currentStep = getCurrentStepIndex(order);
   const getOrderImage = (order) => {
-    // ✅ Priority 1: Fabric details (for fabric/custom orders)
+    // ✅ Priority 1: Fabric details
     if (order.fabric_details?.image) {
-      const img = order.fabric_details.image;
-      return img.startsWith("http") ? img : `http://127.0.0.1:8000${img}`;
+      return order.fabric_details.image;
     }
-
     // ✅ Priority 2: Rental item details
     if (order.rental_item_details?.image) {
-      const img = order.rental_item_details.image;
-      return img.startsWith("http") ? img : `http://127.0.0.1:8000${img}`;
+      return order.rental_item_details.image;
     }
-
-    // ✅ Priority 3: Product details (for ready-made/traditional)
+    // ✅ Priority 3: Accessory details
+    if (order.accessory_details?.image) {
+      return order.accessory_details.image;
+    }
+    // ✅ Priority 4: Innerwear details
+    if (order.innerwear_details?.image) {
+      return order.innerwear_details.image;
+    }
+    // ✅ Priority 5: Product details
     if (order.product_details?.image) {
-      const img = order.product_details.image;
-      return img.startsWith("http") ? img : `http://127.0.0.1:8000${img}`;
+      return order.product_details.image;
     }
 
     // ✅ Fallback

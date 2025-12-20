@@ -59,6 +59,25 @@ class Order(models.Model):
         blank=True,
         related_name='orders'
     )
+    
+
+    # ✅ ACCESSORY REFERENCE
+    accessory = models.ForeignKey(
+        'products.Accessory',
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='orders'
+    )
+
+    # ✅ INNERWEAR REFERENCE
+    innerwear = models.ForeignKey(
+        'products.Innerwear',
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='orders'
+    )
 
     # ===============================
     # Fabric / Custom fields

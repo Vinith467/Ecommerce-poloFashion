@@ -99,7 +99,7 @@ export default function UserDashboard() {
       key: "image",
       render: (_, order) => {
         const getImage = () => {
-          // ✅ Priority 1: Fabric details (for fabric/custom orders)
+          // ✅ Priority 1: Fabric details
           if (order.fabric_details?.image) {
             return order.fabric_details.image;
           }
@@ -107,13 +107,20 @@ export default function UserDashboard() {
           if (order.rental_item_details?.image) {
             return order.rental_item_details.image;
           }
-          // ✅ Priority 3: Product details (for ready-made/traditional)
+          // ✅ Priority 3: Accessory details
+          if (order.accessory_details?.image) {
+            return order.accessory_details.image;
+          }
+          // ✅ Priority 4: Innerwear details
+          if (order.innerwear_details?.image) {
+            return order.innerwear_details.image;
+          }
+          // ✅ Priority 5: Product details
           if (order.product_details?.image) {
             return order.product_details.image;
           }
           return "https://via.placeholder.com/50";
         };
-
         const img = getImage();
         const fullUrl = img.startsWith("http")
           ? img
@@ -148,9 +155,9 @@ export default function UserDashboard() {
         return <Tag color={color}>{type?.toUpperCase().replace("-", " ")}</Tag>;
       },
     },
-    { 
-      title: "Qty", 
-      dataIndex: "quantity" 
+    {
+      title: "Qty",
+      dataIndex: "quantity",
     },
     {
       title: "Total",

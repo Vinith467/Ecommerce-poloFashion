@@ -76,6 +76,7 @@ export const authAPI = {
     const response = await api.get('/accounts/users/');
     return response.data;
   },
+  
   updateMeasurement: async (userId, formData) => {
     const response = await api.patch(
       `/accounts/users/${userId}/update_measurement/`,
@@ -83,10 +84,8 @@ export const authAPI = {
     );
     return response.data;
   },
-
-
 };
-// RAI apis
+
 // ------------------- RENTALS -------------------
 export const rentalsAPI = {
   getAll: () => api.get("/rentals/").then(r => r.data),
@@ -101,6 +100,7 @@ export const accessoriesAPI = {
 export const innerwearAPI = {
   getAll: () => api.get("/innerwear/").then(r => r.data),
 };
+
 // Products APIs
 export const productsAPI = {
   getAll: async () => {
@@ -130,7 +130,6 @@ export const bookingsAPI = {
   },
 
   create: async (bookingData) => {
-    // Only send what we have - Django will fill the rest from request.user
     const payload = {
       phone: bookingData.phone,
       date: bookingData.date,
@@ -147,24 +146,39 @@ export const bookingsAPI = {
     );
     return response.data;
   },
-
-
 };
-// Orders APIs
+
+// ================= ORDERS API (FIXED) =================
 export const ordersAPI = {
   getAll: async () => {
     const response = await api.get('/orders/');
     return response.data;
   },
+  
   create: async (orderData) => {
     const payload = {
-      quantity: orderData.quantity,
+      quantity: orderData.quantity || 1,
       total_price: orderData.totalPrice,
     };
 
+    // ✅ FABRIC ORDERS (from Fabrics tab)
+    if (orderData.fabricId) {
+      payload.fabric = orderData.fabricId;
+      
+      if (orderData.meters) {
+        payload.meters = orderData.meters;
+        payload.fabric_price_per_meter = orderData.fabricPricePerMeter;
+      }
+
+      // With stitching
+      if (orderData.stitchType) {
+        payload.stitch_type = orderData.stitchType;
+        payload.stitching_charge = orderData.stitchingCharge;
+      }
+    }
     // ✅ RENTAL ORDERS
-    if (orderData.rentalItemId) {
-      payload.rental_item = orderData.rentalItemId;  // ✅ Use rental_item field
+    else if (orderData.rentalItemId) {
+      payload.rental_item = orderData.rentalItemId;
       payload.rental_days = orderData.rentalDays;
       payload.rental_deposit = orderData.rentalDeposit;
       payload.rental_price_per_day = orderData.rentalPricePerDay;
@@ -173,27 +187,46 @@ export const ordersAPI = {
         payload.size = orderData.size;
       }
     }
-    // ✅ REGULAR PRODUCT ORDERS
+    // ✅ PRODUCT ORDERS (Ready-made, Traditional, Custom products)
     else if (orderData.productId) {
       payload.product = orderData.productId;
 
-      // Fabric price
+      // Fabric-related fields for CUSTOM products
       if (orderData.fabricPricePerMeter) {
         payload.fabric_price_per_meter = orderData.fabricPricePerMeter;
       }
 
-      // Meters
       if (orderData.meters) {
         payload.meters = orderData.meters;
       }
 
-      // Stitching
+      // Stitching for custom products
       if (orderData.stitchType) {
         payload.stitch_type = orderData.stitchType;
         payload.stitching_charge = orderData.stitchingCharge;
       }
 
-      // Size
+      // Size for ready-made and traditional
+      if (orderData.size) {
+        payload.size = orderData.size;
+      }
+    }
+    // ✅ ACCESSORY ORDERS
+    else if (orderData.accessoryId) {
+      // For now, we'll use product FK with a flag
+      // You'll need to add accessory FK to Order model for proper separation
+      payload.product = orderData.accessoryId;
+      
+      if (orderData.size) {
+        payload.size = orderData.size;
+      }
+    }
+    // ✅ INNERWEAR ORDERS
+    else if (orderData.innerwearId) {
+      // For now, we'll use product FK with a flag
+      // You'll need to add innerwear FK to Order model for proper separation
+      payload.product = orderData.innerwearId;
+      
       if (orderData.size) {
         payload.size = orderData.size;
       }
@@ -205,7 +238,7 @@ export const ordersAPI = {
 
   updateStatus: async (id, status) => {
     const response = await api.patch(`/orders/${id}/update-status/`,
-      { status }  // Backend expects { status: "new_status" }
+      { status }
     );
     return response.data;
   },
