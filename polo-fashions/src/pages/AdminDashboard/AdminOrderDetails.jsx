@@ -24,6 +24,9 @@ import {
   ClockCircleOutlined,
 } from "@ant-design/icons";
 import { useAuth } from "../../context/AuthContext";
+import { ordersAPI } from "../../services/api"; // ✅ IMPORT THIS
+
+const API_BASE_URL = 'http://127.0.0.1:8000';
 
 const ORDER_STATUS_LABELS = {
   placed: "Placed",
@@ -74,24 +77,12 @@ export default function AdminOrderDetails() {
   const fetchOrderDetails = async () => {
     try {
       setLoading(true);
-      const token = localStorage.getItem("token");
-      const response = await fetch(
-        `http://127.0.0.1:8000/api/orders/${orderId}/`,
-        {
-          headers: {
-            Authorization: `Token ${token}`,
-          },
-        }
-      );
-
-      if (!response.ok) {
-        throw new Error("Failed to fetch order details");
-      }
-
-      const data = await response.json();
+      // ✅ USE YOUR API SERVICE INSTEAD OF DIRECT FETCH
+      const data = await ordersAPI.getById(orderId);
       setOrder(data);
       setError(null);
     } catch (err) {
+      console.error('Failed to fetch order:', err);
       setError(err.message);
       message.error("Failed to load order details");
     } finally {
@@ -141,6 +132,36 @@ export default function AdminOrderDetails() {
     } catch {
       return dateStr;
     }
+  };
+
+  // ✅ FIXED: Helper to get image with proper priority
+  const getOrderImage = () => {
+    if (!order) return "https://via.placeholder.com/120?text=No+Image";
+    
+    let imageUrl = null;
+
+    // Priority 1: Multi-image arrays
+    if (order.product_details?.images?.length > 0) {
+      imageUrl = order.product_details.images[0].image;
+    } else if (order.rental_item_details?.images?.length > 0) {
+      imageUrl = order.rental_item_details.images[0].image;
+    }
+    
+    // Priority 2: Single image fields
+    if (!imageUrl) {
+      imageUrl = order.fabric_details?.image || 
+                 order.rental_item_details?.image ||
+                 order.accessory_details?.image ||
+                 order.innerwear_details?.image ||
+                 order.product_details?.image;
+    }
+
+    // Convert relative to absolute
+    if (imageUrl && !imageUrl.startsWith('http')) {
+      imageUrl = `${API_BASE_URL}${imageUrl}`;
+    }
+
+    return imageUrl || "https://via.placeholder.com/120?text=No+Image";
   };
 
   if (loading) {
@@ -222,7 +243,7 @@ export default function AdminOrderDetails() {
       <Row gutter={[24, 24]}>
         {/* Left Column */}
         <Col xs={24} lg={16}>
-          {/* 🧵 Order Details */}
+          {/* Order Details */}
           <Card
             title={
               <Space>
@@ -239,8 +260,8 @@ export default function AdminOrderDetails() {
               <Descriptions.Item label="Customer Name">
                 {order.customer_name || "—"}
               </Descriptions.Item>
-              <Descriptions.Item label="Phone">
-                {order.customer_phone || "—"}
+              <Descriptions.Item label="Product Name">
+                {order.product_name || "—"}
               </Descriptions.Item>
               <Descriptions.Item label="Order Type">
                 <Tag color="blue">{order.product_type?.toUpperCase()}</Tag>
@@ -262,14 +283,14 @@ export default function AdminOrderDetails() {
                     {order.rental_days} days
                   </Descriptions.Item>
                   <Descriptions.Item label="Deposit Amount">
-                    ₹{order.deposit_amount || 0}
+                    ₹{order.rental_deposit || 0}
                   </Descriptions.Item>
                 </>
               )}
             </Descriptions>
           </Card>
 
-          {/* 👕 Product Details */}
+          {/* Product Details */}
           <Card
             title={
               <Space>
@@ -280,150 +301,54 @@ export default function AdminOrderDetails() {
             style={{ marginBottom: 24 }}
           >
             <Row gutter={24}>
-              {/* Product Image */}
-              {order.product_details?.image && (
-                <Col xs={24} md={8}>
-                  <Image
-                    src={order.product_details.image}
-                    alt={order.product_name}
-                    style={{
-                      width: "100%",
-                      borderRadius: 8,
-                      border: "1px solid #d9d9d9",
-                    }}
-                  />
-                </Col>
-              )}
+              <Col xs={24} md={8}>
+                <Image
+                  src={getOrderImage()}
+                  alt={order.product_name}
+                  style={{
+                    width: "100%",
+                    borderRadius: 8,
+                    border: "1px solid #d9d9d9",
+                  }}
+                  fallback="https://via.placeholder.com/120?text=No+Image"
+                />
+              </Col>
 
-              {/* Product Info */}
-              <Col xs={24} md={order.product_details?.image ? 16 : 24}>
+              <Col xs={24} md={16}>
                 <Descriptions column={1} bordered>
                   <Descriptions.Item label="Product Name">
                     <strong>{order.product_name || "—"}</strong>
                   </Descriptions.Item>
-                  <Descriptions.Item label="Category">
-                    {order.product_details?.category || "—"}
-                  </Descriptions.Item>
-                  {order.product_details?.brand && (
-                    <Descriptions.Item label="Brand">
-                      {order.product_details.brand}
+                  {order.size && (
+                    <Descriptions.Item label="Size">
+                      <Tag color="blue">{order.size}</Tag>
                     </Descriptions.Item>
                   )}
-                  {order.product_details?.color && (
-                    <Descriptions.Item label="Color">
-                      {order.product_details.color}
+                  {order.fabric_name && (
+                    <Descriptions.Item label="Fabric">
+                      {order.fabric_name}
                     </Descriptions.Item>
                   )}
-                  {order.product_details?.description && (
-                    <Descriptions.Item label="Description">
-                      {order.product_details.description}
+                  {order.meters && (
+                    <Descriptions.Item label="Meters">
+                      {order.meters} m
+                    </Descriptions.Item>
+                  )}
+                  {order.stitch_type && (
+                    <Descriptions.Item label="Stitch Type">
+                      {order.stitch_type.toUpperCase()}
                     </Descriptions.Item>
                   )}
                 </Descriptions>
               </Col>
             </Row>
           </Card>
-
-          {/* 📏 Tailoring Details */}
-          {(order.product_type === "traditional" ||
-            order.fabric_details ||
-            order.product_details?.size) && (
-            <Card
-              title={
-                <Space>
-                  <ScissorOutlined />
-                  <span>Tailoring Details</span>
-                </Space>
-              }
-            >
-              <Descriptions column={2} bordered>
-                {/* Ready-made Size */}
-                {order.product_type === "ready_made" &&
-                  order.product_details?.size && (
-                    <Descriptions.Item label="Size" span={2}>
-                      <Tag color="blue" style={{ fontSize: 16, padding: "4px 12px" }}>
-                        {order.product_details.size}
-                      </Tag>
-                    </Descriptions.Item>
-                  )}
-
-                {/* Traditional/Custom Details */}
-                {order.product_type === "traditional" && (
-                  <>
-                    {order.fabric_details?.name && (
-                      <Descriptions.Item label="Fabric Name">
-                        <strong>{order.fabric_details.name}</strong>
-                      </Descriptions.Item>
-                    )}
-                    {order.fabric_details?.meters && (
-                      <Descriptions.Item label="Meters Required">
-                        {order.fabric_details.meters} meters
-                      </Descriptions.Item>
-                    )}
-                    {order.fabric_details?.stitch_type && (
-                      <Descriptions.Item label="Stitch Type" span={2}>
-                        <Tag color="purple">
-                          {order.fabric_details.stitch_type}
-                        </Tag>
-                      </Descriptions.Item>
-                    )}
-                  </>
-                )}
-
-                {/* Measurement Status */}
-                <Descriptions.Item label="Measurement Status" span={2}>
-                  {order.measurement_status === "completed" ? (
-                    <Tag
-                      icon={<CheckCircleOutlined />}
-                      color="success"
-                      style={{ fontSize: 14, padding: "4px 12px" }}
-                    >
-                      COMPLETED
-                    </Tag>
-                  ) : (
-                    <Tag
-                      icon={<ClockCircleOutlined />}
-                      color="warning"
-                      style={{ fontSize: 14, padding: "4px 12px" }}
-                    >
-                      PENDING
-                    </Tag>
-                  )}
-                </Descriptions.Item>
-
-                {/* Notes */}
-                {order.notes && (
-                  <Descriptions.Item label="Special Notes" span={2}>
-                    <Alert
-                      message={order.notes}
-                      type="info"
-                      showIcon
-                      style={{ marginTop: 8 }}
-                    />
-                  </Descriptions.Item>
-                )}
-              </Descriptions>
-
-              {/* Warning for Pending Measurements */}
-              {order.measurement_status !== "completed" &&
-                order.product_type === "traditional" && (
-                  <Alert
-                    message="⚠️ Measurement Pending"
-                    description="Customer measurements are not completed. Please complete measurements before starting tailoring to avoid mistakes."
-                    type="warning"
-                    showIcon
-                    style={{ marginTop: 16 }}
-                  />
-                )}
-            </Card>
-          )}
         </Col>
 
-        {/* Right Column - Actions */}
+        {/* Right Column */}
         <Col xs={24} lg={8}>
           <Card title="Order Actions" style={{ position: "sticky", top: 24 }}>
             <Space direction="vertical" style={{ width: "100%" }} size="large">
-              {/* Status Update */}
               {nextStatuses.length > 0 && (
                 <div>
                   <h4 style={{ marginBottom: 12 }}>Update Status</h4>
@@ -444,7 +369,6 @@ export default function AdminOrderDetails() {
 
               <Divider />
 
-              {/* Customer Info */}
               <div>
                 <h4 style={{ marginBottom: 12 }}>
                   <UserOutlined /> Customer Info
@@ -453,36 +377,8 @@ export default function AdminOrderDetails() {
                   <Descriptions.Item label="Name">
                     {order.customer_name || "—"}
                   </Descriptions.Item>
-                  <Descriptions.Item label="Phone">
-                    {order.customer_phone || "—"}
-                  </Descriptions.Item>
-                  {order.customer_email && (
-                    <Descriptions.Item label="Email">
-                      {order.customer_email}
-                    </Descriptions.Item>
-                  )}
                 </Descriptions>
               </div>
-
-              {/* Measurement Alert */}
-              {order.product_type === "traditional" && (
-                <>
-                  <Divider />
-                  <Alert
-                    message="Tailoring Checklist"
-                    description={
-                      <ul style={{ paddingLeft: 20, marginBottom: 0 }}>
-                        <li>Verify customer measurements</li>
-                        <li>Check fabric availability</li>
-                        <li>Confirm stitch type</li>
-                        <li>Review special notes</li>
-                      </ul>
-                    }
-                    type="info"
-                    showIcon
-                  />
-                </>
-              )}
             </Space>
           </Card>
         </Col>

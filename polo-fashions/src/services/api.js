@@ -154,6 +154,12 @@ export const ordersAPI = {
     const response = await api.get('/orders/');
     return response.data;
   },
+    // ✅ ADD THIS METHOD
+  getById: async (id) => {
+    const response = await api.get(`/orders/${id}/`);
+    return response.data;
+  },
+  
   
   create: async (orderData) => {
     // ✅ BASE PAYLOAD (always required)
