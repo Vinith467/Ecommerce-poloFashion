@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Modal,
   Button,
@@ -32,6 +32,17 @@ export default function ReadyMadeModal({
   const [orderSuccess, setOrderSuccess] = useState("");
   const [placing, setPlacing] = useState(false);
 
+  // ✅ RESET STATE when modal opens/closes or product changes
+  useEffect(() => {
+    if (show && selectedProduct) {
+      setSelectedSize("");
+      setQuantity(1);
+      setOrderError("");
+      setOrderSuccess("");
+      setPlacing(false);
+    }
+  }, [show, selectedProduct]);
+
   const handlePlaceOrder = async () => {
     setOrderError("");
     setOrderSuccess("");
@@ -51,14 +62,17 @@ export default function ReadyMadeModal({
       return;
     }
 
+    // ✅ FIXED: Ensure orderType is included
     const orderData = {
       productId: selectedProduct.id,
       productName: selectedProduct.name,
-      orderType: "readymade",
+      orderType: "readymade", // ✅ CRITICAL
       quantity,
       size: selectedSize,
-      totalPrice: selectedProduct.price * quantity, // 🔒 untouched
+      totalPrice: selectedProduct.price * quantity,
     };
+
+    console.log('📦 Ready-made order data:', orderData);
 
     try {
       setPlacing(true);
@@ -74,9 +88,10 @@ export default function ReadyMadeModal({
       } else {
         setOrderError(result.message || "Failed to place order");
       }
-    } catch {
+    } catch (error) {
       setPlacing(false);
-      setOrderError("Failed to place order");
+      console.error('❌ Order error:', error);
+      setOrderError(error?.response?.data?.detail || "Failed to place order");
     }
   };
 
@@ -87,6 +102,7 @@ export default function ReadyMadeModal({
       footer={null}
       width={900}
       title={selectedProduct?.name}
+      destroyOnClose // ✅ Ensures clean state
     >
       {orderSuccess && (
         <Alert
@@ -110,30 +126,45 @@ export default function ReadyMadeModal({
         <Row gutter={24}>
           {/* LEFT */}
           <Col span={10}>
-            <ProductImageGallery product={selectedProduct} />
+            <ProductImageGallery 
+              product={selectedProduct} 
+              key={selectedProduct.id} // ✅ Force re-render
+            />
 
             <Divider />
 
-            <Text strong>
-              Price:{" "}
-              <Text type="primary">₹{selectedProduct.price}</Text>
-            </Text>
+            <div style={{ marginBottom: 12 }}>
+              <Text strong style={{ fontSize: 18 }}>
+                Price:{" "}
+                <Text type="primary" style={{ fontSize: 20 }}>
+                  ₹{selectedProduct.price}
+                </Text>
+              </Text>
+            </div>
 
             <Paragraph type="secondary" style={{ marginTop: 8 }}>
               {selectedProduct.description}
             </Paragraph>
+
+            {selectedProduct.brand && (
+              <div style={{ marginTop: 12 }}>
+                <Text type="secondary">Brand: </Text>
+                <Text strong>{selectedProduct.brand}</Text>
+              </div>
+            )}
           </Col>
 
           {/* RIGHT */}
           <Col span={14}>
             {selectedProduct.sizes && (
               <div style={{ marginBottom: 16 }}>
-                <Text>Select Size</Text>
+                <Text strong>Select Size *</Text>
                 <Select
-                  style={{ width: "100%" }}
+                  style={{ width: "100%", marginTop: 8 }}
                   value={selectedSize}
-                  placeholder="Select size"
+                  placeholder="Choose size"
                   onChange={setSelectedSize}
+                  size="large"
                 >
                   {selectedProduct.sizes.map((size) => (
                     <Select.Option key={size} value={size}>
@@ -145,24 +176,32 @@ export default function ReadyMadeModal({
             )}
 
             <div style={{ marginBottom: 16 }}>
-              <Text>Quantity</Text>
+              <Text strong>Quantity</Text>
               <InputNumber
                 min={1}
                 value={quantity}
                 onChange={setQuantity}
-                style={{ width: "100%" }}
+                style={{ width: "100%", marginTop: 8 }}
+                size="large"
               />
             </div>
 
             <Divider />
 
             <Space
-              style={{ width: "100%", justifyContent: "space-between" }}
+              direction="horizontal"
+              style={{
+                width: "100%",
+                justifyContent: "space-between",
+                padding: "12px 16px",
+                background: "#f5f5f5",
+                borderRadius: 8,
+              }}
             >
-              <Text>
+              <Text style={{ fontSize: 16 }}>
                 {quantity} × ₹{selectedProduct.price}
               </Text>
-              <Text strong type="primary">
+              <Text strong type="primary" style={{ fontSize: 20 }}>
                 ₹{selectedProduct.price * quantity}
               </Text>
             </Space>
@@ -173,13 +212,16 @@ export default function ReadyMadeModal({
       <Divider />
 
       <Space style={{ width: "100%", justifyContent: "flex-end" }}>
-        <Button onClick={onHide}>Close</Button>
+        <Button onClick={onHide} size="large">
+          Close
+        </Button>
         <Button
           type="primary"
           icon={<ShoppingOutlined />}
           loading={placing}
           disabled={!selectedSize}
           onClick={handlePlaceOrder}
+          size="large"
         >
           Place Order
         </Button>

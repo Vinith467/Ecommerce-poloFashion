@@ -21,6 +21,8 @@ import {
 import { useAuth } from "../context/AuthContext";
 import { Link, useNavigate } from "react-router-dom";
 
+const API_BASE_URL = 'http://127.0.0.1:8000';
+
 export default function UserDashboard() {
   const navigate = useNavigate();
   const { currentUser, bookings = [], orders = [] } = useAuth();
@@ -38,31 +40,33 @@ export default function UserDashboard() {
     });
   };
 
-  // ✅ HELPER: Get order image from any source
+  // ✅ FIXED: Enhanced helper with proper priority for multi-image arrays
   const getOrderImage = (order) => {
-    // Priority 1: Fabric details
-    if (order.fabric_details?.image) {
-      return order.fabric_details.image;
+    let imageUrl = null;
+
+    // ✅ Priority 1: Check multi-image arrays FIRST (ready-made, traditional, rentals)
+    if (order.product_details?.images?.length > 0) {
+      imageUrl = order.product_details.images[0].image;
+    } else if (order.rental_item_details?.images?.length > 0) {
+      imageUrl = order.rental_item_details.images[0].image;
     }
-    // Priority 2: Rental item details
-    if (order.rental_item_details?.image) {
-      return order.rental_item_details.image;
+    
+    // ✅ Priority 2: Single image fields (fabrics, accessories, innerwear)
+    if (!imageUrl) {
+      imageUrl = order.fabric_details?.image || 
+                 order.rental_item_details?.image ||
+                 order.accessory_details?.image ||
+                 order.innerwear_details?.image ||
+                 order.product_details?.image;
     }
-    // Priority 3: Accessory details
-    if (order.accessory_details?.image) {
-      return order.accessory_details.image;
-    }
-    // Priority 4: Innerwear details
-    if (order.innerwear_details?.image) {
-      return order.innerwear_details.image;
-    }
-    // Priority 5: Product details
-    if (order.product_details?.image) {
-      return order.product_details.image;
+
+    // ✅ Convert relative URLs to absolute
+    if (imageUrl && !imageUrl.startsWith('http')) {
+      imageUrl = `${API_BASE_URL}${imageUrl}`;
     }
 
     // Fallback
-    return "https://via.placeholder.com/50?text=No+Image";
+    return imageUrl || "https://via.placeholder.com/50?text=No+Image";
   };
 
   /* ===================== TABLE COLUMNS ===================== */
@@ -127,23 +131,16 @@ export default function UserDashboard() {
     {
       title: "Image",
       key: "image",
-      render: (_, order) => {
-        const imgSrc = getOrderImage(order);
-        const fullUrl = imgSrc.startsWith("http")
-          ? imgSrc
-          : `http://127.0.0.1:8000${imgSrc}`;
-
-        return (
-          <Image
-            src={fullUrl}
-            alt={order.product_name}
-            width={50}
-            height={50}
-            style={{ objectFit: "cover", borderRadius: 4 }}
-            fallback="https://via.placeholder.com/50?text=No+Image"
-          />
-        );
-      },
+      render: (_, order) => (
+        <Image
+          src={getOrderImage(order)}
+          alt={order.product_name}
+          width={50}
+          height={50}
+          style={{ objectFit: "cover", borderRadius: 4 }}
+          fallback="https://via.placeholder.com/50?text=No+Image"
+        />
+      ),
     },
     {
       title: "Product",

@@ -35,12 +35,29 @@ class OrderSerializer(serializers.ModelSerializer):
         ]
 
     def get_product_details(self, obj):
+        """
+        Get product details with proper image handling.
+        Checks for related images first, then falls back to main image field.
+        """
         if obj.product:
+            # Get primary image - check for related images first, then main image field
+            image_url = None
+            
+            # Priority 1: Check if product has related images (ProductImage model)
+            if hasattr(obj.product, 'images') and obj.product.images.exists():
+                first_image = obj.product.images.first()
+                if first_image and first_image.image:
+                    image_url = first_image.image.url
+            
+            # Priority 2: Check main image field
+            elif obj.product.image:
+                image_url = obj.product.image.url
+            
             return {
                 'id': obj.product.id,
                 'name': obj.product.name,
                 'category': getattr(obj.product, 'category', None),
-                'image': obj.product.image.url if obj.product.image else None,
+                'image': image_url,
             }
         return None
 

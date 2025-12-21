@@ -15,6 +15,8 @@ import { ArrowLeftOutlined } from "@ant-design/icons";
 import { useAuth } from "../context/AuthContext";
 
 const { Title, Text } = Typography;
+const API_BASE_URL = 'http://127.0.0.1:8000';
+
 const ORDER_STEPS = [
   "placed",
   "processing",
@@ -38,6 +40,7 @@ const STATUS_LABELS = {
   returned: "Returned",
   deposit_refunded: "Deposit Refunded",
 };
+
 const getCurrentStepIndex = (order) => {
   const steps = [
     ...ORDER_STEPS,
@@ -64,30 +67,34 @@ export default function OrderTracking() {
   ];
 
   const currentStep = getCurrentStepIndex(order);
+
+  // ✅ FIXED: Enhanced helper with proper priority for multi-image arrays
   const getOrderImage = (order) => {
-    // ✅ Priority 1: Fabric details
-    if (order.fabric_details?.image) {
-      return order.fabric_details.image;
+    let imageUrl = null;
+
+    // ✅ Priority 1: Check multi-image arrays FIRST (ready-made, traditional, rentals)
+    if (order.product_details?.images?.length > 0) {
+      imageUrl = order.product_details.images[0].image;
+    } else if (order.rental_item_details?.images?.length > 0) {
+      imageUrl = order.rental_item_details.images[0].image;
     }
-    // ✅ Priority 2: Rental item details
-    if (order.rental_item_details?.image) {
-      return order.rental_item_details.image;
-    }
-    // ✅ Priority 3: Accessory details
-    if (order.accessory_details?.image) {
-      return order.accessory_details.image;
-    }
-    // ✅ Priority 4: Innerwear details
-    if (order.innerwear_details?.image) {
-      return order.innerwear_details.image;
-    }
-    // ✅ Priority 5: Product details
-    if (order.product_details?.image) {
-      return order.product_details.image;
+    
+    // ✅ Priority 2: Single image fields (fabrics, accessories, innerwear)
+    if (!imageUrl) {
+      imageUrl = order.fabric_details?.image || 
+                 order.rental_item_details?.image ||
+                 order.accessory_details?.image ||
+                 order.innerwear_details?.image ||
+                 order.product_details?.image;
     }
 
-    // ✅ Fallback
-    return "https://via.placeholder.com/120";
+    // ✅ Convert relative URLs to absolute
+    if (imageUrl && !imageUrl.startsWith('http')) {
+      imageUrl = `${API_BASE_URL}${imageUrl}`;
+    }
+
+    // Fallback
+    return imageUrl || "https://via.placeholder.com/120?text=No+Image";
   };
 
   return (
@@ -106,8 +113,9 @@ export default function OrderTracking() {
         <div style={{ display: "flex", gap: 16, marginBottom: 24 }}>
           <Image
             width={120}
-            src={getOrderImage(order)} // ✅ Use helper function
+            src={getOrderImage(order)}
             alt={order.product_name}
+            fallback="https://via.placeholder.com/120?text=No+Image"
           />
 
           <div>

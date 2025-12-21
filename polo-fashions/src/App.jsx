@@ -9,7 +9,7 @@ import Register from "./pages/Register";
 import Products from "./pages/Products";
 import Booking from "./pages/Booking";
 import UserDashboard from "./pages/UserDashboard";
-import AdminDashboard from "./pages/AdminDashboard";
+import AdminDashboard from "./pages/AdminDashboard/AdminDashboard";
 import OrderTracking from "./pages/OrderTracking";
 
 import "./App.css";

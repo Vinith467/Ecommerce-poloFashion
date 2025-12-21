@@ -148,7 +148,7 @@ export const bookingsAPI = {
   },
 };
 
-// ================= ORDERS API (FIXED) =================
+// ================= ORDERS API (COMPREHENSIVE FIX) =================
 export const ordersAPI = {
   getAll: async () => {
     const response = await api.get('/orders/');
@@ -156,86 +156,126 @@ export const ordersAPI = {
   },
   
   create: async (orderData) => {
+    // ✅ BASE PAYLOAD (always required)
     const payload = {
       quantity: orderData.quantity || 1,
       total_price: orderData.totalPrice,
     };
 
-    // ✅ FABRIC ORDERS (from Fabrics tab)
+    console.log('📦 Creating order with data:', orderData);
+
+    // ================= ORDER TYPE DETECTION =================
+
+    // ✅ TYPE 1: FABRIC ORDERS (from Fabrics tab)
     if (orderData.fabricId) {
       payload.fabric = orderData.fabricId;
       
       if (orderData.meters) {
-        payload.meters = orderData.meters;
-        payload.fabric_price_per_meter = orderData.fabricPricePerMeter;
+        payload.meters = Number(orderData.meters);
+        payload.fabric_price_per_meter = Number(orderData.fabricPricePerMeter);
       }
 
       // With stitching
       if (orderData.stitchType) {
         payload.stitch_type = orderData.stitchType;
-        payload.stitching_charge = orderData.stitchingCharge;
+        payload.stitching_charge = Number(orderData.stitchingCharge);
       }
+
+      console.log('🧵 Fabric order payload:', payload);
     }
-    // ✅ RENTAL ORDERS
+    
+    // ✅ TYPE 2: RENTAL ORDERS
     else if (orderData.rentalItemId) {
       payload.rental_item = orderData.rentalItemId;
-      payload.rental_days = orderData.rentalDays || 0;
-      payload.rental_deposit = orderData.rentalDeposit || 0;
-      payload.rental_price_per_day = orderData.rentalPricePerDay || 0;
+      payload.rental_days = Number(orderData.rentalDays) || 0;
+      payload.rental_deposit = Number(orderData.rentalDeposit) || 0;
+      payload.rental_price_per_day = Number(orderData.rentalPricePerDay) || 0;
 
       if (orderData.size) {
         payload.size = orderData.size;
       }
+
+      console.log('🎩 Rental order payload:', payload);
     }
-    // ✅ ACCESSORY ORDERS
+    
+    // ✅ TYPE 3: ACCESSORY ORDERS
     else if (orderData.accessoryId) {
       payload.accessory = orderData.accessoryId;
       
       if (orderData.size) {
         payload.size = orderData.size;
       }
+
+      console.log('👔 Accessory order payload:', payload);
     }
-    // ✅ INNERWEAR ORDERS
+    
+    // ✅ TYPE 4: INNERWEAR ORDERS
     else if (orderData.innerwearId) {
       payload.innerwear = orderData.innerwearId;
       
       if (orderData.size) {
         payload.size = orderData.size;
       }
+
+      console.log('👕 Innerwear order payload:', payload);
     }
-    // ✅ PRODUCT ORDERS (Ready-made, Traditional, Custom products)
+    
+    // ✅ TYPE 5: PRODUCT ORDERS (Ready-made, Traditional, Custom products)
     else if (orderData.productId) {
       payload.product = orderData.productId;
 
-      // Fabric-related fields for CUSTOM products
+      // ✅ Ready-made / Traditional orders
+      if (orderData.orderType === "readymade" || orderData.orderType === "traditional") {
+        if (orderData.size) {
+          payload.size = orderData.size;
+        }
+        
+        // Traditional with stitching
+        if (orderData.stitchType) {
+          payload.stitch_type = orderData.stitchType;
+          payload.stitching_charge = Number(orderData.stitchingCharge);
+        }
+      }
+
+      // ✅ Custom products (with fabric)
       if (orderData.fabricPricePerMeter) {
-        payload.fabric_price_per_meter = orderData.fabricPricePerMeter;
+        payload.fabric_price_per_meter = Number(orderData.fabricPricePerMeter);
       }
 
       if (orderData.meters) {
-        payload.meters = orderData.meters;
+        payload.meters = Number(orderData.meters);
       }
 
       // Stitching for custom products
-      if (orderData.stitchType) {
+      if (orderData.stitchType && !payload.stitch_type) {
         payload.stitch_type = orderData.stitchType;
-        payload.stitching_charge = orderData.stitchingCharge;
+        payload.stitching_charge = Number(orderData.stitchingCharge);
       }
 
-      // Size for ready-made and traditional
-      if (orderData.size) {
-        payload.size = orderData.size;
-      }
+      console.log('📦 Product order payload:', payload);
     }
 
-    console.log('🔵 Order Payload:', payload); // Debug log
+    // ✅ ERROR: No valid order type detected
+    else {
+      console.error('❌ Invalid order data - no product ID found:', orderData);
+      throw new Error('Invalid order data: No product identifier provided');
+    }
 
-    const response = await api.post('/orders/', payload);
-    return response.data;
+    // ✅ SEND REQUEST
+    try {
+      console.log('🚀 Sending order payload:', payload);
+      const response = await api.post('/orders/', payload);
+      console.log('✅ Order created successfully:', response.data);
+      return response.data;
+    } catch (error) {
+      console.error('❌ Order creation failed:', error.response?.data || error);
+      throw error;
+    }
   },
 
   updateStatus: async (id, status) => {
-    const response = await api.patch(`/orders/${id}/update-status/`,
+    const response = await api.patch(
+      `/orders/${id}/update-status/`,
       { status }
     );
     return response.data;
