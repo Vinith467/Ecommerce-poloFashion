@@ -244,12 +244,19 @@ export const getCustomerColumns = (
   },
 ];
 
-export const getOrderColumns = (handleOrderStatusUpdate) => [
+export const getOrderColumns = (handleOrderStatusUpdate, navigate) => [
   {
     title: "Order ID",
     dataIndex: "id",
     key: "id",
-    render: (id) => `#${id}`,
+    render: (id) => (
+      <a
+        onClick={() => navigate(`/admin/orders/${id}`)}
+        style={{ color: "#1677ff", cursor: "pointer", fontWeight: 500 }}
+      >
+        #{id}
+      </a>
+    ),
     width: 100,
   },
   {
@@ -261,6 +268,14 @@ export const getOrderColumns = (handleOrderStatusUpdate) => [
     title: "Product",
     dataIndex: "product_name",
     key: "product_name",
+    render: (product_name, record) => (
+      <a
+        onClick={() => navigate(`/admin/orders/${record.id}`)}
+        style={{ color: "#1677ff", cursor: "pointer" }}
+      >
+        {product_name}
+      </a>
+    ),
   },
   {
     title: "Qty",

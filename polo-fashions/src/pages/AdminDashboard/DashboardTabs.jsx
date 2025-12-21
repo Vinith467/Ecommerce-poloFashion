@@ -1,5 +1,6 @@
 import React from "react";
 import { Card, Tabs, Table, Empty } from "antd";
+import { useNavigate } from "react-router-dom";
 
 export default function DashboardTabs({
   bookings,

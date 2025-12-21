@@ -10,6 +10,7 @@ import Products from "./pages/Products";
 import Booking from "./pages/Booking";
 import UserDashboard from "./pages/UserDashboard";
 import AdminDashboard from "./pages/AdminDashboard/AdminDashboard";
+import AdminOrderDetails from "./pages/AdminDashboard/AdminOrderDetails";
 import OrderTracking from "./pages/OrderTracking";
 
 import "./App.css";
@@ -76,6 +77,10 @@ function AppLayout() {
                 <AdminDashboard />
               </ProtectedRoute>
             }
+          />
+          <Route
+            path="/admin/orders/:orderId"
+            element={<AdminOrderDetails />}
           />
 
           {/* Fallback */}
