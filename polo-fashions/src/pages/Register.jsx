@@ -69,8 +69,7 @@ export default function Register() {
 
   return (
     <Row justify="center" style={{ padding: 80 }}>
-      <Col span={10}>
-        <Card>
+      <Col xs={24} sm={20} md={16} lg={12} xl={10}>        <Card>
           <div style={{ textAlign: "center", marginBottom: 24 }}>
             <UserAddOutlined style={{ fontSize: 42, color: "#1677ff" }} />
             <Title level={3} style={{ marginTop: 12 }}>

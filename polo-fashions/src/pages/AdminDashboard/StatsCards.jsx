@@ -14,7 +14,7 @@ export default function StatsCards({
 }) {
   return (
     <Row gutter={16} style={{ marginBottom: 24 }}>
-      <Col xs={24} sm={12} md={6}>
+       <Col xs={24} sm={12} md={12} lg={6}>
         <Card>
           <Statistic
             title="Total Customers"
@@ -24,7 +24,7 @@ export default function StatsCards({
           />
         </Card>
       </Col>
-      <Col xs={24} sm={12} md={6}>
+       <Col xs={24} sm={12} md={12} lg={6}>
         <Card>
           <Statistic
             title="Pending Bookings"
@@ -34,7 +34,7 @@ export default function StatsCards({
           />
         </Card>
       </Col>
-      <Col xs={24} sm={12} md={6}>
+       <Col xs={24} sm={12} md={12} lg={6}>
         <Card>
           <Statistic
             title="Processing Orders"
@@ -44,7 +44,7 @@ export default function StatsCards({
           />
         </Card>
       </Col>
-      <Col xs={24} sm={12} md={6}>
+       <Col xs={24} sm={12} md={12} lg={6}>
         <Card>
           <Statistic
             title="Total Orders"

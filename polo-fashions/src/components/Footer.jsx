@@ -15,20 +15,20 @@ export default function Footer() {
       style={{
         background: "#001529",
         color: "#fff",
-        padding: "48px 40px",
+        padding: "32px 24px",
         marginTop: 64,
       }}
     >
-      <Row gutter={[32, 32]}>
+      <Row gutter={[24, 24]}>
         {/* BRAND */}
-        <Col xs={24} md={8}>
+        <Col xs={24} sm={24} md={8}>
           <Title level={4} style={{ color: "#fff" }}>
             Polo Fashions
           </Title>
           <Text style={{ color: "rgba(255,255,255,0.75)" }}>
             Your trusted partner for custom tailoring and premium ready-made
             traditional wear.
-            <div>
+            <div style={{ marginTop: 8 }}>
               Get Your Dress Ready in as soon as 1-2 Hours Only at Polo
               Fashions!
             </div>
@@ -36,7 +36,7 @@ export default function Footer() {
         </Col>
 
         {/* CONTACT */}
-        <Col xs={24} md={8}>
+        <Col xs={24} sm={12} md={8}>
           <Title level={5} style={{ color: "#fff" }}>
             Contact Info
           </Title>
@@ -64,7 +64,7 @@ export default function Footer() {
         </Col>
 
         {/* BUSINESS HOURS */}
-        <Col xs={24} md={8}>
+        <Col xs={24} sm={12} md={8}>
           <Title level={5} style={{ color: "#fff" }}>
             Business Hours
           </Title>
@@ -85,11 +85,11 @@ export default function Footer() {
       </Row>
 
       <Divider
-        style={{ borderColor: "rgba(255,255,255,0.2)", margin: "32px 0" }}
+        style={{ borderColor: "rgba(255,255,255,0.2)", margin: "24px 0 16px" }}
       />
 
       <Row justify="center">
-        <Text style={{ color: "rgba(255,255,255,0.65)" }}>
+        <Text style={{ color: "rgba(255,255,255,0.65)", textAlign: "center" }}>
           © {new Date().getFullYear()} Polo Fashions. All rights reserved.
         </Text>
       </Row>

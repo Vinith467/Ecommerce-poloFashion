@@ -53,8 +53,8 @@ export default function Products() {
   }, []);
 
   const openModalForProduct = (product) => {
-    console.log('🔵 Opening modal for product:', product);
-    console.log('🔵 Active category:', activeCategory);
+    console.log("🔵 Opening modal for product:", product);
+    console.log("🔵 Active category:", activeCategory);
     setSelectedProduct(product);
     setShowModal(false);
     setTimeout(() => setShowModal(true), 10);
@@ -103,19 +103,25 @@ export default function Products() {
   // ✅ SIMPLIFIED: If we're in fabrics tab, show fabric modal
   const isFabricModal = activeCategory === "fabrics" && selectedProduct;
 
-  const isTraditional = activeCategory === "traditional" || selectedProduct?.category === "traditional";
-  const isReadyMade = (activeCategory === "ready_shirts" || activeCategory === "ready_pants") && selectedProduct;
+  const isTraditional =
+    activeCategory === "traditional" ||
+    selectedProduct?.category === "traditional";
+  const isReadyMade =
+    (activeCategory === "ready_shirts" || activeCategory === "ready_pants") &&
+    selectedProduct;
   const isRental = activeCategory === "rentals" && selectedProduct;
-  const isAccessory = (activeCategory === "accessories" || activeCategory === "innerwear") && selectedProduct;
+  const isAccessory =
+    (activeCategory === "accessories" || activeCategory === "innerwear") &&
+    selectedProduct;
 
-  console.log('🟢 Modal Logic:', {
+  console.log("🟢 Modal Logic:", {
     isFabricModal,
     isTraditional,
     isReadyMade,
     isRental,
     isAccessory,
     selectedProduct: selectedProduct?.name,
-    activeCategory
+    activeCategory,
   });
 
   /* ================= UI ================= */
@@ -157,7 +163,14 @@ export default function Products() {
           </Col>
         ) : (
           filteredProducts.map((product) => (
-            <Col key={product.id} span={8}>
+            <Col
+              key={product.id}
+              xs={24} // Full width on extra small
+              sm={12} // Half width on small
+              md={8} // Third width on medium
+              lg={8} // Third width on large
+              xl={6} // Quarter width on extra large
+            >
               <ProductCard
                 product={product}
                 onClick={() => openModalForProduct(product)}

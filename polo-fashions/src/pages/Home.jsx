@@ -35,14 +35,13 @@ export default function Home() {
   return (
     <div>
       {/* HERO SECTION */}
-      <div
-        style={{
+      <div className="hero-section"
+      style={{
           background: "linear-gradient(135deg, #001529, #4096ff)",
           padding: "100px 20px",
           color: "#fff",
           textAlign: "center",
-        }}
-      >
+        }}>
         <Title style={{ color: "#fff" }}>
           Welcome to Polo Fashions
         </Title>
@@ -51,9 +50,9 @@ export default function Home() {
           Where Traditional Craftsmanship Meets Modern Convenience
         </Paragraph>
 
-        {/* 🔑 AUTH-AWARE CTA */}
+        {/* AUTH-AWARE CTA */}
         {!currentUser && (
-          <Space size="large">
+          <Space size="middle" wrap style={{ justifyContent: "center" }}>
             <Button size="large" onClick={() => navigate("/products")}>
               Explore Collection
             </Button>
@@ -74,7 +73,7 @@ export default function Home() {
         )}
 
         {currentUser?.role === "customer" && (
-          <Space size="large">
+          <Space size="middle" wrap style={{ justifyContent: "center" }}>
             <Button
               size="large"
               icon={<UserOutlined />}
@@ -118,39 +117,39 @@ export default function Home() {
         )}
       </div>
 
-      {/* FEATURES SECTION (UNCHANGED) */}
-      <div style={{ padding: "80px 40px" }}>
+      {/* FEATURES SECTION */}
+      <div style={{ padding: "60px 20px" }}>
         <Title level={2} style={{ textAlign: "center", marginBottom: 48 }}>
           Why Choose Polo Fashions?
         </Title>
 
-        <Row gutter={[24, 24]}>
-          <Col span={6}>
-            <Card hoverable style={{ textAlign: "center" }}>
+        <Row gutter={[24, 24]} justify="center">
+          <Col xs={24} sm={12} md={12} lg={6}>
+            <Card hoverable style={{ textAlign: "center", height: "100%" }}>
               <ScissorOutlined style={{ fontSize: 32, color: "#1677ff" }} />
               <Title level={4}>Custom Tailoring</Title>
               <Text>Perfectly tailored clothes made to your measurements</Text>
             </Card>
           </Col>
 
-          <Col span={6}>
-            <Card hoverable style={{ textAlign: "center" }}>
+          <Col xs={24} sm={12} md={12} lg={6}>
+            <Card hoverable style={{ textAlign: "center", height: "100%" }}>
               <ColumnWidthOutlined style={{ fontSize: 32, color: "#1677ff" }} />
               <Title level={4}>One-Time Measurement</Title>
               <Text>Visit once, shop online anytime</Text>
             </Card>
           </Col>
 
-          <Col span={6}>
-            <Card hoverable style={{ textAlign: "center" }}>
+          <Col xs={24} sm={12} md={12} lg={6}>
+            <Card hoverable style={{ textAlign: "center", height: "100%" }}>
               <ShoppingOutlined style={{ fontSize: 32, color: "#1677ff" }} />
               <Title level={4}>Premium Brands</Title>
               <Text>Ramraj, DSP, and more</Text>
             </Card>
           </Col>
 
-          <Col span={6}>
-            <Card hoverable style={{ textAlign: "center" }}>
+          <Col xs={24} sm={12} md={12} lg={6}>
+            <Card hoverable style={{ textAlign: "center", height: "100%" }}>
               <CalendarOutlined style={{ fontSize: 32, color: "#1677ff" }} />
               <Title level={4}>Easy Booking</Title>
               <Text>Book measurement online in seconds</Text>

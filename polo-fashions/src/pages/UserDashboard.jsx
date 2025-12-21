@@ -189,7 +189,7 @@ export default function UserDashboard() {
       {/* TOP CARDS */}
       <Row gutter={16} style={{ marginBottom: 24 }}>
         {/* PROFILE */}
-        <Col span={8}>
+        <Col xs={24} sm={24} md={8}>
           <Card title="Profile Information">
             <p>
               <strong>Name:</strong> {currentUser?.username}
@@ -204,7 +204,7 @@ export default function UserDashboard() {
         </Col>
 
         {/* MEASUREMENT STATUS */}
-        <Col span={8}>
+       <Col xs={24} sm={12} md={8}>
           <Card title="Measurement Status">
             {currentUser?.measurement_status === "completed" ? (
               <Space direction="vertical">
@@ -225,7 +225,7 @@ export default function UserDashboard() {
         </Col>
 
         {/* QUICK STATS */}
-        <Col span={8}>
+        <Col xs={24} sm={12} md={8}>
           <Card title="Quick Stats">
             <Statistic
               title="Bookings"

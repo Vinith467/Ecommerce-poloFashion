@@ -78,8 +78,7 @@ export default function Booking() {
   if (!currentUser) {
     return (
       <Row justify="center" style={{ padding: 80 }}>
-        <Col span={10}>
-          <Alert
+        <Col xs={24} sm={20} md={16} lg={12} xl={10}>          <Alert
             type="warning"
             showIcon
             message="Login Required"
@@ -99,8 +98,7 @@ export default function Booking() {
 
   return (
     <Row justify="center" style={{ padding: 40 }}>
-      <Col span={10}>
-        <Card>
+      <Col xs={24} sm={20} md={16} lg={12} xl={10}>        <Card>
           <div style={{ textAlign: "center", marginBottom: 24 }}>
             <CalendarOutlined style={{ fontSize: 40, color: "#1677ff" }} />
             <Title level={3} style={{ marginTop: 12 }}>

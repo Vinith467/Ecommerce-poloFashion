@@ -1,30 +1,31 @@
 /* =========================
-   HERO SECTION
+   HERO SECTION - RESPONSIVE
 ========================= */
 .hero-section {
   background: linear-gradient(135deg, #1677ff 0%, #4096ff 100%);
   color: #ffffff;
-  padding: 120px 20px 90px;
+  padding: 80px 20px 60px;
   text-align: center;
 }
 
 .hero-section h1 {
-  font-size: 3.2rem;
+  font-size: clamp(1.75rem, 5vw, 3.2rem); /* Responsive font */
   font-weight: 700;
   margin-bottom: 1rem;
   letter-spacing: 0.5px;
 }
 
 .hero-section p {
-  font-size: 1.25rem;
-  margin-bottom: 2.5rem;
+  font-size: clamp(1rem, 3vw, 1.25rem);
+  margin-bottom: 2rem;
   opacity: 0.95;
   max-width: 720px;
   margin-inline: auto;
+  padding: 0 16px;
 }
 
 /* =========================
-   FEATURE CARDS
+   FEATURE CARDS - RESPONSIVE
 ========================= */
 .feature-card {
   border: none;
@@ -35,13 +36,13 @@
 }
 
 .feature-card:hover {
-  transform: translateY(-6px);
-  box-shadow: 0 16px 30px rgba(0, 0, 0, 0.15);
+  transform: translateY(-4px);
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.12);
 }
 
 .feature-icon {
-  width: 64px;
-  height: 64px;
+  width: 56px;
+  height: 56px;
   margin: 0 auto 1rem;
   display: flex;
   align-items: center;
@@ -52,8 +53,16 @@
   box-shadow: 0 6px 18px rgba(22, 119, 255, 0.4);
 }
 
+/* Mobile adjustments */
+@media (max-width: 768px) {
+  .feature-icon {
+    width: 48px;
+    height: 48px;
+  }
+}
+
 /* =========================
-   PRODUCT CARD
+   PRODUCT CARD - RESPONSIVE
 ========================= */
 .product-card {
   cursor: pointer;
@@ -66,17 +75,24 @@
 }
 
 .product-card:hover {
-  transform: translateY(-4px) scale(1.02);
-  box-shadow: 0 16px 30px rgba(0, 0, 0, 0.18);
+  transform: translateY(-3px) scale(1.01);
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
 }
 
 .product-card img {
-  height: 240px;
+  height: 200px;
   object-fit: cover;
+  width: 100%;
+}
+
+@media (max-width: 576px) {
+  .product-card img {
+    height: 180px;
+  }
 }
 
 /* =========================
-   FABRIC CARD
+   FABRIC CARD - RESPONSIVE
 ========================= */
 .fabric-card {
   cursor: pointer;
@@ -89,7 +105,7 @@
 
 .fabric-card:hover {
   border-color: #1677ff;
-  box-shadow: 0 10px 25px rgba(22, 119, 255, 0.35);
+  box-shadow: 0 8px 20px rgba(22, 119, 255, 0.3);
 }
 
 .fabric-card.selected {
@@ -98,8 +114,15 @@
 }
 
 .fabric-card img {
-  height: 200px;
+  height: 180px;
   object-fit: cover;
+  width: 100%;
+}
+
+@media (max-width: 576px) {
+  .fabric-card img {
+    height: 160px;
+  }
 }
 
 /* =========================
@@ -138,7 +161,7 @@
 }
 
 /* =========================
-   PRIMARY BUTTON (BOOTSTRAP OVERRIDE)
+   PRIMARY BUTTON
 ========================= */
 .btn-primary {
   background: linear-gradient(135deg, #1677ff, #4096ff);
@@ -155,31 +178,46 @@
 }
 
 /* =========================
-   FOOTER
+   FOOTER - RESPONSIVE
 ========================= */
 footer {
   margin-top: auto;
   background: #0f172a;
   color: #ffffff;
-  padding: 2.5rem 0;
+  padding: 2rem 1rem;
+}
+
+@media (max-width: 768px) {
+  footer {
+    text-align: center;
+  }
 }
 
 /* =========================
-   TABLE
+   TABLE - RESPONSIVE
 ========================= */
 .table-responsive {
   border-radius: 12px;
   overflow: hidden;
   box-shadow: 0 4px 14px rgba(0, 0, 0, 0.1);
+  overflow-x: auto;
+}
+
+/* Hide table columns on mobile */
+@media (max-width: 768px) {
+  .ant-table-thead > tr > th:not(:first-child):not(:nth-child(2)):not(:last-child),
+  .ant-table-tbody > tr > td:not(:first-child):not(:nth-child(2)):not(:last-child) {
+    display: none;
+  }
 }
 
 /* =========================
-   ADMIN STATS
+   ADMIN STATS - RESPONSIVE
 ========================= */
 .admin-stats {
   background: linear-gradient(135deg, #1677ff, #4096ff);
   color: white;
-  padding: 2rem;
+  padding: 1.5rem;
   border-radius: 16px;
   margin-bottom: 2rem;
 }
@@ -187,7 +225,27 @@ footer {
 .stat-card {
   background: rgba(255, 255, 255, 0.18);
   border-radius: 14px;
-  padding: 1.5rem;
+  padding: 1.25rem;
   backdrop-filter: blur(12px);
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+}
+
+@media (max-width: 768px) {
+  .admin-stats {
+    padding: 1rem;
+  }
+  
+  .stat-card {
+    padding: 1rem;
+    margin-bottom: 12px;
+  }
+}
+
+/* =========================
+   RESPONSIVE PADDING
+========================= */
+@media (max-width: 768px) {
+  .page-container {
+    padding: 16px !important;
+  }
 }
