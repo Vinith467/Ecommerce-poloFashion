@@ -131,13 +131,15 @@ else:
     CORS_ALLOWED_ORIGINS = []
     frontend_url = config('FRONTEND_URL', default='')
     if frontend_url:
+        # Remove trailing slash if present
+        frontend_url = frontend_url.rstrip('/')
         CORS_ALLOWED_ORIGINS.append(frontend_url)
     
     # Also allow from Vercel preview deployments
     CORS_ALLOWED_ORIGIN_REGEXES = [
         r"^https://.*\.vercel\.app$",
     ]
-
+    
 # Custom User Model
 AUTH_USER_MODEL = 'accounts.User'
 
