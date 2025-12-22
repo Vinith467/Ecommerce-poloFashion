@@ -21,7 +21,7 @@ import {
 import { useAuth } from "../context/AuthContext";
 import { Link, useNavigate } from "react-router-dom";
 
-const API_BASE_URL = import.meta.env.VITE_API_URL;
+const API_BASE_URL = import.meta.env.VITE_API_URL?.replace('/api', '') || 'http://127.0.0.1:8000/api';
 
 const normalizeImageUrl = (url) => {
   if (!url) return "https://via.placeholder.com/50?text=No+Image";
