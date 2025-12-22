@@ -2,22 +2,38 @@ import React, { useState, useMemo } from "react";
 import { Modal } from "antd";
 import "./ProductImageGallery.css";
 
+const API_BASE_URL = 'http://127.0.0.1:8000'; // For local development
+// const API_BASE_URL = 'https://ecommerce-polofashion.onrender.com'; // For production
+
+// ✅ Helper function to normalize image URLs
+const normalizeImageUrl = (url) => {
+  if (!url) return null;
+  
+  // If URL is already absolute (starts with http:// or https://), return as-is
+  if (url.startsWith('http://') || url.startsWith('https://')) {
+    return url;
+  }
+  
+  // If URL is relative, prepend the base URL
+  return `${API_BASE_URL}${url.startsWith('/') ? url : '/' + url}`;
+};
+
 export default function ProductImageGallery({ product }) {
-  // ✅ Memoize images so reference does NOT change every render
+  // ✅ Memoize and normalize images
   const images = useMemo(() => {
+    let imageUrls = [];
+    
     if (product.images?.length > 0) {
-      return product.images.map((img) => img.image);
+      imageUrls = product.images.map((img) => normalizeImageUrl(img.image));
+    } else if (product.rental_images?.length > 0) {
+      imageUrls = product.rental_images.map((img) => normalizeImageUrl(img.image));
+    } else if (product.image) {
+      imageUrls = [normalizeImageUrl(product.image)];
     }
-    if (product.rental_images?.length > 0) {
-      return product.rental_images.map((img) => img.image);
-    }
-    if (product.image) {
-      return [product.image];
-    }
-    return [];
+    
+    return imageUrls.filter(Boolean); // Remove any null/undefined values
   }, [product]);
 
-  // ✅ Initialize once
   const [selectedImage, setSelectedImage] = useState(() => images[0]);
   const [fullScreen, setFullScreen] = useState(false);
 
@@ -56,7 +72,7 @@ export default function ProductImageGallery({ product }) {
         width="100vw"
         centered
         closable={false}
-        transitionName="" // remove animation delay
+        transitionName=""
         maskTransitionName=""
         styles={{
           body: {

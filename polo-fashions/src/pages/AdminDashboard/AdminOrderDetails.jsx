@@ -24,9 +24,43 @@ import {
   ClockCircleOutlined,
 } from "@ant-design/icons";
 import { useAuth } from "../../context/AuthContext";
-import { ordersAPI } from "../../services/api"; // ✅ IMPORT THIS
+import { ordersAPI } from "../../services/api";
 
-const API_BASE_URL = 'http://127.0.0.1:8000';
+const API_BASE_URL = import.meta.env.VITE_API_URL;
+
+const normalizeImageUrl = (url) => {
+  if (!url) return "https://via.placeholder.com/120?text=No+Image";
+  if (url.startsWith("http://") || url.startsWith("https://")) {
+    return url;
+  }
+  return `${API_BASE_URL}${url.startsWith("/") ? url : "/" + url}`;
+};
+
+// ✅ Helper to get order image with proper priority
+const getOrderImage = (order) => {
+  if (!order) return "https://via.placeholder.com/120?text=No+Image";
+  
+  let imageUrl = null;
+
+  // Priority 1: Multi-image arrays
+  if (order.product_details?.images?.length > 0) {
+    imageUrl = order.product_details.images[0].image;
+  } else if (order.rental_item_details?.images?.length > 0) {
+    imageUrl = order.rental_item_details.images[0].image;
+  }
+
+  // Priority 2: Single image fields
+  if (!imageUrl) {
+    imageUrl =
+      order.fabric_details?.image ||
+      order.rental_item_details?.image ||
+      order.accessory_details?.image ||
+      order.innerwear_details?.image ||
+      order.product_details?.image;
+  }
+
+  return normalizeImageUrl(imageUrl);
+};
 
 const ORDER_STATUS_LABELS = {
   placed: "Placed",
@@ -77,12 +111,11 @@ export default function AdminOrderDetails() {
   const fetchOrderDetails = async () => {
     try {
       setLoading(true);
-      // ✅ USE YOUR API SERVICE INSTEAD OF DIRECT FETCH
       const data = await ordersAPI.getById(orderId);
       setOrder(data);
       setError(null);
     } catch (err) {
-      console.error('Failed to fetch order:', err);
+      console.error("Failed to fetch order:", err);
       setError(err.message);
       message.error("Failed to load order details");
     } finally {
@@ -99,7 +132,7 @@ export default function AdminOrderDetails() {
     try {
       await updateOrderStatus(orderId, newStatus);
       message.success("Order status updated successfully");
-      fetchOrderDetails(); // Refresh data
+      fetchOrderDetails();
     } catch (err) {
       message.error(
         err?.response?.data?.error || "Failed to update order status"
@@ -110,7 +143,6 @@ export default function AdminOrderDetails() {
   const getNextStatuses = (currentStatus) => {
     let next = ORDER_STATUS_FLOW[currentStatus] || [];
 
-    // Rental-only protection
     if (!order?.rental_days || order.rental_days === 0) {
       next = next.filter((s) => s !== "returned" && s !== "deposit_refunded");
     }
@@ -132,36 +164,6 @@ export default function AdminOrderDetails() {
     } catch {
       return dateStr;
     }
-  };
-
-  // ✅ FIXED: Helper to get image with proper priority
-  const getOrderImage = () => {
-    if (!order) return "https://via.placeholder.com/120?text=No+Image";
-    
-    let imageUrl = null;
-
-    // Priority 1: Multi-image arrays
-    if (order.product_details?.images?.length > 0) {
-      imageUrl = order.product_details.images[0].image;
-    } else if (order.rental_item_details?.images?.length > 0) {
-      imageUrl = order.rental_item_details.images[0].image;
-    }
-    
-    // Priority 2: Single image fields
-    if (!imageUrl) {
-      imageUrl = order.fabric_details?.image || 
-                 order.rental_item_details?.image ||
-                 order.accessory_details?.image ||
-                 order.innerwear_details?.image ||
-                 order.product_details?.image;
-    }
-
-    // Convert relative to absolute
-    if (imageUrl && !imageUrl.startsWith('http')) {
-      imageUrl = `${API_BASE_URL}${imageUrl}`;
-    }
-
-    return imageUrl || "https://via.placeholder.com/120?text=No+Image";
   };
 
   if (loading) {
@@ -204,7 +206,6 @@ export default function AdminOrderDetails() {
 
   return (
     <div style={{ padding: 24, background: "#f0f2f5", minHeight: "100vh" }}>
-      {/* Header */}
       <div style={{ marginBottom: 24 }}>
         <Button
           icon={<ArrowLeftOutlined />}
@@ -241,9 +242,7 @@ export default function AdminOrderDetails() {
       </div>
 
       <Row gutter={[24, 24]}>
-        {/* Left Column */}
         <Col xs={24} lg={16}>
-          {/* Order Details */}
           <Card
             title={
               <Space>
@@ -290,7 +289,6 @@ export default function AdminOrderDetails() {
             </Descriptions>
           </Card>
 
-          {/* Product Details */}
           <Card
             title={
               <Space>
@@ -303,7 +301,7 @@ export default function AdminOrderDetails() {
             <Row gutter={24}>
               <Col xs={24} md={8}>
                 <Image
-                  src={getOrderImage()}
+                  src={getOrderImage(order)}
                   alt={order.product_name}
                   style={{
                     width: "100%",
@@ -345,7 +343,6 @@ export default function AdminOrderDetails() {
           </Card>
         </Col>
 
-        {/* Right Column */}
         <Col xs={24} lg={8}>
           <Card title="Order Actions" style={{ position: "sticky", top: 24 }}>
             <Space direction="vertical" style={{ width: "100%" }} size="large">

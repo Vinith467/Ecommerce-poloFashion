@@ -21,7 +21,39 @@ import {
 import { useAuth } from "../context/AuthContext";
 import { Link, useNavigate } from "react-router-dom";
 
-const API_BASE_URL = 'http://127.0.0.1:8000';
+const API_BASE_URL = import.meta.env.VITE_API_URL;
+
+const normalizeImageUrl = (url) => {
+  if (!url) return "https://via.placeholder.com/50?text=No+Image";
+  if (url.startsWith("http://") || url.startsWith("https://")) {
+    return url;
+  }
+  return `${API_BASE_URL}${url.startsWith("/") ? url : "/" + url}`;
+};
+
+// ✅ Helper to get order image with proper priority
+const getOrderImage = (order) => {
+  let imageUrl = null;
+
+  // Priority 1: Multi-image arrays
+  if (order.product_details?.images?.length > 0) {
+    imageUrl = order.product_details.images[0].image;
+  } else if (order.rental_item_details?.images?.length > 0) {
+    imageUrl = order.rental_item_details.images[0].image;
+  }
+
+  // Priority 2: Single image fields
+  if (!imageUrl) {
+    imageUrl =
+      order.fabric_details?.image ||
+      order.rental_item_details?.image ||
+      order.accessory_details?.image ||
+      order.innerwear_details?.image ||
+      order.product_details?.image;
+  }
+
+  return normalizeImageUrl(imageUrl);
+};
 
 export default function UserDashboard() {
   const navigate = useNavigate();
@@ -39,37 +71,6 @@ export default function UserDashboard() {
       day: "numeric",
     });
   };
-
-  // ✅ FIXED: Enhanced helper with proper priority for multi-image arrays
-  const getOrderImage = (order) => {
-    let imageUrl = null;
-
-    // ✅ Priority 1: Check multi-image arrays FIRST (ready-made, traditional, rentals)
-    if (order.product_details?.images?.length > 0) {
-      imageUrl = order.product_details.images[0].image;
-    } else if (order.rental_item_details?.images?.length > 0) {
-      imageUrl = order.rental_item_details.images[0].image;
-    }
-    
-    // ✅ Priority 2: Single image fields (fabrics, accessories, innerwear)
-    if (!imageUrl) {
-      imageUrl = order.fabric_details?.image || 
-                 order.rental_item_details?.image ||
-                 order.accessory_details?.image ||
-                 order.innerwear_details?.image ||
-                 order.product_details?.image;
-    }
-
-    // ✅ Convert relative URLs to absolute
-    if (imageUrl && !imageUrl.startsWith('http')) {
-      imageUrl = `${API_BASE_URL}${imageUrl}`;
-    }
-
-    // Fallback
-    return imageUrl || "https://via.placeholder.com/50?text=No+Image";
-  };
-
-  /* ===================== TABLE COLUMNS ===================== */
 
   const bookingColumns = [
     {
@@ -174,11 +175,11 @@ export default function UserDashboard() {
     {
       title: "Status",
       dataIndex: "status",
-      render: (s) => <Tag color="blue">{s.toUpperCase().replace("_", " ")}</Tag>,
+      render: (s) => (
+        <Tag color="blue">{s.toUpperCase().replace("_", " ")}</Tag>
+      ),
     },
   ];
-
-  /* ===================== UI ===================== */
 
   return (
     <div style={{ padding: 24 }}>
@@ -186,9 +187,7 @@ export default function UserDashboard() {
         <UserOutlined /> My Dashboard
       </h2>
 
-      {/* TOP CARDS */}
       <Row gutter={16} style={{ marginBottom: 24 }}>
-        {/* PROFILE */}
         <Col xs={24} sm={24} md={8}>
           <Card title="Profile Information">
             <p>
@@ -203,8 +202,7 @@ export default function UserDashboard() {
           </Card>
         </Col>
 
-        {/* MEASUREMENT STATUS */}
-       <Col xs={24} sm={12} md={8}>
+        <Col xs={24} sm={12} md={8}>
           <Card title="Measurement Status">
             {currentUser?.measurement_status === "completed" ? (
               <Space direction="vertical">
@@ -224,7 +222,6 @@ export default function UserDashboard() {
           </Card>
         </Col>
 
-        {/* QUICK STATS */}
         <Col xs={24} sm={12} md={8}>
           <Card title="Quick Stats">
             <Statistic
@@ -241,7 +238,6 @@ export default function UserDashboard() {
         </Col>
       </Row>
 
-      {/* BOOKINGS */}
       <Card title="My Appointments" style={{ marginBottom: 24 }}>
         {userBookings.length === 0 ? (
           <Empty description="No appointments yet" />
@@ -254,7 +250,6 @@ export default function UserDashboard() {
         )}
       </Card>
 
-      {/* ORDERS */}
       <Card title="My Orders">
         {userOrders.length === 0 ? (
           <Empty description="No orders placed yet">
