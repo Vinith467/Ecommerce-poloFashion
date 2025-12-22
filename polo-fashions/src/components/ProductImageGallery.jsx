@@ -2,8 +2,8 @@ import React, { useState, useMemo } from "react";
 import { Modal } from "antd";
 import "./ProductImageGallery.css";
 
-const API_BASE_URL = 'http://127.0.0.1:8000'; // For local development
-// const API_BASE_URL = 'https://ecommerce-polofashion.onrender.com'; // For production
+//const API_BASE_URL = 'http://127.0.0.1:8000'; // For local development
+ const API_BASE_URL = 'https://ecommerce-polofashion.onrender.com'; // For production
 
 // ✅ Helper function to normalize image URLs
 const normalizeImageUrl = (url) => {
