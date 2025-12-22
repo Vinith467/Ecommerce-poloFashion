@@ -1,3 +1,4 @@
+// src/pages/AdminDashboard/AdminOrderDetails.jsx
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import {
@@ -19,48 +20,10 @@ import {
   ArrowLeftOutlined,
   ShoppingOutlined,
   UserOutlined,
-  ScissorOutlined,
-  CheckCircleOutlined,
-  ClockCircleOutlined,
 } from "@ant-design/icons";
 import { useAuth } from "../../context/AuthContext";
 import { ordersAPI } from "../../services/api";
-
-const API_BASE_URL = import.meta.env.VITE_API_URL;
-
-const normalizeImageUrl = (url) => {
-  if (!url) return "https://via.placeholder.com/120?text=No+Image";
-  if (url.startsWith("http://") || url.startsWith("https://")) {
-    return url;
-  }
-  return `${API_BASE_URL}${url.startsWith("/") ? url : "/" + url}`;
-};
-
-// ✅ Helper to get order image with proper priority
-const getOrderImage = (order) => {
-  if (!order) return "https://via.placeholder.com/120?text=No+Image";
-  
-  let imageUrl = null;
-
-  // Priority 1: Multi-image arrays
-  if (order.product_details?.images?.length > 0) {
-    imageUrl = order.product_details.images[0].image;
-  } else if (order.rental_item_details?.images?.length > 0) {
-    imageUrl = order.rental_item_details.images[0].image;
-  }
-
-  // Priority 2: Single image fields
-  if (!imageUrl) {
-    imageUrl =
-      order.fabric_details?.image ||
-      order.rental_item_details?.image ||
-      order.accessory_details?.image ||
-      order.innerwear_details?.image ||
-      order.product_details?.image;
-  }
-
-  return normalizeImageUrl(imageUrl);
-};
+import { getOrderImage } from "../../utils/imageUtils";
 
 const ORDER_STATUS_LABELS = {
   placed: "Placed",

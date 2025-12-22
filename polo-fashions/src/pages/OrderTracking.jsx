@@ -1,3 +1,4 @@
+// src/pages/OrderTracking.jsx
 import React from "react";
 import {
   Steps,
@@ -13,9 +14,10 @@ import {
 import { useParams, useNavigate } from "react-router-dom";
 import { ArrowLeftOutlined } from "@ant-design/icons";
 import { useAuth } from "../context/AuthContext";
+import { getOrderImage } from "../utils/imageUtils";
 
 const { Title, Text } = Typography;
-const API_BASE_URL = import.meta.env.VITE_API_URL?.replace('/api', '') || 'http://127.0.0.1:8000';
+
 const ORDER_STEPS = [
   "placed",
   "processing",
@@ -66,35 +68,6 @@ export default function OrderTracking() {
   ];
 
   const currentStep = getCurrentStepIndex(order);
-
-  // ✅ FIXED: Enhanced helper with proper priority for multi-image arrays
-  const getOrderImage = (order) => {
-    let imageUrl = null;
-
-    // ✅ Priority 1: Check multi-image arrays FIRST (ready-made, traditional, rentals)
-    if (order.product_details?.images?.length > 0) {
-      imageUrl = order.product_details.images[0].image;
-    } else if (order.rental_item_details?.images?.length > 0) {
-      imageUrl = order.rental_item_details.images[0].image;
-    }
-    
-    // ✅ Priority 2: Single image fields (fabrics, accessories, innerwear)
-    if (!imageUrl) {
-      imageUrl = order.fabric_details?.image || 
-                 order.rental_item_details?.image ||
-                 order.accessory_details?.image ||
-                 order.innerwear_details?.image ||
-                 order.product_details?.image;
-    }
-
-    // ✅ Convert relative URLs to absolute
-    if (imageUrl && !imageUrl.startsWith('http')) {
-      imageUrl = `${API_BASE_URL}${imageUrl}`;
-    }
-
-    // Fallback
-    return imageUrl || "https://via.placeholder.com/120?text=No+Image";
-  };
 
   return (
     <div style={{ padding: 24 }}>

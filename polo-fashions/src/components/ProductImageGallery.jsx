@@ -1,20 +1,8 @@
+// src/components/ProductImageGallery.jsx
 import React, { useState, useMemo } from "react";
 import { Modal } from "antd";
+import { normalizeImageUrl } from "../utils/imageUtils";
 import "./ProductImageGallery.css";
-
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000/api';
-// ✅ Helper function to normalize image URLs
-const normalizeImageUrl = (url) => {
-  if (!url) return null;
-  
-  // If URL is already absolute (starts with http:// or https://), return as-is
-  if (url.startsWith('http://') || url.startsWith('https://')) {
-    return url;
-  }
-  
-  // If URL is relative, prepend the base URL
-  return `${API_BASE_URL}${url.startsWith('/') ? url : '/' + url}`;
-};
 
 export default function ProductImageGallery({ product }) {
   // ✅ Memoize and normalize images
@@ -47,6 +35,9 @@ export default function ProductImageGallery({ product }) {
               className={`thumb ${selectedImage === img ? "active-thumb" : ""}`}
               onClick={() => setSelectedImage(img)}
               alt=""
+              onError={(e) => {
+                e.target.src = "https://via.placeholder.com/70?text=Error";
+              }}
             />
           ))}
         </div>
@@ -58,6 +49,9 @@ export default function ProductImageGallery({ product }) {
             className="main-image"
             onClick={() => setFullScreen(true)}
             alt=""
+            onError={(e) => {
+              e.target.src = "https://via.placeholder.com/380?text=Image+Not+Found";
+            }}
           />
         </div>
       </div>
@@ -93,6 +87,9 @@ export default function ProductImageGallery({ product }) {
             src={selectedImage}
             alt="Product"
             className="ecom-fullscreen-image"
+            onError={(e) => {
+              e.target.src = "https://via.placeholder.com/800?text=Image+Not+Found";
+            }}
           />
         </div>
       </Modal>

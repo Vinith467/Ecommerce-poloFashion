@@ -1,3 +1,4 @@
+// src/pages/UserDashboard.jsx
 import React from "react";
 import {
   Card,
@@ -20,40 +21,7 @@ import {
 } from "@ant-design/icons";
 import { useAuth } from "../context/AuthContext";
 import { Link, useNavigate } from "react-router-dom";
-
-const API_BASE_URL = import.meta.env.VITE_API_URL?.replace('/api', '') || 'http://127.0.0.1:8000/api';
-
-const normalizeImageUrl = (url) => {
-  if (!url) return "https://via.placeholder.com/50?text=No+Image";
-  if (url.startsWith("http://") || url.startsWith("https://")) {
-    return url;
-  }
-  return `${API_BASE_URL}${url.startsWith("/") ? url : "/" + url}`;
-};
-
-// ✅ Helper to get order image with proper priority
-const getOrderImage = (order) => {
-  let imageUrl = null;
-
-  // Priority 1: Multi-image arrays
-  if (order.product_details?.images?.length > 0) {
-    imageUrl = order.product_details.images[0].image;
-  } else if (order.rental_item_details?.images?.length > 0) {
-    imageUrl = order.rental_item_details.images[0].image;
-  }
-
-  // Priority 2: Single image fields
-  if (!imageUrl) {
-    imageUrl =
-      order.fabric_details?.image ||
-      order.rental_item_details?.image ||
-      order.accessory_details?.image ||
-      order.innerwear_details?.image ||
-      order.product_details?.image;
-  }
-
-  return normalizeImageUrl(imageUrl);
-};
+import { getOrderImage } from "../utils/imageUtils";
 
 export default function UserDashboard() {
   const navigate = useNavigate();
@@ -140,6 +108,7 @@ export default function UserDashboard() {
           height={50}
           style={{ objectFit: "cover", borderRadius: 4 }}
           fallback="https://via.placeholder.com/50?text=No+Image"
+          preview={false}
         />
       ),
     },
@@ -246,6 +215,7 @@ export default function UserDashboard() {
             rowKey="id"
             columns={bookingColumns}
             dataSource={userBookings}
+            scroll={{ x: 'max-content' }}
           />
         )}
       </Card>
@@ -258,7 +228,12 @@ export default function UserDashboard() {
             </Button>
           </Empty>
         ) : (
-          <Table rowKey="id" columns={orderColumns} dataSource={userOrders} />
+          <Table 
+            rowKey="id" 
+            columns={orderColumns} 
+            dataSource={userOrders}
+            scroll={{ x: 'max-content' }}
+          />
         )}
       </Card>
     </div>
