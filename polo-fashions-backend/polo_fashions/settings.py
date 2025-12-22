@@ -168,3 +168,7 @@ STATIC_ROOT = BASE_DIR / 'staticfiles'
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 # Custom User Model (we'll create this)
 AUTH_USER_MODEL = 'accounts.User'
+
+import os
+
+CREATE_SUPERUSER = os.environ.get("CREATE_SUPERUSER", "False") == "True"
