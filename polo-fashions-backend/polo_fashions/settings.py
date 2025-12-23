@@ -24,8 +24,8 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     
     # Third party apps
-    'cloudinary_storage',  # ← Add 
-    'cloudinary',          # ← Add this
+    'cloudinary_storage',
+    'cloudinary',
     'rest_framework',
     'corsheaders',
     'rest_framework_simplejwt',
@@ -96,37 +96,33 @@ STATIC_URL = '/static/'
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
-
-
-# Debug: Print environment variables
-import os
-print("=" * 50)
-print("CLOUDINARY_CLOUD_NAME:", os.getenv('CLOUDINARY_CLOUD_NAME'))
-print("CLOUDINARY_API_KEY:", os.getenv('CLOUDINARY_API_KEY'))
-print("CLOUDINARY_API_SECRET exists:", bool(os.getenv('CLOUDINARY_API_SECRET')))
-print("=" * 50)
-
 # Cloudinary Configuration
 import cloudinary
-# ... rest of your cloudinary config
 import cloudinary.uploader
 import cloudinary.api
 
-CLOUDINARY_STORAGE = {
-    'CLOUD_NAME': config('CLOUDINARY_CLOUD_NAME'),
-    'API_KEY': config('CLOUDINARY_API_KEY'),
-    'API_SECRET': config('CLOUDINARY_API_SECRET')
-}
+# Debug: Print environment variables on startup
+print("=" * 80)
+print("🔍 CHECKING CLOUDINARY CONFIGURATION")
+print("CLOUDINARY_CLOUD_NAME:", os.getenv('CLOUDINARY_CLOUD_NAME'))
+print("CLOUDINARY_API_KEY:", os.getenv('CLOUDINARY_API_KEY'))
+print("CLOUDINARY_API_SECRET exists:", bool(os.getenv('CLOUDINARY_API_SECRET')))
+print("=" * 80)
 
+# Configure Cloudinary
 cloudinary.config(
-    cloud_name=CLOUDINARY_STORAGE['CLOUD_NAME'],
-    api_key=CLOUDINARY_STORAGE['API_KEY'],
-    api_secret=CLOUDINARY_STORAGE['API_SECRET'],
+    cloud_name=config('CLOUDINARY_CLOUD_NAME', default=''),
+    api_key=config('CLOUDINARY_API_KEY', default=''),
+    api_secret=config('CLOUDINARY_API_SECRET', default=''),
     secure=True
 )
 
-# Use Cloudinary for media storage
+# Set Cloudinary as default file storage
 DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
+
+# Print confirmation
+print("✅ DEFAULT_FILE_STORAGE set to:", DEFAULT_FILE_STORAGE)
+print("=" * 80)
 
 # REST Framework Configuration
 REST_FRAMEWORK = {
