@@ -7,21 +7,27 @@
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000/api';
 const BASE_URL = API_BASE_URL.replace('/api', '');
+const CLOUDINARY_BASE = 'https://res.cloudinary.com/dvtq5lk6c';
 
 export const normalizeImageUrl = (url) => {
   if (!url) return "https://via.placeholder.com/120?text=No+Image";
   
-  // If URL is already absolute (Cloudinary or any other CDN), return as-is
+  // If already a full URL (starts with http:// or https://), return as-is
   if (url.startsWith('http://') || url.startsWith('https://')) {
     return url;
   }
   
-  // If URL starts with /media/, prepend the base URL
+  // If it's a Cloudinary path (starts with 'image/upload/')
+  if (url.startsWith('image/upload/')) {
+    return `${CLOUDINARY_BASE}/${url}`;
+  }
+  
+  // If it starts with /media/, prepend the backend base URL
   if (url.startsWith('/media/')) {
     return `${BASE_URL}${url}`;
   }
   
-  // If URL doesn't start with /, add it
+  // If URL doesn't start with /, add /media/ prefix
   if (!url.startsWith('/')) {
     return `${BASE_URL}/media/${url}`;
   }
