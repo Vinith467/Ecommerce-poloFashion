@@ -7,32 +7,31 @@
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000/api';
 const BASE_URL = API_BASE_URL.replace('/api', '');
-const CLOUDINARY_BASE = 'https://res.cloudinary.com/dvtq5lk6c';
 
 export const normalizeImageUrl = (url) => {
   if (!url) return "https://via.placeholder.com/120?text=No+Image";
   
-  // If already a full URL (starts with http:// or https://), return as-is
+  // ✅ If already a full Cloudinary URL, return as-is
+  if (url.startsWith('https://res.cloudinary.com/')) {
+    return url;
+  }
+  
+  // ✅ If it's a relative Cloudinary path, it's already complete
+  // (Cloudinary stores full URLs in your database)
   if (url.startsWith('http://') || url.startsWith('https://')) {
     return url;
   }
   
-  // If it's a Cloudinary path (starts with 'image/upload/')
-  if (url.startsWith('image/upload/')) {
-    return `${CLOUDINARY_BASE}/${url}`;
-  }
-  
-  // If it starts with /media/, prepend the backend base URL
+  // ✅ Handle local development /media/ paths
   if (url.startsWith('/media/')) {
     return `${BASE_URL}${url}`;
   }
   
-  // If URL doesn't start with /, add /media/ prefix
+  // ✅ Fallback for paths without leading slash
   if (!url.startsWith('/')) {
     return `${BASE_URL}/media/${url}`;
   }
   
-  // Fallback: prepend base URL
   return `${BASE_URL}${url}`;
 };
 
@@ -45,7 +44,7 @@ export const getOrderImage = (order) => {
   
   let imageUrl = null;
 
-  // Priority 1: Multi-image arrays (for products with multiple images)
+  // Priority 1: Multi-image arrays
   if (order.product_details?.images?.length > 0) {
     imageUrl = order.product_details.images[0].image;
   } else if (order.rental_item_details?.images?.length > 0) {
@@ -73,13 +72,11 @@ export const getProductImage = (product) => {
   
   let imageUrl = null;
   
-  // Check for multi-image arrays first
   if (product.images?.length > 0) {
     imageUrl = product.images[0].image;
   } else if (product.rental_images?.length > 0) {
     imageUrl = product.rental_images[0].image;
   } else {
-    // Fallback to single image field
     imageUrl = product.image;
   }
   
