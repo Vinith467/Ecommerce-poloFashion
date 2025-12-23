@@ -18,7 +18,8 @@ class Product(models.Model):
     type = models.CharField(max_length=20, choices=TYPE_CHOICES)
 
     description = models.TextField()
-    image = CloudinaryField('image', blank=True, null=True)  # ← CHANGED
+    # ✅ FIXED: Remove folder parameter
+    image = CloudinaryField('image', blank=True, null=True)
 
     brand = models.CharField(max_length=100, blank=True, null=True)
     price = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
@@ -43,7 +44,8 @@ class Product(models.Model):
 
 class ProductImage(models.Model):
     product = models.ForeignKey(Product, related_name="images", on_delete=models.CASCADE)
-    image = CloudinaryField('image')  # ← CHANGED
+    # ✅ FIXED
+    image = CloudinaryField('image')
 
     def __str__(self):
         return f"{self.product.name} Image"
@@ -55,7 +57,8 @@ class RentalItem(models.Model):
     price_per_day = models.DecimalField(max_digits=10, decimal_places=2)
     deposit_amount = models.DecimalField(max_digits=10, decimal_places=2)
     buy_price = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
-    image = CloudinaryField('image')  # ← CHANGED
+    # ✅ FIXED
+    image = CloudinaryField('image')
     description = models.TextField(blank=True, null=True)
     is_active = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -65,7 +68,8 @@ class RentalItem(models.Model):
     
 class RentalImage(models.Model):
     rental_item = models.ForeignKey(RentalItem, related_name="images", on_delete=models.CASCADE)
-    image = CloudinaryField('image')  # ← CHANGED
+    # ✅ FIXED
+    image = CloudinaryField('image')
 
     def __str__(self):
         return f"{self.rental_item.name} Image"
@@ -84,7 +88,8 @@ class Accessory(models.Model):
     name = models.CharField(max_length=200)
     category = models.CharField(max_length=20, choices=CATEGORY_CHOICES)
     price = models.DecimalField(max_digits=10, decimal_places=2)
-    image = CloudinaryField('image')  # ← CHANGED
+    # ✅ FIXED
+    image = CloudinaryField('image')
     description = models.TextField(blank=True, null=True)
     is_active = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -96,7 +101,8 @@ class Innerwear(models.Model):
     name = models.CharField(max_length=200)
     sizes = models.JSONField(null=True, blank=True)
     price = models.DecimalField(max_digits=10, decimal_places=2)
-    image = CloudinaryField('image')  # ← CHANGED
+    # ✅ FIXED
+    image = CloudinaryField('image')
     description = models.TextField(blank=True, null=True)
     is_active = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -109,7 +115,8 @@ class Fabric(models.Model):
     type = models.CharField(max_length=100)
     color = models.CharField(max_length=50)
     price = models.DecimalField(max_digits=10, decimal_places=2)
-    image = CloudinaryField('image', blank=True, null=True)  # ← CHANGED
+    # ✅ FIXED
+    image = CloudinaryField('image', blank=True, null=True)
     description = models.TextField(blank=True, null=True)
     is_active = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)

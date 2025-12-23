@@ -5,6 +5,14 @@ from django.contrib.auth.password_validation import validate_password
 User = get_user_model()
 
 class UserSerializer(serializers.ModelSerializer):
+    measurement_photo = serializers.SerializerMethodField()
+    
+    def get_measurement_photo(self, obj):
+        """Return full Cloudinary URL for measurement photo"""
+        if obj.measurement_photo:
+            return obj.measurement_photo.url  # ✅ Full URL
+        return None
+    
     class Meta:
         model = User
         fields = [
@@ -18,10 +26,12 @@ class UserSerializer(serializers.ModelSerializer):
             'measurement_status',
             'measurement_photo',
             'created_at',
-            'is_staff',         # ✅ Add this
-            'is_superuser',     # ✅ And this
+            'is_staff',
+            'is_superuser',
         ]
         read_only_fields = ['id', 'created_at']
+
+
 class RegisterSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True, required=True, validators=[validate_password])
     password2 = serializers.CharField(write_only=True, required=True)

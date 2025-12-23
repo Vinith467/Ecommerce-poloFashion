@@ -35,23 +35,19 @@ class OrderSerializer(serializers.ModelSerializer):
         ]
 
     def get_product_details(self, obj):
-        """
-        Get product details with proper image handling.
-        Checks for related images first, then falls back to main image field.
-        """
+        """Get product details with proper image handling."""
         if obj.product:
-            # Get primary image - check for related images first, then main image field
             image_url = None
             
-            # Priority 1: Check if product has related images (ProductImage model)
+            # Priority 1: Check for related images first
             if hasattr(obj.product, 'images') and obj.product.images.exists():
                 first_image = obj.product.images.first()
                 if first_image and first_image.image:
-                    image_url = first_image.image.url
+                    image_url = first_image.image.url  # ✅ Full URL
             
             # Priority 2: Check main image field
             elif obj.product.image:
-                image_url = obj.product.image.url
+                image_url = obj.product.image.url  # ✅ Full URL
             
             return {
                 'id': obj.product.id,
@@ -63,12 +59,16 @@ class OrderSerializer(serializers.ModelSerializer):
 
     def get_fabric_details(self, obj):
         if obj.fabric:
+            image_url = None
+            if hasattr(obj.fabric, 'image') and obj.fabric.image:
+                image_url = obj.fabric.image.url  # ✅ Full URL
+            
             return {
                 'id': obj.fabric.id,
                 'name': obj.fabric.name,
                 'color': getattr(obj.fabric, 'color', None),
                 'price': str(obj.fabric.price),
-                'image': obj.fabric.image.url if hasattr(obj.fabric, 'image') and obj.fabric.image else None,
+                'image': image_url,
             }
         return None
 
@@ -78,15 +78,22 @@ class OrderSerializer(serializers.ModelSerializer):
             images = []
             if hasattr(obj.rental_item, 'images'):
                 images = [
-                    {'id': img.id, 'image': img.image.url if img.image else None}
+                    {
+                        'id': img.id, 
+                        'image': img.image.url if img.image else None  # ✅ Full URL
+                    }
                     for img in obj.rental_item.images.all()
                 ]
+            
+            main_image = None
+            if obj.rental_item.image:
+                main_image = obj.rental_item.image.url  # ✅ Full URL
             
             return {
                 'id': obj.rental_item.id,
                 'name': obj.rental_item.name,
                 'color': obj.rental_item.color,
-                'image': obj.rental_item.image.url if obj.rental_item.image else None,
+                'image': main_image,
                 'images': images,
                 'sizes': obj.rental_item.sizes,
             }
@@ -95,11 +102,15 @@ class OrderSerializer(serializers.ModelSerializer):
     def get_accessory_details(self, obj):
         """Get accessory details"""
         if obj.accessory:
+            image_url = None
+            if obj.accessory.image:
+                image_url = obj.accessory.image.url  # ✅ Full URL
+            
             return {
                 'id': obj.accessory.id,
                 'name': obj.accessory.name,
                 'category': obj.accessory.category,
-                'image': obj.accessory.image.url if obj.accessory.image else None,
+                'image': image_url,
                 'price': str(obj.accessory.price),
             }
         return None
@@ -107,10 +118,14 @@ class OrderSerializer(serializers.ModelSerializer):
     def get_innerwear_details(self, obj):
         """Get innerwear details"""
         if obj.innerwear:
+            image_url = None
+            if obj.innerwear.image:
+                image_url = obj.innerwear.image.url  # ✅ Full URL
+            
             return {
                 'id': obj.innerwear.id,
                 'name': obj.innerwear.name,
-                'image': obj.innerwear.image.url if obj.innerwear.image else None,
+                'image': image_url,
                 'price': str(obj.innerwear.price),
                 'sizes': obj.innerwear.sizes,
             }
