@@ -59,53 +59,63 @@
 }
 
 /* ===============================
-   FULLSCREEN - ENLARGED IMAGE
+   FULLSCREEN - WHITE BACKGROUND
 ================================ */
 .ecom-fullscreen {
-  position: relative;
+  position: fixed; /* ✅ Changed to fixed for better mobile positioning */
+  top: 0;
+  left: 0;
   width: 100vw;
   height: 100vh;
-  background: #000;
+  background: #ffffff; /* ✅ Changed to white */
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 0; /* ✅ Remove padding */
+  padding: 0;
+  z-index: 9999; /* ✅ Ensure it's always on top */
 }
 
 .ecom-fullscreen-image {
-  width: 100%; /* ✅ Fill width */
-  height: 100%; /* ✅ Fill height */
-  object-fit: contain; /* ✅ Maintain aspect ratio but fill space */
-  max-width: none; /* ✅ Remove max-width constraint */
-  max-height: none; /* ✅ Remove max-height constraint */
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  max-width: none;
+  max-height: none;
 }
 
 .ecom-close {
   position: absolute;
-  top: 16px;
-  right: 16px;
-  width: 40px;
-  height: 40px;
+  top: 20px;
+  right: 20px;
+  width: 44px;
+  height: 44px;
   border-radius: 50%;
-  border: none;
-  background: rgba(255, 255, 255, 0.95);
-  font-size: 20px;
+  border: 2px solid #e0e0e0; /* ✅ Added border for visibility on white */
+  background: rgba(255, 255, 255, 0.98); /* ✅ Almost solid white */
+  color: #333; /* ✅ Dark text for white background */
+  font-size: 22px;
+  font-weight: 300;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 1000;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  z-index: 10000;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.15); /* ✅ Subtle shadow */
   transition: all 0.2s;
 }
 
 .ecom-close:hover {
-  background: #fff;
-  transform: scale(1.1);
+  background: #f5f5f5;
+  border-color: #999;
+  transform: scale(1.05);
+}
+
+.ecom-close:active {
+  transform: scale(0.95);
 }
 
 /* ===============================
-   MOBILE RESPONSIVE
+   MOBILE RESPONSIVE - CLEAN FULLSCREEN
 ================================ */
 @media (max-width: 576px) {
   .gallery-container {
@@ -137,20 +147,38 @@
     max-height: 280px;
   }
 
-  /* ✅ Larger fullscreen image on mobile */
+  /* ✅ CLEANER MOBILE FULLSCREEN */
+  .ecom-fullscreen {
+    position: fixed;
+    top: 0 !important;
+    left: 0 !important;
+    width: 100vw !important;
+    height: 100vh !important;
+    height: 100dvh !important; /* ✅ Dynamic viewport height for mobile browsers */
+    margin: 0;
+    padding: 0;
+    background: #ffffff; /* ✅ White background */
+  }
+
   .ecom-fullscreen-image {
     width: 100vw;
     height: 100vh;
+    height: 100dvh; /* ✅ Better mobile support */
     object-fit: contain;
+    padding: 0;
   }
 
-  /* ✅ Better positioned close button on mobile */
+  /* ✅ BETTER MOBILE CLOSE BUTTON */
   .ecom-close {
-    top: 12px;
-    right: 12px;
-    width: 36px;
-    height: 36px;
-    font-size: 18px;
+    position: fixed; /* ✅ Fixed positioning for mobile */
+    top: 16px;
+    right: 16px;
+    width: 40px;
+    height: 40px;
+    font-size: 20px;
+    background: rgba(255, 255, 255, 0.95);
+    border: 1px solid #ddd;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
   }
 }
 
@@ -166,22 +194,51 @@
     max-height: 320px;
   }
 
-  /* ✅ Larger fullscreen image on tablet */
+  .ecom-fullscreen {
+    background: #ffffff; /* ✅ White background */
+  }
+
   .ecom-fullscreen-image {
-    width: 95vw;
-    height: 95vh;
+    width: 98vw;
+    height: 98vh;
     object-fit: contain;
+  }
+
+  .ecom-close {
+    top: 18px;
+    right: 18px;
+    border: 2px solid #e0e0e0;
   }
 }
 
 /* ===============================
-   DESKTOP - LARGER IMAGE
+   DESKTOP - CLEAN WHITE DESIGN
 ================================ */
 @media (min-width: 769px) {
-  /* ✅ Larger fullscreen image on desktop */
+  .ecom-fullscreen {
+    background: #ffffff; /* ✅ White background */
+  }
+
   .ecom-fullscreen-image {
-    width: 95vw;
-    height: 95vh;
+    width: 96vw;
+    height: 96vh;
     object-fit: contain;
   }
+
+  .ecom-close {
+    top: 20px;
+    right: 20px;
+    width: 44px;
+    height: 44px;
+    border: 2px solid #e0e0e0;
+  }
+}
+
+/* ===============================
+   PREVENT SCROLLING WHEN FULLSCREEN OPEN
+================================ */
+body.fullscreen-open {
+  overflow: hidden;
+  position: fixed;
+  width: 100%;
 }
