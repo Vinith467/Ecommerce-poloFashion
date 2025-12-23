@@ -1,4 +1,5 @@
 from django.db import models
+from cloudinary.models import CloudinaryField
 
 class Product(models.Model):
     CATEGORY_CHOICES = (
@@ -17,14 +18,12 @@ class Product(models.Model):
     type = models.CharField(max_length=20, choices=TYPE_CHOICES)
 
     description = models.TextField()
-    image = models.ImageField(upload_to='products/', blank=True, null=True)
+    image = CloudinaryField('image', blank=True, null=True)  # ← CHANGED
 
     brand = models.CharField(max_length=100, blank=True, null=True)
     price = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
 
     sizes = models.JSONField(blank=True, null=True)
-
-    # ✅ WHAT'S INSIDE THE BOX
     box_items = models.JSONField(
         blank=True,
         null=True,
@@ -44,33 +43,20 @@ class Product(models.Model):
 
 class ProductImage(models.Model):
     product = models.ForeignKey(Product, related_name="images", on_delete=models.CASCADE)
-    image = models.ImageField(upload_to="products/")
+    image = CloudinaryField('image')  # ← CHANGED
 
     def __str__(self):
         return f"{self.product.name} Image"
     
 class RentalItem(models.Model):
     name = models.CharField(max_length=200)
-
-    sizes = models.JSONField(   # 👈 multiple sizes supported
-        help_text="Example: ['S','M','L','XL']"
-    )
-
+    sizes = models.JSONField(help_text="Example: ['S','M','L','XL']")
     color = models.CharField(max_length=50)
-
     price_per_day = models.DecimalField(max_digits=10, decimal_places=2)
     deposit_amount = models.DecimalField(max_digits=10, decimal_places=2)
-
-    buy_price = models.DecimalField(   # 👈 BUY option
-        max_digits=10,
-        decimal_places=2,
-        null=True,
-        blank=True
-    )
-
-    image = models.ImageField(upload_to="rentals/")
+    buy_price = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
+    image = CloudinaryField('image')  # ← CHANGED
     description = models.TextField(blank=True, null=True)
-
     is_active = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
@@ -78,12 +64,8 @@ class RentalItem(models.Model):
         return self.name
     
 class RentalImage(models.Model):
-    rental_item = models.ForeignKey(
-        RentalItem,
-        related_name="images",
-        on_delete=models.CASCADE
-    )
-    image = models.ImageField(upload_to="rentals/")
+    rental_item = models.ForeignKey(RentalItem, related_name="images", on_delete=models.CASCADE)
+    image = CloudinaryField('image')  # ← CHANGED
 
     def __str__(self):
         return f"{self.rental_item.name} Image"
@@ -102,7 +84,7 @@ class Accessory(models.Model):
     name = models.CharField(max_length=200)
     category = models.CharField(max_length=20, choices=CATEGORY_CHOICES)
     price = models.DecimalField(max_digits=10, decimal_places=2)
-    image = models.ImageField(upload_to="accessories/")
+    image = CloudinaryField('image')  # ← CHANGED
     description = models.TextField(blank=True, null=True)
     is_active = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -112,9 +94,9 @@ class Accessory(models.Model):
     
 class Innerwear(models.Model):
     name = models.CharField(max_length=200)
-    sizes = models.JSONField(null=True, blank=True)  # ["S","M","L","XL"]
+    sizes = models.JSONField(null=True, blank=True)
     price = models.DecimalField(max_digits=10, decimal_places=2)
-    image = models.ImageField(upload_to="innerwear/")
+    image = CloudinaryField('image')  # ← CHANGED
     description = models.TextField(blank=True, null=True)
     is_active = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -124,10 +106,10 @@ class Innerwear(models.Model):
 
 class Fabric(models.Model):
     name = models.CharField(max_length=200)
-    type = models.CharField(max_length=100)  # Cotton, Linen, Silk, etc.
+    type = models.CharField(max_length=100)
     color = models.CharField(max_length=50)
     price = models.DecimalField(max_digits=10, decimal_places=2)
-    image = models.ImageField(upload_to='fabrics/', blank=True, null=True)
+    image = CloudinaryField('image', blank=True, null=True)  # ← CHANGED
     description = models.TextField(blank=True, null=True)
     is_active = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
