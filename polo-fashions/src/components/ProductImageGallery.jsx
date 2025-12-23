@@ -17,42 +17,63 @@ export default function ProductImageGallery({ product }) {
       imageUrls = [normalizeImageUrl(product.image)];
     }
     
-    return imageUrls.filter(Boolean); // Remove any null/undefined values
+    return imageUrls.filter(Boolean);
   }, [product]);
 
   const [selectedImage, setSelectedImage] = useState(() => images[0]);
   const [fullScreen, setFullScreen] = useState(false);
 
+  // ✅ Update selected image when images change
+  React.useEffect(() => {
+    if (images.length > 0) {
+      setSelectedImage(images[0]);
+    }
+  }, [images]);
+
   return (
     <>
       <div className="gallery-container">
-        {/* Thumbnails */}
-        <div className="thumb-list">
-          {images.map((img, index) => (
-            <img
-              key={index}
-              src={img}
-              className={`thumb ${selectedImage === img ? "active-thumb" : ""}`}
-              onClick={() => setSelectedImage(img)}
-              alt=""
-              onError={(e) => {
-                e.target.src = "https://via.placeholder.com/70?text=Error";
-              }}
-            />
-          ))}
-        </div>
+        {/* Thumbnails - Hide on mobile if only one image */}
+        {images.length > 1 && (
+          <div className="thumb-list">
+            {images.map((img, index) => (
+              <img
+                key={index}
+                src={img}
+                className={`thumb ${selectedImage === img ? "active-thumb" : ""}`}
+                onClick={() => setSelectedImage(img)}
+                alt=""
+                onError={(e) => {
+                  e.target.src = "https://via.placeholder.com/70?text=Error";
+                }}
+              />
+            ))}
+          </div>
+        )}
 
         {/* Main Image */}
         <div className="main-image-box">
-          <img
-            src={selectedImage}
-            className="main-image"
-            onClick={() => setFullScreen(true)}
-            alt=""
-            onError={(e) => {
-              e.target.src = "https://via.placeholder.com/380?text=Image+Not+Found";
-            }}
-          />
+          {selectedImage ? (
+            <img
+              src={selectedImage}
+              className="main-image"
+              onClick={() => setFullScreen(true)}
+              alt=""
+              onError={(e) => {
+                e.target.src = "https://via.placeholder.com/380?text=Image+Not+Found";
+              }}
+            />
+          ) : (
+            <div style={{ 
+              display: 'flex', 
+              alignItems: 'center', 
+              justifyContent: 'center',
+              minHeight: '200px',
+              color: '#999'
+            }}>
+              No image available
+            </div>
+          )}
         </div>
       </div>
 

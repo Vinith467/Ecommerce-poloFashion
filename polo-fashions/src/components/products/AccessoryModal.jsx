@@ -78,10 +78,9 @@ export default function AccessoryModal({
 
     // ✅ FIXED: Use correct ID field based on category
     const orderData = {
-      ...(isInnerwear 
+      ...(isInnerwear
         ? { innerwearId: selectedProduct.id }
-        : { accessoryId: selectedProduct.id }
-      ),
+        : { accessoryId: selectedProduct.id }),
       productName: selectedProduct.name,
       orderType: isInnerwear ? "innerwear" : "accessory",
       quantity,
@@ -89,7 +88,7 @@ export default function AccessoryModal({
       totalPrice: selectedProduct.price * quantity,
     };
 
-    console.log('Submitting order:', orderData);  // ✅ Debug log
+    console.log("Submitting order:", orderData); // ✅ Debug log
 
     try {
       setPlacing(true);
@@ -107,7 +106,7 @@ export default function AccessoryModal({
       }
     } catch (error) {
       setPlacing(false);
-      console.error('Order error:', error);
+      console.error("Order error:", error);
       setOrderError("Failed to place order");
     }
   };
@@ -117,9 +116,10 @@ export default function AccessoryModal({
       open={show}
       onCancel={onHide}
       footer={null}
-      width={900}
+      width="90vw" // ✅ Changed from 900
+      style={{ maxWidth: 900 }} // ✅ Added max-width
       title={selectedProduct?.name}
-      destroyOnClose={true}  // ✅ Destroy modal content on close
+      destroyOnClose={true}
     >
       {orderSuccess && (
         <Alert
@@ -142,13 +142,15 @@ export default function AccessoryModal({
       {selectedProduct && (
         <Row gutter={24}>
           <Col span={10}>
-            <ProductImageGallery product={selectedProduct} key={selectedProduct.id} />
+            <ProductImageGallery
+              product={selectedProduct}
+              key={selectedProduct.id}
+            />
 
             <Divider />
 
             <Text strong>
-              Price:{" "}
-              <Text type="primary">₹{selectedProduct.price}</Text>
+              Price: <Text type="primary">₹{selectedProduct.price}</Text>
             </Text>
 
             <Paragraph type="secondary" style={{ marginTop: 8 }}>

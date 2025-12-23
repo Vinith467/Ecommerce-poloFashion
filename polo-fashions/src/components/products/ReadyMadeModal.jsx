@@ -72,7 +72,7 @@ export default function ReadyMadeModal({
       totalPrice: selectedProduct.price * quantity,
     };
 
-    console.log('📦 Ready-made order data:', orderData);
+    console.log("📦 Ready-made order data:", orderData);
 
     try {
       setPlacing(true);
@@ -90,7 +90,7 @@ export default function ReadyMadeModal({
       }
     } catch (error) {
       setPlacing(false);
-      console.error('❌ Order error:', error);
+      console.error("❌ Order error:", error);
       setOrderError(error?.response?.data?.detail || "Failed to place order");
     }
   };
@@ -100,9 +100,10 @@ export default function ReadyMadeModal({
       open={show}
       onCancel={onHide}
       footer={null}
-      width={900}
+      width="90vw" // ✅ Changed from 900
+      style={{ maxWidth: 900 }} // ✅ Added max-width
       title={selectedProduct?.name}
-      destroyOnClose // ✅ Ensures clean state
+      destroyOnClose={true}
     >
       {orderSuccess && (
         <Alert
@@ -126,8 +127,8 @@ export default function ReadyMadeModal({
         <Row gutter={24}>
           {/* LEFT */}
           <Col span={10}>
-            <ProductImageGallery 
-              product={selectedProduct} 
+            <ProductImageGallery
+              product={selectedProduct}
               key={selectedProduct.id} // ✅ Force re-render
             />
 

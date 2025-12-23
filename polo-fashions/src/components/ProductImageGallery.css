@@ -1,3 +1,5 @@
+/* src/components/ProductImageGallery.css */
+
 /* ===============================
    GALLERY LAYOUT
 ================================ */
@@ -23,6 +25,11 @@
   cursor: pointer;
   border-radius: 6px;
   border: 1px solid #ddd;
+  transition: all 0.2s;
+}
+
+.thumb:hover {
+  border-color: #1677ff;
 }
 
 .active-thumb {
@@ -41,6 +48,7 @@
   border: 1px solid #e5e5e5;
   border-radius: 6px;
   padding: 12px;
+  min-height: 250px; /* ✅ Ensure minimum height */
 }
 
 .main-image {
@@ -49,25 +57,26 @@
   object-fit: contain;
   cursor: zoom-in;
 }
-/* Fullscreen container */
+
+/* ===============================
+   FULLSCREEN
+================================ */
 .ecom-fullscreen {
   position: relative;
   width: 100%;
   height: 100vh;
-  background: #f0f0f0;
+  background: #000;
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
-/* Image */
 .ecom-fullscreen-image {
   max-width: 90vw;
   max-height: 90vh;
   object-fit: contain;
 }
 
-/* Close button */
 .ecom-close {
   position: absolute;
   top: 24px;
@@ -82,8 +91,64 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  z-index: 10;
 }
 
 .ecom-close:hover {
   background: #fff;
+}
+
+/* ===============================
+   MOBILE RESPONSIVE
+================================ */
+@media (max-width: 576px) {
+  .gallery-container {
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  /* Horizontal thumbnails on mobile */
+  .thumb-list {
+    width: 100%;
+    flex-direction: row;
+    overflow-x: auto;
+    padding-bottom: 8px;
+  }
+
+  .thumb {
+    min-width: 60px;
+    width: 60px;
+    height: 60px;
+  }
+
+  .main-image-box {
+    width: 100%;
+    min-height: 200px;
+    max-height: 300px;
+  }
+
+  .main-image {
+    max-height: 280px;
+  }
+
+  .ecom-close {
+    top: 12px;
+    right: 12px;
+    width: 32px;
+    height: 32px;
+    font-size: 16px;
+  }
+}
+
+/* ===============================
+   TABLET
+================================ */
+@media (min-width: 577px) and (max-width: 768px) {
+  .main-image-box {
+    min-height: 280px;
+  }
+
+  .main-image {
+    max-height: 320px;
+  }
 }

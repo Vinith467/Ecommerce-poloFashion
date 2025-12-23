@@ -148,8 +148,10 @@ export default function FabricModal({
       open={show}
       onCancel={onHide}
       footer={null}
-      width={950}
+      width="90vw" // ✅ Changed from 900
+      style={{ maxWidth: 900 }} // ✅ Added max-width
       title={selectedProduct?.name}
+      destroyOnClose={true}
     >
       {orderSuccess && (
         <Alert

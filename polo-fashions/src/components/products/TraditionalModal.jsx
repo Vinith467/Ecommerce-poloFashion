@@ -102,8 +102,10 @@ export default function TraditionalModal({
       open={show}
       onCancel={onHide}
       footer={null}
-      width={900}
+      width="90vw" // ✅ Changed from 900
+      style={{ maxWidth: 900 }} // ✅ Added max-width
       title={selectedProduct?.name}
+      destroyOnClose={true}
     >
       {orderSuccess && (
         <Alert
@@ -132,8 +134,7 @@ export default function TraditionalModal({
             <Divider />
 
             <Text strong>
-              Price:{" "}
-              <Text type="primary">₹{selectedProduct.price}</Text>
+              Price: <Text type="primary">₹{selectedProduct.price}</Text>
             </Text>
 
             <Paragraph type="secondary" style={{ marginTop: 8 }}>
@@ -214,13 +215,8 @@ export default function TraditionalModal({
 
             <Divider />
 
-            <Space
-              direction="vertical"
-              style={{ width: "100%" }}
-            >
-              <Space
-                style={{ width: "100%", justifyContent: "space-between" }}
-              >
+            <Space direction="vertical" style={{ width: "100%" }}>
+              <Space style={{ width: "100%", justifyContent: "space-between" }}>
                 <Text>Traditional Set</Text>
                 <Text>₹{selectedProduct.price}</Text>
               </Space>
@@ -239,9 +235,7 @@ export default function TraditionalModal({
 
               <Divider style={{ margin: "8px 0" }} />
 
-              <Space
-                style={{ width: "100%", justifyContent: "space-between" }}
-              >
+              <Space style={{ width: "100%", justifyContent: "space-between" }}>
                 <Text strong>Total</Text>
                 <Text strong type="primary">
                   ₹

@@ -127,8 +127,10 @@ export default function RentalModal({
       open={show}
       onCancel={onHide}
       footer={null}
-      width={900}
+      width="90vw" // ✅ Changed from 900
+      style={{ maxWidth: 900 }} // ✅ Added max-width
       title={selectedProduct?.name}
+      destroyOnClose={true}
     >
       {orderSuccess && <Alert type="success" message={orderSuccess} showIcon />}
       {orderError && <Alert type="error" message={orderError} showIcon />}

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { Tabs, Row, Col, Skeleton, Empty } from "antd";
 import { useAuth } from "../context/AuthContext";
 import {
@@ -65,42 +65,44 @@ export default function Products() {
     setSelectedProduct(null);
   };
 
-  /* ================= FILTER LOGIC ================= */
+  /* ================= FILTER LOGIC (FIXED WITH useMemo) ================= */
 
-  let filteredProducts = [];
+  // ✅ FIX: Use useMemo to ensure filtering happens reactively
+  const filteredProducts = useMemo(() => {
+    if (!products) return [];
 
-  if (products) {
+    console.log("🔄 Filtering products for category:", activeCategory);
+
     if (activeCategory === "fabrics") {
       const customProducts = products.products.filter(
         (p) =>
           p.type === "custom" &&
           (p.category === "shirt" || p.category === "pant")
       );
-      filteredProducts = [...products.fabrics, ...customProducts];
+      return [...products.fabrics, ...customProducts];
     } else if (activeCategory === "ready_shirts") {
-      filteredProducts = products.products.filter(
+      return products.products.filter(
         (p) => p.category === "shirt" && p.type === "readymade"
       );
     } else if (activeCategory === "ready_pants") {
-      filteredProducts = products.products.filter(
+      return products.products.filter(
         (p) => p.category === "pant" && p.type === "readymade"
       );
     } else if (activeCategory === "traditional") {
-      filteredProducts = products.products.filter(
-        (p) => p.category === "traditional"
-      );
+      return products.products.filter((p) => p.category === "traditional");
     } else if (activeCategory === "rentals") {
-      filteredProducts = products.rentals;
+      return products.rentals;
     } else if (activeCategory === "accessories") {
-      filteredProducts = products.accessories;
+      return products.accessories;
     } else if (activeCategory === "innerwear") {
-      filteredProducts = products.innerwear;
+      return products.innerwear;
     }
-  }
 
-  /* ================= MODAL TYPE LOGIC (FIXED) ================= */
+    return [];
+  }, [products, activeCategory]); // ✅ CRITICAL: Both dependencies
 
-  // ✅ SIMPLIFIED: If we're in fabrics tab, show fabric modal
+  /* ================= MODAL TYPE LOGIC ================= */
+
   const isFabricModal = activeCategory === "fabrics" && selectedProduct;
 
   const isTraditional =
@@ -182,7 +184,7 @@ export default function Products() {
 
       {/* ================= MODALS ================= */}
 
-      {/* ✅ Fabric Modal - Shows for fabrics tab (both pure fabrics AND custom products) */}
+      {/* Fabric Modal - Shows for fabrics tab (both pure fabrics AND custom products) */}
       {isFabricModal && (
         <FabricModal
           show={showModal}
