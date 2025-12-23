@@ -96,12 +96,19 @@ STATIC_URL = '/static/'
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
-# Media Files (for uploads)
-MEDIA_URL = '/media/'
-MEDIA_ROOT = BASE_DIR / 'media'
+
+
+# Debug: Print environment variables
+import os
+print("=" * 50)
+print("CLOUDINARY_CLOUD_NAME:", os.getenv('CLOUDINARY_CLOUD_NAME'))
+print("CLOUDINARY_API_KEY:", os.getenv('CLOUDINARY_API_KEY'))
+print("CLOUDINARY_API_SECRET exists:", bool(os.getenv('CLOUDINARY_API_SECRET')))
+print("=" * 50)
 
 # Cloudinary Configuration
 import cloudinary
+# ... rest of your cloudinary config
 import cloudinary.uploader
 import cloudinary.api
 
