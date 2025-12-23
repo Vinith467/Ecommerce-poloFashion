@@ -48,7 +48,7 @@
   border: 1px solid #e5e5e5;
   border-radius: 6px;
   padding: 12px;
-  min-height: 250px; /* ✅ Ensure minimum height */
+  min-height: 250px;
 }
 
 .main-image {
@@ -59,43 +59,49 @@
 }
 
 /* ===============================
-   FULLSCREEN
+   FULLSCREEN - ENLARGED IMAGE
 ================================ */
 .ecom-fullscreen {
   position: relative;
-  width: 100%;
+  width: 100vw;
   height: 100vh;
   background: #000;
   display: flex;
   align-items: center;
   justify-content: center;
+  padding: 0; /* ✅ Remove padding */
 }
 
 .ecom-fullscreen-image {
-  max-width: 90vw;
-  max-height: 90vh;
-  object-fit: contain;
+  width: 100%; /* ✅ Fill width */
+  height: 100%; /* ✅ Fill height */
+  object-fit: contain; /* ✅ Maintain aspect ratio but fill space */
+  max-width: none; /* ✅ Remove max-width constraint */
+  max-height: none; /* ✅ Remove max-height constraint */
 }
 
 .ecom-close {
   position: absolute;
-  top: 24px;
-  right: 28px;
-  width: 36px;
-  height: 36px;
+  top: 16px;
+  right: 16px;
+  width: 40px;
+  height: 40px;
   border-radius: 50%;
   border: none;
-  background: rgba(255, 255, 255, 0.9);
-  font-size: 18px;
+  background: rgba(255, 255, 255, 0.95);
+  font-size: 20px;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 10;
+  z-index: 1000;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  transition: all 0.2s;
 }
 
 .ecom-close:hover {
   background: #fff;
+  transform: scale(1.1);
 }
 
 /* ===============================
@@ -131,12 +137,20 @@
     max-height: 280px;
   }
 
+  /* ✅ Larger fullscreen image on mobile */
+  .ecom-fullscreen-image {
+    width: 100vw;
+    height: 100vh;
+    object-fit: contain;
+  }
+
+  /* ✅ Better positioned close button on mobile */
   .ecom-close {
     top: 12px;
     right: 12px;
-    width: 32px;
-    height: 32px;
-    font-size: 16px;
+    width: 36px;
+    height: 36px;
+    font-size: 18px;
   }
 }
 
@@ -150,5 +164,24 @@
 
   .main-image {
     max-height: 320px;
+  }
+
+  /* ✅ Larger fullscreen image on tablet */
+  .ecom-fullscreen-image {
+    width: 95vw;
+    height: 95vh;
+    object-fit: contain;
+  }
+}
+
+/* ===============================
+   DESKTOP - LARGER IMAGE
+================================ */
+@media (min-width: 769px) {
+  /* ✅ Larger fullscreen image on desktop */
+  .ecom-fullscreen-image {
+    width: 95vw;
+    height: 95vh;
+    object-fit: contain;
   }
 }
