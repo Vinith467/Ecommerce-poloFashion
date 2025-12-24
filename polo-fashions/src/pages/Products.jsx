@@ -176,6 +176,7 @@ export default function Products() {
               <ProductCard
                 product={product}
                 onClick={() => openModalForProduct(product)}
+                activeCategory={activeCategory}
               />
             </Col>
           ))
