@@ -10,11 +10,7 @@ import {
   Typography,
   Divider,
 } from "antd";
-import {
-  LoginOutlined,
-  MailOutlined,
-  LockOutlined,
-} from "@ant-design/icons";
+import { LoginOutlined, MailOutlined, LockOutlined } from "@ant-design/icons";
 import { useAuth } from "../context/AuthContext";
 import { useNavigate } from "react-router-dom";
 
@@ -48,23 +44,20 @@ export default function Login() {
 
   return (
     <Row justify="center" style={{ padding: 80 }}>
-      <Col xs={24} sm={20} md={16} lg={12} xl={10}>        <Card>
+      <Col xs={24} sm={20} md={16} lg={12} xl={10}>
+        {" "}
+        <Card>
           <div style={{ textAlign: "center", marginBottom: 24 }}>
             <LoginOutlined style={{ fontSize: 42, color: "#1677ff" }} />
             <Title level={3} style={{ marginTop: 12 }}>
               Login
             </Title>
-            <Text type="secondary">
-              Welcome back to Polo Fashions
-            </Text>
+            <Text type="secondary">Welcome back to Polo Fashions</Text>
           </div>
 
           {error && <Alert type="error" showIcon message={error} />}
 
-          <Form
-            layout="vertical"
-            onFinish={handleSubmit}
-          >
+          <Form layout="vertical" onFinish={handleSubmit}>
             <Form.Item
               label="Email Address"
               name="email"
@@ -73,10 +66,7 @@ export default function Login() {
                 { type: "email", message: "Enter a valid email" },
               ]}
             >
-              <Input
-                prefix={<MailOutlined />}
-                placeholder="Enter your email"
-              />
+              <Input prefix={<MailOutlined />} placeholder="Enter your email" />
             </Form.Item>
 
             <Form.Item
@@ -109,21 +99,7 @@ export default function Login() {
               </Button>
             </Text>
           </div>
-
           <Divider />
-
-          <div style={{ textAlign: "center" }}>
-            <Text type="secondary">Demo Credentials</Text>
-            <div style={{ marginTop: 8 }}>
-              <Text>
-                <strong>Customer:</strong> customer@test.com / customer123
-              </Text>
-              <br />
-              <Text>
-                <strong>Admin:</strong> admin@polofashions.com / admin123
-              </Text>
-            </div>
-          </div>
         </Card>
       </Col>
     </Row>
