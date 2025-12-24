@@ -12,6 +12,8 @@ import {
   Space,
   Image,
 } from "antd";
+import { EyeOutlined } from "@ant-design/icons";
+import "./UserDashboard.css";
 import {
   UserOutlined,
   CalendarOutlined,
@@ -38,6 +40,11 @@ export default function UserDashboard() {
       month: "short",
       day: "numeric",
     });
+  };
+
+  // ✅ Handler for viewing order details
+  const handleViewOrder = (orderId) => {
+    navigate(`/orders/${orderId}`);
   };
 
   const bookingColumns = [
@@ -215,7 +222,7 @@ export default function UserDashboard() {
             rowKey="id"
             columns={bookingColumns}
             dataSource={userBookings}
-            scroll={{ x: 'max-content' }}
+            scroll={{ x: "max-content" }}
           />
         )}
       </Card>
@@ -228,12 +235,51 @@ export default function UserDashboard() {
             </Button>
           </Empty>
         ) : (
-          <Table 
-            rowKey="id" 
-            columns={orderColumns} 
-            dataSource={userOrders}
-            scroll={{ x: 'max-content' }}
-          />
+          <>
+            {/* ✅ DESKTOP TABLE VIEW */}
+            <div className="desktop-orders-table">
+              <Table
+                rowKey="id"
+                columns={orderColumns}
+                dataSource={userOrders}
+                scroll={{ x: "max-content" }}
+              />
+            </div>
+
+            {/* ✅ MOBILE CARD VIEW */}
+            <div className="mobile-orders-table">
+              {userOrders.map((order) => (
+                <div key={order.id} className="mobile-order-card">
+                  <div className="mobile-order-row">
+                    <div className="order-id-mobile">#{order.id}</div>
+                    <Image
+                      src={getOrderImage(order)}
+                      alt={order.product_name}
+                      className="order-image-mobile"
+                      width={60}
+                      height={60}
+                      style={{ objectFit: "cover", borderRadius: 6 }}
+                      fallback="https://via.placeholder.com/60?text=No+Image"
+                      preview={false}
+                    />
+                    <div className="order-status-mobile">
+                      <Tag color="blue">
+                        {order.status.toUpperCase().replace("_", " ")}
+                      </Tag>
+                    </div>
+                  </div>
+
+                  {/* ✅ VIEW ORDER SUMMARY BUTTON */}
+                  <button
+                    className="view-order-btn-mobile"
+                    onClick={() => handleViewOrder(order.id)}
+                  >
+                    <EyeOutlined /> View Order Summary
+                  </button>
+                </div>
+              ))}
+            </div>
+          </>
         )}
       </Card>
     </div>
