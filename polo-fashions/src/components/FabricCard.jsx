@@ -58,7 +58,7 @@ export default function FabricCard({ fabric, isSelected, onClick, activeCategory
         </Title>
 
         {/* ✅ BLUE DOT for Custom Fabrics */}
-        {activeCategory === "fabrics" && (
+        {activeCategory?.toLowerCase() === "fabrics" && (
           <Space size={6} align="center">
             <Badge color="blue" />
             <Text style={{ fontSize: 14 }}>Custom</Text>
@@ -88,7 +88,7 @@ export default function FabricCard({ fabric, isSelected, onClick, activeCategory
       </Title>
 
       {/* Custom pricing note */}
-      {activeCategory === "fabrics" && (
+      {activeCategory?.toLowerCase() === "fabrics" && (
         <Text type="secondary" style={{ fontSize: 12, display: "block", marginTop: 4 }}>
           Price varies by fabric selection
         </Text>
