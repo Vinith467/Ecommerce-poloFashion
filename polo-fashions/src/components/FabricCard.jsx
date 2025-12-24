@@ -23,6 +23,7 @@ export default function FabricCard({ fabric, isSelected, onClick }) {
           style={{
             height: 200,
             objectFit: "cover",
+            objectPosition:"center"
           }}
         />
       }
