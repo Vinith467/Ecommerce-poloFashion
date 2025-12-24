@@ -59,9 +59,9 @@ export default function FabricCard({ fabric, isSelected, onClick, activeCategory
 
         {/* ✅ BLUE DOT for Custom Fabrics */}
         {activeCategory === "fabrics" && (
-          <Space size={4}>
+          <Space size={6} align="center">
             <Badge color="blue" />
-            <Text type="secondary" style={{ fontSize: 13 }}>Custom</Text>
+            <Text style={{ fontSize: 14 }}>Custom</Text>
           </Space>
         )}
       </Space>
