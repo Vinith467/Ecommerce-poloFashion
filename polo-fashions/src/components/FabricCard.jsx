@@ -3,7 +3,6 @@ import { Card, Typography, Badge, Space } from "antd";
 import { CheckOutlined } from "@ant-design/icons";
 
 const { Title, Text } = Typography;
-
 export default function FabricCard({ fabric, isSelected, onClick }) {
   return (
     <Card
@@ -58,10 +57,11 @@ export default function FabricCard({ fabric, isSelected, onClick }) {
         </Title>
 
         {/* ✅ BLUE DOT for Custom Fabrics */}
-        {(fabric.type === "fabric" || fabric.type === "custom") && (
+        {(fabric.type === "fabrics" || fabric.type === "fabrics") && (
           <Badge color="blue" text="Custom" />
         )}
       </Space>
+      
 
       {/* Additional Info */}
       {fabric.color && (
@@ -84,7 +84,7 @@ export default function FabricCard({ fabric, isSelected, onClick }) {
       </Title>
 
       {/* Custom pricing note */}
-      {(fabric.type === "fabric" || fabric.type === "custom") && (
+      {(fabric.type === "fabrics" || fabric.type === "custom") && (
         <Text type="secondary" style={{ fontSize: 12, display: "block", marginTop: 4 }}>
           Price varies by fabric selection
         </Text>
