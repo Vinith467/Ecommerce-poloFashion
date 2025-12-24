@@ -3,7 +3,7 @@ import { Card, Badge, Carousel, Typography, Space } from "antd";
 
 const { Title, Text, Paragraph } = Typography;
 
-export default function ProductCard({ product, onClick }) {
+export default function ProductCard({ product, onClick, activeCategory }) {
   return (
     <Card
       hoverable
@@ -55,10 +55,23 @@ export default function ProductCard({ product, onClick }) {
         </Title>
 
         {product.type === "readymade" && (
-          <Badge color="green" text="Ready-made" />
+          <Space size={6} align="center">
+            <Badge color="green" />
+            <Text style={{ fontSize: 14 }}>Ready-made</Text>
+          </Space>
         )}
         {product.type === "custom" && (
-          <Badge color="blue" text="Custom-made" />
+          <Space size={6} align="center">
+            <Badge color="blue" />
+            <Text style={{ fontSize: 14 }}>Custom</Text>
+          </Space>
+        )}
+        {/* Show Custom badge for all items in fabrics category */}
+        {activeCategory === "fabrics" && !product.type && (
+          <Space size={6} align="center">
+            <Badge color="blue" />
+            <Text style={{ fontSize: 14 }}>Custom</Text>
+          </Space>
         )}
       </Space>
 
@@ -85,7 +98,7 @@ export default function ProductCard({ product, onClick }) {
         </Title>
       )}
 
-      {product.type === "custom" && (
+      {(product.type === "custom" || (activeCategory === "fabrics" && !product.type)) && (
         <Text type="secondary" style={{ fontSize: 12, display: "block", marginTop: 4 }}>
           Price varies by fabric selection
         </Text>
