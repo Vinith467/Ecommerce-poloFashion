@@ -3,7 +3,7 @@ import { Card, Badge, Carousel, Typography, Space } from "antd";
 
 const { Title, Text, Paragraph } = Typography;
 
-export default function ProductCard({ product, onClick, activeCategory }) {
+export default function ProductCard({ product, onClick }) {
   return (
     <Card
       hoverable
@@ -55,23 +55,16 @@ export default function ProductCard({ product, onClick, activeCategory }) {
         </Title>
 
         {product.type === "readymade" && (
-          <Space size={6} align="center">
-            <Badge color="green" />
-            <Text style={{ fontSize: 14 }}>Ready-made</Text>
-          </Space>
+          <Badge color="green" text="Ready-made" />
         )}
         {product.type === "custom" && (
-          <Space size={6} align="center">
-            <Badge color="blue" />
-            <Text style={{ fontSize: 14 }}>Custom</Text>
-          </Space>
+          <Badge color="blue" text="Custom" />
         )}
-        {/* Show Custom badge for all items in fabrics category */}
-        {activeCategory === "fabrics" && !product.type && (
-          <Space size={6} align="center">
-            <Badge color="blue" />
-            <Text style={{ fontSize: 14 }}>Custom</Text>
-          </Space>
+         {product.type === "shirt" && (
+          <Badge color="blue" text="Custom" />
+        )}
+         {product.type === "pant" && (
+          <Badge color="blue" text="Custom" />
         )}
       </Space>
 
@@ -98,8 +91,8 @@ export default function ProductCard({ product, onClick, activeCategory }) {
         </Title>
       )}
 
-      {(product.type === "custom" || (activeCategory === "fabrics" && !product.type)) && (
-        <Text type="secondary" style={{ fontSize: 12, display: "block", marginTop: 4 }}>
+      {product.type === "custom" && (
+        <Text type="secondary" style={{ fontSize: 12 }}>
           Price varies by fabric selection
         </Text>
       )}
