@@ -11,11 +11,11 @@ import {
   InputNumber,
   Divider,
   Space,
+  Card,
 } from "antd";
 import { ShoppingOutlined } from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
 import ProductImageGallery from "../ProductImageGallery";
-import "../products/ProductModals.css"; 
 
 const { Title, Text, Paragraph } = Typography;
 
@@ -66,9 +66,8 @@ export default function RentalModal({
           return;
         }
 
-        // ✅ FIX: Use rentalItemId instead of productId
         const orderData = {
-          rentalItemId: selectedProduct.id, // ✅ Changed from productId
+          rentalItemId: selectedProduct.id,
           productName: selectedProduct.name,
           orderType: "rental",
           rentalMode: "rent",
@@ -93,14 +92,13 @@ export default function RentalModal({
       }
 
       if (rentalMode === "buy") {
-        // ✅ FIX: Use rentalItemId for buy mode too
         const orderData = {
-          rentalItemId: selectedProduct.id, // ✅ Changed from productId
+          rentalItemId: selectedProduct.id,
           productName: selectedProduct.name,
           orderType: "rental_buy",
           size: selectedSize || null,
           quantity: 1,
-          rentalDays: 0, // ✅ No rental days for buy
+          rentalDays: 0,
           totalPrice: selectedProduct.buy_price,
         };
 
@@ -128,105 +126,295 @@ export default function RentalModal({
       open={show}
       onCancel={onHide}
       footer={null}
-      width="90vw" // ✅ Changed from 900
-      style={{ maxWidth: 900 }} // ✅ Added max-width
-      title={selectedProduct?.name}
+      width="95vw"
+      style={{ 
+        maxWidth: 900,
+        top: 20,
+      }}
+      title={
+        <div style={{ 
+          fontSize: 'clamp(16px, 4vw, 20px)',
+          wordBreak: 'break-word',
+          paddingRight: 24,
+        }}>
+          {selectedProduct?.name}
+        </div>
+      }
       destroyOnClose={true}
+      styles={{
+        body: {
+          padding: 'clamp(12px, 3vw, 24px)',
+          maxHeight: '85vh',
+          overflowY: 'auto',
+        }
+      }}
     >
-      {orderSuccess && <Alert type="success" message={orderSuccess} showIcon />}
-      {orderError && <Alert type="error" message={orderError} showIcon />}
+      {orderSuccess && (
+        <Alert 
+          type="success" 
+          message={orderSuccess} 
+          showIcon 
+          style={{ marginBottom: 16 }}
+        />
+      )}
+      {orderError && (
+        <Alert 
+          type="error" 
+          message={orderError} 
+          showIcon 
+          style={{ marginBottom: 16 }}
+        />
+      )}
 
       {selectedProduct && (
-        <Row gutter={24}>
-          <Col span={10}>
+        <Row gutter={[16, 16]}>
+          {/* LEFT - Image */}
+          <Col xs={24} md={10}>
             <ProductImageGallery product={selectedProduct} />
-            <Divider />
-            <Text strong>
+            <Divider style={{ margin: '16px 0' }} />
+            <Text strong style={{ fontSize: 'clamp(14px, 3vw, 16px)' }}>
               Price:{" "}
-              <Text type="primary">
+              <Text type="primary" style={{ fontSize: 'clamp(16px, 3.5vw, 18px)' }}>
                 {rentalMode === "rent"
                   ? `₹${selectedProduct.price_per_day} / day`
                   : `₹${selectedProduct.buy_price}`}
               </Text>
             </Text>
-            <Paragraph type="secondary">
-              {selectedProduct.description}
-            </Paragraph>
+            <div className="desktop-only">
+              <Paragraph type="secondary" style={{ marginTop: 8 }}>
+                {selectedProduct.description}
+              </Paragraph>
+            </div>
           </Col>
 
-          <Col span={14}>
-            <Title level={5}>Rental Options</Title>
+          {/* RIGHT - Options */}
+          <Col xs={24} md={14}>
+            <Title level={5} style={{ fontSize: 'clamp(16px, 3.5vw, 18px)' }}>
+              Rental Options
+            </Title>
 
+            {/* ✅ Rent/Buy Toggle - Mobile */}
             <Radio.Group
               value={rentalMode}
               onChange={(e) => setRentalMode(e.target.value)}
-              style={{ marginBottom: 16 }}
+              style={{ marginBottom: 16, width: '100%' }}
+              size="large"
             >
-              <Radio.Button value="rent">Rent</Radio.Button>
-              <Radio.Button value="buy">Buy</Radio.Button>
+              <Radio.Button 
+                value="rent"
+                style={{ 
+                  width: '50%',
+                  textAlign: 'center',
+                  fontSize: 'clamp(14px, 3vw, 16px)',
+                }}
+              >
+                Rent
+              </Radio.Button>
+              <Radio.Button 
+                value="buy"
+                style={{ 
+                  width: '50%',
+                  textAlign: 'center',
+                  fontSize: 'clamp(14px, 3vw, 16px)',
+                }}
+              >
+                Buy
+              </Radio.Button>
             </Radio.Group>
 
+            {/* ✅ Size Selector - Mobile */}
             <div style={{ marginBottom: 16 }}>
-              <Text>Select Size</Text>
+              <Text 
+                strong
+                style={{ 
+                  display: 'block',
+                  marginBottom: 8,
+                  fontSize: 'clamp(14px, 3vw, 16px)',
+                }}
+              >
+                Select Size
+              </Text>
               <Select
                 style={{ width: "100%" }}
                 value={selectedSize}
                 onChange={setSelectedSize}
                 placeholder="Select size"
-              >
-                {selectedProduct.sizes?.map((size) => (
-                  <Select.Option key={size} value={size}>
-                    {size}
-                  </Select.Option>
-                ))}
-              </Select>
+                size="large"
+                options={selectedProduct.sizes?.map((size) => ({
+                  label: size,
+                  value: size,
+                }))}
+              />
             </div>
 
+            {/* ✅ Rental Days - Mobile */}
             {rentalMode === "rent" && (
               <>
-                <Text>Number of Days</Text>
+                <Text 
+                  strong
+                  style={{ 
+                    display: 'block',
+                    marginBottom: 8,
+                    fontSize: 'clamp(14px, 3vw, 16px)',
+                  }}
+                >
+                  Number of Days
+                </Text>
                 <InputNumber
                   min={1}
                   value={rentalDays}
                   onChange={setRentalDays}
                   style={{ width: "100%", marginBottom: 16 }}
+                  size="large"
+                  controls={{
+                    upIcon: <span style={{ fontSize: 20 }}>+</span>,
+                    downIcon: <span style={{ fontSize: 20 }}>−</span>,
+                  }}
                 />
 
-                <Divider />
+                {/* ✅ Mobile Description */}
+                <div className="mobile-only" style={{ marginBottom: 16 }}>
+                  <Divider style={{ margin: '12px 0' }} />
+                  <Paragraph type="secondary">
+                    {selectedProduct.description}
+                  </Paragraph>
+                </div>
 
-                <Space direction="vertical" style={{ width: "100%" }}>
-                  <Text>Rent: ₹{rentalCost()}</Text>
-                  <Text>Deposit: ₹{rentalDeposit()}</Text>
-                  <Text strong type="primary">
-                    Pay Now: ₹{rentalPayNow()}
-                  </Text>
-                </Space>
+                <Divider style={{ margin: '16px 0' }} />
+
+                {/* ✅ Rental Breakdown - Mobile Card */}
+                <Card
+                  style={{
+                    background: '#f5f5f5',
+                    borderRadius: 8,
+                  }}
+                  bodyStyle={{ padding: 'clamp(12px, 3vw, 16px)' }}
+                >
+                  <Space direction="vertical" style={{ width: "100%" }} size={8}>
+                    <Space style={{ width: "100%", justifyContent: "space-between" }}>
+                      <Text style={{ fontSize: 'clamp(13px, 2.8vw, 15px)' }}>
+                        Rent ({rentalDays} days)
+                      </Text>
+                      <Text style={{ fontSize: 'clamp(14px, 3vw, 16px)' }}>
+                        ₹{rentalCost()}
+                      </Text>
+                    </Space>
+
+                    <Space style={{ width: "100%", justifyContent: "space-between" }}>
+                      <Text style={{ fontSize: 'clamp(13px, 2.8vw, 15px)' }}>
+                        Deposit (refundable)
+                      </Text>
+                      <Text style={{ fontSize: 'clamp(14px, 3vw, 16px)' }}>
+                        ₹{rentalDeposit()}
+                      </Text>
+                    </Space>
+
+                    <Divider style={{ margin: "8px 0" }} />
+
+                    <Space style={{ width: "100%", justifyContent: "space-between" }}>
+                      <Text strong style={{ fontSize: 'clamp(14px, 3vw, 16px)' }}>
+                        Pay Now
+                      </Text>
+                      <Text 
+                        strong 
+                        type="primary" 
+                        style={{ fontSize: 'clamp(16px, 3.5vw, 18px)' }}
+                      >
+                        ₹{rentalPayNow()}
+                      </Text>
+                    </Space>
+                  </Space>
+                </Card>
               </>
             )}
 
+            {/* ✅ Buy Mode - Mobile */}
             {rentalMode === "buy" && (
-              <Text strong type="primary">
-                Buy Price: ₹{selectedProduct.buy_price}
-              </Text>
+              <>
+                <div className="mobile-only" style={{ marginBottom: 16 }}>
+                  <Divider style={{ margin: '12px 0' }} />
+                  <Paragraph type="secondary">
+                    {selectedProduct.description}
+                  </Paragraph>
+                </div>
+
+                <Card
+                  style={{
+                    background: '#f5f5f5',
+                    borderRadius: 8,
+                  }}
+                  bodyStyle={{ padding: 'clamp(12px, 3vw, 16px)' }}
+                >
+                  <Space style={{ width: "100%", justifyContent: "space-between" }}>
+                    <Text strong style={{ fontSize: 'clamp(14px, 3vw, 16px)' }}>
+                      Buy Price
+                    </Text>
+                    <Text 
+                      strong 
+                      type="primary" 
+                      style={{ fontSize: 'clamp(16px, 3.5vw, 18px)' }}
+                    >
+                      ₹{selectedProduct.buy_price}
+                    </Text>
+                  </Space>
+                </Card>
+              </>
             )}
           </Col>
         </Row>
       )}
 
-      <Divider />
+      <Divider style={{ margin: '16px 0' }} />
 
-      <Space style={{ width: "100%", justifyContent: "flex-end" }}>
-        <Button onClick={onHide}>Close</Button>
+      {/* ✅ Action Buttons */}
+      <Space 
+        style={{ 
+          width: "100%", 
+          justifyContent: "flex-end",
+          flexWrap: 'wrap',
+        }}
+        size={[8, 8]}
+      >
+        <Button 
+          onClick={onHide}
+          size="large"
+          style={{ minWidth: 'clamp(100px, 25vw, 120px)' }}
+        >
+          Close
+        </Button>
         <Button
           type="primary"
           icon={<ShoppingOutlined />}
           loading={placing}
           disabled={rentalMode === "rent" && !selectedSize}
           onClick={handlePlaceOrder}
+          size="large"
+          style={{ minWidth: 'clamp(120px, 30vw, 150px)' }}
         >
           Place Order
         </Button>
       </Space>
+
+      {/* ✅ Responsive CSS */}
+      <style jsx>{`
+        @media (max-width: 768px) {
+          .desktop-only {
+            display: none;
+          }
+          .mobile-only {
+            display: block;
+          }
+        }
+
+        @media (min-width: 769px) {
+          .desktop-only {
+            display: block;
+          }
+          .mobile-only {
+            display: none;
+          }
+        }
+      `}</style>
     </Modal>
   );
 }

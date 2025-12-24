@@ -10,14 +10,13 @@ import {
   InputNumber,
   Divider,
   Space,
+  Card,
 } from "antd";
 import { ShoppingOutlined } from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
 import ProductImageGallery from "../ProductImageGallery";
-import "../products/ProductModals.css"; 
 
-
-const { Title, Text, Paragraph } = Typography;
+const { Text, Paragraph } = Typography;
 
 export default function AccessoryModal({
   show,
@@ -78,7 +77,6 @@ export default function AccessoryModal({
       return;
     }
 
-    // ✅ FIXED: Use correct ID field based on category
     const orderData = {
       ...(isInnerwear
         ? { innerwearId: selectedProduct.id }
@@ -90,7 +88,7 @@ export default function AccessoryModal({
       totalPrice: selectedProduct.price * quantity,
     };
 
-    console.log("Submitting order:", orderData); // ✅ Debug log
+    console.log("Submitting order:", orderData);
 
     try {
       setPlacing(true);
@@ -118,10 +116,28 @@ export default function AccessoryModal({
       open={show}
       onCancel={onHide}
       footer={null}
-      width="90vw" // ✅ Changed from 900
-      style={{ maxWidth: 900 }} // ✅ Added max-width
-      title={selectedProduct?.name}
+      width="95vw"
+      style={{ 
+        maxWidth: 900,
+        top: 20,
+      }}
+      title={
+        <div style={{ 
+          fontSize: 'clamp(16px, 4vw, 20px)',
+          wordBreak: 'break-word',
+          paddingRight: 24,
+        }}>
+          {selectedProduct?.name}
+        </div>
+      }
       destroyOnClose={true}
+      styles={{
+        body: {
+          padding: 'clamp(12px, 3vw, 24px)',
+          maxHeight: '85vh',
+          overflowY: 'auto',
+        }
+      }}
     >
       {orderSuccess && (
         <Alert
@@ -142,84 +158,176 @@ export default function AccessoryModal({
       )}
 
       {selectedProduct && (
-        <Row gutter={24}>
-          <Col span={10}>
+        <Row gutter={[16, 16]}>
+          {/* LEFT - Image */}
+          <Col xs={24} md={10}>
             <ProductImageGallery
               product={selectedProduct}
               key={selectedProduct.id}
             />
 
-            <Divider />
+            <Divider style={{ margin: '16px 0' }} />
 
-            <Text strong>
-              Price: <Text type="primary">₹{selectedProduct.price}</Text>
+            <Text strong style={{ fontSize: 'clamp(14px, 3vw, 16px)' }}>
+              Price:{" "}
+              <Text type="primary" style={{ fontSize: 'clamp(16px, 3.5vw, 18px)' }}>
+                ₹{selectedProduct.price}
+              </Text>
             </Text>
 
-            <Paragraph type="secondary" style={{ marginTop: 8 }}>
-              {selectedProduct.description}
-            </Paragraph>
+            <div className="desktop-only">
+              <Paragraph type="secondary" style={{ marginTop: 8 }}>
+                {selectedProduct.description}
+              </Paragraph>
+            </div>
           </Col>
 
-          <Col span={14}>
+          {/* RIGHT - Options */}
+          <Col xs={24} md={14}>
+            {/* ✅ Size Selector for Innerwear - Mobile */}
             {isInnerwear && selectedProduct.sizes && (
               <div style={{ marginBottom: 16 }}>
-                <Text>Select Size</Text>
+                <Text 
+                  strong
+                  style={{ 
+                    display: 'block',
+                    marginBottom: 8,
+                    fontSize: 'clamp(14px, 3vw, 16px)',
+                  }}
+                >
+                  Select Size *
+                </Text>
                 <Select
                   style={{ width: "100%" }}
                   placeholder="Choose size"
                   value={selectedSize}
                   onChange={setSelectedSize}
-                >
-                  {selectedProduct.sizes.map((size) => (
-                    <Select.Option key={size} value={size}>
-                      {size}
-                    </Select.Option>
-                  ))}
-                </Select>
+                  size="large"
+                  options={selectedProduct.sizes.map((size) => ({
+                    label: size,
+                    value: size,
+                  }))}
+                />
               </div>
             )}
 
+            {/* ✅ Quantity Selector - Mobile */}
             <div style={{ marginBottom: 16 }}>
-              <Text>Quantity</Text>
+              <Text 
+                strong
+                style={{ 
+                  display: 'block',
+                  marginBottom: 8,
+                  fontSize: 'clamp(14px, 3vw, 16px)',
+                }}
+              >
+                Quantity
+              </Text>
               <InputNumber
                 min={1}
                 value={quantity}
                 onChange={setQuantity}
                 style={{ width: "100%" }}
+                size="large"
+                controls={{
+                  upIcon: <span style={{ fontSize: 20 }}>+</span>,
+                  downIcon: <span style={{ fontSize: 20 }}>−</span>,
+                }}
               />
             </div>
 
-            <Divider />
+            {/* ✅ Mobile Description */}
+            <div className="mobile-only" style={{ marginBottom: 16 }}>
+              <Divider style={{ margin: '12px 0' }} />
+              <Paragraph type="secondary">
+                {selectedProduct.description}
+              </Paragraph>
+            </div>
 
-            <Space
-              direction="horizontal"
-              style={{ width: "100%", justifyContent: "space-between" }}
+            <Divider style={{ margin: '16px 0' }} />
+
+            {/* ✅ Price Summary - Mobile Card */}
+            <Card
+              style={{
+                background: '#f5f5f5',
+                borderRadius: 8,
+              }}
+              bodyStyle={{ padding: 'clamp(12px, 3vw, 16px)' }}
             >
-              <Text>
-                {quantity} × ₹{selectedProduct.price}
-              </Text>
-              <Text strong type="primary">
-                ₹{selectedProduct.price * quantity}
-              </Text>
-            </Space>
+              <Space
+                direction="horizontal"
+                style={{
+                  width: "100%",
+                  justifyContent: "space-between",
+                }}
+              >
+                <Text style={{ fontSize: 'clamp(14px, 3vw, 16px)' }}>
+                  {quantity} × ₹{selectedProduct.price}
+                </Text>
+                <Text 
+                  strong 
+                  type="primary" 
+                  style={{ fontSize: 'clamp(18px, 4vw, 20px)' }}
+                >
+                  ₹{selectedProduct.price * quantity}
+                </Text>
+              </Space>
+            </Card>
           </Col>
         </Row>
       )}
 
-      <Divider />
+      <Divider style={{ margin: '16px 0' }} />
 
-      <Space style={{ width: "100%", justifyContent: "flex-end" }}>
-        <Button onClick={onHide}>Close</Button>
+      {/* ✅ Action Buttons */}
+      <Space 
+        style={{ 
+          width: "100%", 
+          justifyContent: "flex-end",
+          flexWrap: 'wrap',
+        }}
+        size={[8, 8]}
+      >
+        <Button 
+          onClick={onHide}
+          size="large"
+          style={{ minWidth: 'clamp(100px, 25vw, 120px)' }}
+        >
+          Close
+        </Button>
         <Button
           type="primary"
           icon={<ShoppingOutlined />}
           loading={placing}
           disabled={!selectedProduct || (isInnerwear && !selectedSize)}
           onClick={handlePlaceOrder}
+          size="large"
+          style={{ minWidth: 'clamp(120px, 30vw, 150px)' }}
         >
           Place Order
         </Button>
       </Space>
+
+      {/* ✅ Responsive CSS */}
+      <style jsx>{`
+        @media (max-width: 768px) {
+          .desktop-only {
+            display: none;
+          }
+          .mobile-only {
+            display: block;
+          }
+        }
+
+        @media (min-width: 769px) {
+          .desktop-only {
+            display: block;
+          }
+          .mobile-only {
+            display: none;
+          }
+        }
+      `}</style>
     </Modal>
   );
 }

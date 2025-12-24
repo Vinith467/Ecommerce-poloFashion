@@ -11,11 +11,12 @@ import {
   Divider,
   Space,
   Tag,
+  Card,
 } from "antd";
 import { ShoppingOutlined } from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
 import ProductImageGallery from "../ProductImageGallery";
-import "../products/ProductModals.css"; 
+
 const { Text, Paragraph, Title } = Typography;
 
 const STITCHING_CHARGES = {
@@ -104,11 +105,9 @@ export default function FabricModal({
       return;
     }
 
-    // ✅ FIXED: Determine if this is a Fabric or a Custom Product
     const isFabricItem = !selectedProduct.type || !selectedProduct.category;
 
     const orderData = {
-      // ✅ Use fabricId for actual fabrics, productId for custom products
       ...(isFabricItem
         ? { fabricId: selectedProduct.id }
         : { productId: selectedProduct.id }),
@@ -119,8 +118,6 @@ export default function FabricModal({
       totalPrice: calcTotal(),
       quantity: 1,
     };
-
-    console.log("🟢 Fabric Order:", orderData);
 
     try {
       setPlacing(true);
@@ -148,10 +145,28 @@ export default function FabricModal({
       open={show}
       onCancel={onHide}
       footer={null}
-      width="90vw" // ✅ Changed from 900
-      style={{ maxWidth: 900 }} // ✅ Added max-width
-      title={selectedProduct?.name}
+      width="95vw"
+      style={{ 
+        maxWidth: 900,
+        top: 20,
+      }}
+      title={
+        <div style={{ 
+          fontSize: 'clamp(16px, 4vw, 20px)',
+          wordBreak: 'break-word',
+          paddingRight: 24,
+        }}>
+          {selectedProduct?.name}
+        </div>
+      }
       destroyOnClose={true}
+      styles={{
+        body: {
+          padding: 'clamp(12px, 3vw, 24px)',
+          maxHeight: '85vh',
+          overflowY: 'auto',
+        }
+      }}
     >
       {orderSuccess && (
         <Alert
@@ -172,27 +187,34 @@ export default function FabricModal({
       )}
 
       {selectedProduct && (
-        <Row gutter={24}>
-          {/* LEFT */}
-          <Col span={10}>
+        <Row gutter={[16, 16]}>
+          {/* LEFT - Image */}
+          <Col xs={24} md={10}>
             <ProductImageGallery product={selectedProduct} />
 
-            <Divider />
+            <Divider style={{ margin: '16px 0' }} />
 
-            <Text strong>
+            <Text strong style={{ fontSize: 'clamp(14px, 3vw, 16px)' }}>
               Price:{" "}
-              <Text type="primary">₹{selectedProduct.price} / meter</Text>
+              <Text type="primary" style={{ fontSize: 'clamp(16px, 3.5vw, 18px)' }}>
+                ₹{selectedProduct.price} / meter
+              </Text>
             </Text>
 
-            <Paragraph type="secondary" style={{ marginTop: 8 }}>
-              {selectedProduct.description}
-            </Paragraph>
+            <div className="desktop-only">
+              <Paragraph type="secondary" style={{ marginTop: 8 }}>
+                {selectedProduct.description}
+              </Paragraph>
+            </div>
           </Col>
 
-          {/* RIGHT */}
-          <Col span={14}>
-            <Title level={5}>Stitching Options</Title>
+          {/* RIGHT - Options */}
+          <Col xs={24} md={14}>
+            <Title level={5} style={{ fontSize: 'clamp(16px, 3.5vw, 18px)' }}>
+              Stitching Options
+            </Title>
 
+            {/* ✅ Mobile Optimized Radio */}
             <Radio.Group
               value={wantStitching}
               onChange={(e) => {
@@ -202,12 +224,19 @@ export default function FabricModal({
                   setMeters(1);
                 }
               }}
-              style={{ marginBottom: 16 }}
+              style={{ marginBottom: 16, width: '100%' }}
             >
-              <Radio value={true}>Yes, stitch it</Radio>
-              <Radio value={false}>No, just buy fabric</Radio>
+              <Space direction="vertical" style={{ width: '100%' }}>
+                <Radio value={true} style={{ fontSize: 'clamp(14px, 3vw, 16px)' }}>
+                  Yes, stitch it
+                </Radio>
+                <Radio value={false} style={{ fontSize: 'clamp(14px, 3vw, 16px)' }}>
+                  No, just buy fabric
+                </Radio>
+              </Space>
             </Radio.Group>
 
+            {/* ✅ Stitch Type Tags - Mobile Wrap */}
             {wantStitching && (
               <Space wrap style={{ marginBottom: 16 }}>
                 {Object.keys(STITCHING_CHARGES).map((type) => (
@@ -215,6 +244,11 @@ export default function FabricModal({
                     key={type}
                     checked={stitchType === type}
                     onChange={() => onSelectStitchType(type)}
+                    style={{
+                      padding: '8px 16px',
+                      fontSize: 'clamp(13px, 2.8vw, 15px)',
+                      borderRadius: 6,
+                    }}
                   >
                     {type.toUpperCase()} — ₹{STITCHING_CHARGES[type]}
                   </Tag.CheckableTag>
@@ -222,17 +256,33 @@ export default function FabricModal({
               </Space>
             )}
 
-            <Divider />
+            <Divider style={{ margin: '16px 0' }} />
 
-            <Text>Meters Required</Text>
+            {/* ✅ Meters Input - Mobile Optimized */}
+            <Text 
+              strong
+              style={{ 
+                display: 'block',
+                marginBottom: 8,
+                fontSize: 'clamp(14px, 3vw, 16px)',
+              }}
+            >
+              Meters Required
+            </Text>
             <InputNumber
               min={0.1}
               step={0.1}
               value={meters}
               onChange={(val) => setMeters(val)}
               style={{ width: "100%", marginBottom: 16 }}
+              size="large"
+              controls={{
+                upIcon: <span style={{ fontSize: 20 }}>+</span>,
+                downIcon: <span style={{ fontSize: 20 }}>−</span>,
+              }}
             />
 
+            {/* ✅ Measurement Warning - Mobile */}
             {wantStitching && !measurementDone && (
               <Alert
                 type="warning"
@@ -244,6 +294,7 @@ export default function FabricModal({
                       onHide();
                       navigate("/booking");
                     }}
+                    style={{ padding: 0 }}
                   >
                     Complete measurement booking first
                   </Button>
@@ -253,53 +304,121 @@ export default function FabricModal({
               />
             )}
 
-            <Divider />
+            {/* ✅ Mobile Description */}
+            <div className="mobile-only" style={{ marginBottom: 16 }}>
+              <Divider style={{ margin: '12px 0' }} />
+              <Paragraph type="secondary">
+                {selectedProduct.description}
+              </Paragraph>
+            </div>
 
-            <Space direction="vertical" style={{ width: "100%" }}>
-              <Space style={{ width: "100%", justifyContent: "space-between" }}>
-                <Text>Fabric ({meters} m)</Text>
-                <Text>₹{calcFabricCost()}</Text>
-              </Space>
+            <Divider style={{ margin: '16px 0' }} />
 
-              {wantStitching && (
-                <Space
-                  style={{
-                    width: "100%",
-                    justifyContent: "space-between",
-                  }}
-                >
-                  <Text>Stitching ({stitchType})</Text>
-                  <Text>₹{calcStitchCharge()}</Text>
+            {/* ✅ Price Breakdown - Mobile Card */}
+            <Card
+              style={{
+                background: '#f5f5f5',
+                borderRadius: 8,
+              }}
+              bodyStyle={{ padding: 'clamp(12px, 3vw, 16px)' }}
+            >
+              <Space direction="vertical" style={{ width: "100%" }} size={8}>
+                <Space style={{ width: "100%", justifyContent: "space-between" }}>
+                  <Text style={{ fontSize: 'clamp(13px, 2.8vw, 15px)' }}>
+                    Fabric ({meters} m)
+                  </Text>
+                  <Text style={{ fontSize: 'clamp(14px, 3vw, 16px)' }}>
+                    ₹{calcFabricCost()}
+                  </Text>
                 </Space>
-              )}
 
-              <Divider style={{ margin: "8px 0" }} />
+                {wantStitching && (
+                  <Space
+                    style={{
+                      width: "100%",
+                      justifyContent: "space-between",
+                    }}
+                  >
+                    <Text style={{ fontSize: 'clamp(13px, 2.8vw, 15px)' }}>
+                      Stitching ({stitchType})
+                    </Text>
+                    <Text style={{ fontSize: 'clamp(14px, 3vw, 16px)' }}>
+                      ₹{calcStitchCharge()}
+                    </Text>
+                  </Space>
+                )}
 
-              <Space style={{ width: "100%", justifyContent: "space-between" }}>
-                <Text strong>Total</Text>
-                <Text strong type="primary">
-                  ₹{calcTotal()}
-                </Text>
+                <Divider style={{ margin: "8px 0" }} />
+
+                <Space style={{ width: "100%", justifyContent: "space-between" }}>
+                  <Text strong style={{ fontSize: 'clamp(14px, 3vw, 16px)' }}>
+                    Total
+                  </Text>
+                  <Text 
+                    strong 
+                    type="primary" 
+                    style={{ fontSize: 'clamp(16px, 3.5vw, 18px)' }}
+                  >
+                    ₹{calcTotal()}
+                  </Text>
+                </Space>
               </Space>
-            </Space>
+            </Card>
           </Col>
         </Row>
       )}
 
-      <Divider />
+      <Divider style={{ margin: '16px 0' }} />
 
-      <Space style={{ width: "100%", justifyContent: "flex-end" }}>
-        <Button onClick={onHide}>Close</Button>
+      {/* ✅ Action Buttons */}
+      <Space 
+        style={{ 
+          width: "100%", 
+          justifyContent: "flex-end",
+          flexWrap: 'wrap',
+        }}
+        size={[8, 8]}
+      >
+        <Button 
+          onClick={onHide}
+          size="large"
+          style={{ minWidth: 'clamp(100px, 25vw, 120px)' }}
+        >
+          Close
+        </Button>
         <Button
           type="primary"
           icon={<ShoppingOutlined />}
           loading={placing}
           disabled={!selectedProduct || !meters || Number(meters) <= 0}
           onClick={handlePlaceOrder}
+          size="large"
+          style={{ minWidth: 'clamp(120px, 30vw, 150px)' }}
         >
           Place Order
         </Button>
       </Space>
+
+      {/* ✅ Responsive CSS */}
+      <style jsx>{`
+        @media (max-width: 768px) {
+          .desktop-only {
+            display: none;
+          }
+          .mobile-only {
+            display: block;
+          }
+        }
+
+        @media (min-width: 769px) {
+          .desktop-only {
+            display: block;
+          }
+          .mobile-only {
+            display: none;
+          }
+        }
+      `}</style>
     </Modal>
   );
 }
