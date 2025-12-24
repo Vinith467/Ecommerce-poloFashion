@@ -91,7 +91,7 @@ export default function ProductCard({ product, onClick }) {
         </Title>
       )}
 
-      {product.type === "custom" && (
+      {product.type === "custom" ||product.type === "shirt" ||product.type === "pant"  && (
         <Text type="secondary" style={{ fontSize: 12 }}>
           Price varies by fabric selection
         </Text>
