@@ -15,6 +15,7 @@ import {
 import { ShoppingOutlined } from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
 import ProductImageGallery from "../ProductImageGallery";
+import "../products/ProductModals.css"; 
 
 const { Title, Text, Paragraph } = Typography;
 

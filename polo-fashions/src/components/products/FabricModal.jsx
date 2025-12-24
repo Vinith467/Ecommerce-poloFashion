@@ -15,7 +15,7 @@ import {
 import { ShoppingOutlined } from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
 import ProductImageGallery from "../ProductImageGallery";
-
+import "../products/ProductModals.css"; 
 const { Text, Paragraph, Title } = Typography;
 
 const STITCHING_CHARGES = {
