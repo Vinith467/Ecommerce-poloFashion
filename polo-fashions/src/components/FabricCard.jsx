@@ -57,7 +57,7 @@ export default function FabricCard({ fabric, isSelected, onClick }) {
         </Title>
 
         {/* ✅ BLUE DOT for Custom Fabrics */}
-        {(fabric.type === "fabrics" || fabric.type === "fabrics") && (
+        {(fabric.type === "fabrics") && (
           <Badge color="blue" text="Custom" />
         )}
       </Space>
@@ -84,7 +84,7 @@ export default function FabricCard({ fabric, isSelected, onClick }) {
       </Title>
 
       {/* Custom pricing note */}
-      {(fabric.type === "fabrics" || fabric.type === "custom") && (
+      {(fabric.type === "fabrics") && (
         <Text type="secondary" style={{ fontSize: 12, display: "block", marginTop: 4 }}>
           Price varies by fabric selection
         </Text>
