@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { Tabs, Row, Col, Skeleton, Empty } from "antd";
 import { useAuth } from "../context/AuthContext";
 import {
@@ -65,44 +65,52 @@ export default function Products() {
     setSelectedProduct(null);
   };
 
-  /* ================= FILTER LOGIC ================= */
+  /* ================= ✅ FIXED: FILTER LOGIC WITH useMemo ================= */
 
-  let filteredProducts = [];
+  const filteredProducts = useMemo(() => {
+    if (!products) return [];
 
-  if (products) {
-    if (activeCategory === "fabrics") {
-      const customProducts = products.products.filter(
-        (p) =>
-          p.type === "custom" &&
-          (p.category === "shirt" || p.category === "pant")
-      );
-      filteredProducts = [...products.fabrics, ...customProducts];
-    } else if (activeCategory === "ready_shirts") {
-      filteredProducts = products.products.filter(
-        (p) => p.category === "shirt" && p.type === "readymade"
-      );
-    } else if (activeCategory === "ready_pants") {
-      filteredProducts = products.products.filter(
-        (p) => p.category === "pant" && p.type === "readymade"
-      );
-    } else if (activeCategory === "traditional") {
-      filteredProducts = products.products.filter(
-        (p) => p.category === "traditional"
-      );
-    } else if (activeCategory === "rentals") {
-      filteredProducts = products.rentals;
-    } else if (activeCategory === "accessories") {
-      filteredProducts = products.accessories;
-    } else if (activeCategory === "innerwear") {
-      filteredProducts = products.innerwear;
+    // ✅ Always return a NEW array for each category
+    switch (activeCategory) {
+      case "fabrics": {
+        const customProducts = products.products.filter(
+          (p) =>
+            p.type === "custom" &&
+            (p.category === "shirt" || p.category === "pant")
+        );
+        return [...products.fabrics, ...customProducts];
+      }
+
+      case "ready_shirts":
+        return products.products.filter(
+          (p) => p.category === "shirt" && p.type === "readymade"
+        );
+
+      case "ready_pants":
+        return products.products.filter(
+          (p) => p.category === "pant" && p.type === "readymade"
+        );
+
+      case "traditional":
+        return products.products.filter((p) => p.category === "traditional");
+
+      case "rentals":
+        return [...products.rentals]; // ✅ Return new array
+
+      case "accessories":
+        return [...products.accessories]; // ✅ Return new array
+
+      case "innerwear":
+        return [...products.innerwear]; // ✅ Return new array
+
+      default:
+        return [];
     }
-  }
+  }, [products, activeCategory]); // ✅ Recalculate only when these change
 
-  /* ================= MODAL TYPE LOGIC (FIXED) ================= */
+  /* ================= MODAL TYPE LOGIC ================= */
 
-  // ✅ SIMPLIFIED: If we're in fabrics tab, show fabric modal
   const isFabricModal = activeCategory === "fabrics" && selectedProduct;
-
   const isTraditional =
     activeCategory === "traditional" ||
     selectedProduct?.category === "traditional";
@@ -113,16 +121,6 @@ export default function Products() {
   const isAccessory =
     (activeCategory === "accessories" || activeCategory === "innerwear") &&
     selectedProduct;
-
-  console.log("🟢 Modal Logic:", {
-    isFabricModal,
-    isTraditional,
-    isReadyMade,
-    isRental,
-    isAccessory,
-    selectedProduct: selectedProduct?.name,
-    activeCategory,
-  });
 
   /* ================= UI ================= */
 
@@ -165,11 +163,11 @@ export default function Products() {
           filteredProducts.map((product) => (
             <Col
               key={product.id}
-              xs={24} // Full width on extra small
-              sm={12} // Half width on small
-              md={8} // Third width on medium
-              lg={8} // Third width on large
-              xl={6} // Quarter width on extra large
+              xs={24}
+              sm={12}
+              md={8}
+              lg={8}
+              xl={6}
             >
               <ProductCard
                 product={product}
@@ -182,7 +180,6 @@ export default function Products() {
 
       {/* ================= MODALS ================= */}
 
-      {/* ✅ Fabric Modal - Shows for fabrics tab (both pure fabrics AND custom products) */}
       {isFabricModal && (
         <FabricModal
           show={showModal}
@@ -193,7 +190,6 @@ export default function Products() {
         />
       )}
 
-      {/* Ready-made Modal */}
       {isReadyMade && (
         <ReadyMadeModal
           show={showModal}
@@ -204,7 +200,6 @@ export default function Products() {
         />
       )}
 
-      {/* Traditional Modal */}
       {isTraditional && (
         <TraditionalModal
           show={showModal}
@@ -215,7 +210,6 @@ export default function Products() {
         />
       )}
 
-      {/* Rental Modal */}
       {isRental && (
         <RentalModal
           show={showModal}
@@ -226,7 +220,6 @@ export default function Products() {
         />
       )}
 
-      {/* Accessory/Innerwear Modal */}
       {isAccessory && (
         <AccessoryModal
           show={showModal}
