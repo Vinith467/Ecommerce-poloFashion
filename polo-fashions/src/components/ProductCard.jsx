@@ -58,7 +58,7 @@ export default function ProductCard({ product, onClick }) {
           <Badge color="green" text="Ready-made" />
         )}
         {product.type === "custom" && (
-          <Badge color="blue" text="Custom" />
+          <Badge color="blue" text="Custom-made" />
         )}
       </Space>
 
