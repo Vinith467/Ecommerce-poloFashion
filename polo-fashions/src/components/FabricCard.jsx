@@ -52,6 +52,7 @@ export default function FabricCard({ fabric, isSelected, onClick }) {
       <Title level={5} style={{ marginBottom: 8 }}>
         {fabric.name}
       </Title>
+      {fabric.type === "fabric" && <Badge color="blue" text="Custom" />}
 
       <div style={{ marginBottom: 6 }}>
         <Text type="secondary">Type: </Text>
