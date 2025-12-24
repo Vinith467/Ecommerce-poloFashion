@@ -1,7 +1,7 @@
 import React from "react";
 import { Card, Badge, Carousel, Typography, Space } from "antd";
 
-const { Title, Text} = Typography;
+const { Title, Text } = Typography;
 
 export default function ProductCard({ product, onClick }) {
   return (
@@ -57,15 +57,9 @@ export default function ProductCard({ product, onClick }) {
         {product.type === "readymade" && (
           <Badge color="green" text="Ready-made" />
         )}
-        {product.type === "custom" && (
-          <Badge color="blue" text="Custom" />
-        )}
-         {product.type === "shirt" && (
-          <Badge color="blue" text="Custom" />
-        )}
-         {product.type === "pant" && (
-          <Badge color="blue" text="Custom" />
-        )}
+        {product.type === "custom" && <Badge color="blue" text="Custom-made" />}
+        {product.type === "shirt" && <Badge color="blue" text="Custom-made" />}
+        {product.type === "pant" && <Badge color="blue" text="Custom-made" />}
       </Space>
       {/* BRAND */}
       {product.brand && (
