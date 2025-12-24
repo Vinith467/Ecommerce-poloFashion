@@ -3,6 +3,7 @@ import React, { useState, useMemo } from "react";
 import { Modal } from "antd";
 import { normalizeImageUrl } from "../utils/imageUtils";
 import "./ProductImageGallery.css";
+import "../products/ProductModals.css"; 
 
 export default function ProductImageGallery({ product }) {
   // ✅ Memoize and normalize images
