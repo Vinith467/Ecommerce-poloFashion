@@ -112,11 +112,9 @@ export default function Products() {
 
   const isFabricModal = activeCategory === "fabrics" && selectedProduct;
   const isTraditional =
-    activeCategory === "traditional" ||
-    selectedProduct?.category === "traditional";
-  const isReadyMade =
-    (activeCategory === "ready_shirts" || activeCategory === "ready_pants") &&
-    selectedProduct;
+    selectedProduct?.category === "traditional" &&
+    selectedProduct?.type !== "readymade";
+  const isReadyMade = selectedProduct && selectedProduct.type === "readymade";
   const isRental = activeCategory === "rentals" && selectedProduct;
   const isAccessory =
     (activeCategory === "accessories" || activeCategory === "innerwear") &&
@@ -161,14 +159,7 @@ export default function Products() {
           </Col>
         ) : (
           filteredProducts.map((product) => (
-            <Col
-              key={product.id}
-              xs={24}
-              sm={12}
-              md={8}
-              lg={8}
-              xl={6}
-            >
+            <Col key={product.id} xs={24} sm={12} md={8} lg={8} xl={6}>
               <ProductCard
                 product={product}
                 onClick={() => openModalForProduct(product)}
