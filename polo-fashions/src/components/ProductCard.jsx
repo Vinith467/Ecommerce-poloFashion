@@ -1,6 +1,6 @@
 import React from "react";
 import { Card, Badge, Carousel, Typography, Space } from "antd";
-import "../products/ProductModals.css"; 
+
 
 const { Title, Text } = Typography;
 

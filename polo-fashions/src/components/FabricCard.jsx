@@ -1,7 +1,7 @@
 import React from "react";
 import { Card, Typography, Badge } from "antd";
 import { CheckOutlined } from "@ant-design/icons";
-import "../products/ProductModals.css"; 
+
 
 const { Title, Text } = Typography;
 

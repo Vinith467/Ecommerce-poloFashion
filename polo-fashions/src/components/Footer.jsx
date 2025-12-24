@@ -6,7 +6,7 @@ import {
   MailOutlined,
   ClockCircleOutlined,
 } from "@ant-design/icons";
-import "../products/ProductModals.css"; 
+
 
 const { Title, Text } = Typography;
 
