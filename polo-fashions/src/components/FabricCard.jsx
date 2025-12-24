@@ -1,5 +1,5 @@
 import React from "react";
-import { Card, Typography, Badge } from "antd";
+import { Card, Typography, Badge, Space } from "antd";
 import { CheckOutlined } from "@ant-design/icons";
 
 const { Title, Text } = Typography;
@@ -49,24 +49,46 @@ export default function FabricCard({ fabric, isSelected, onClick }) {
       )}
 
       {/* CONTENT */}
-      <Title level={5} style={{ marginBottom: 8 }}>
-        {fabric.name}
-      </Title>
-      {fabric.type === "fabric" && <Badge color="blue" text="Custom" />}
+      <Space
+        align="start"
+        style={{ width: "100%", justifyContent: "space-between", marginBottom: 8 }}
+      >
+        <Title level={5} style={{ margin: 0 }}>
+          {fabric.name}
+        </Title>
 
-      <div style={{ marginBottom: 6 }}>
-        <Text type="secondary">Type: </Text>
-        <Text strong>{fabric.type}</Text>
-      </div>
+        {/* ✅ BLUE DOT for Custom Fabrics */}
+        {(fabric.type === "fabric" || fabric.type === "custom") && (
+          <Badge color="blue" text="Custom" />
+        )}
+      </Space>
 
-      <div style={{ marginBottom: 10 }}>
-        <Text type="secondary">Color: </Text>
-        <Text strong>{fabric.color}</Text>
-      </div>
+      {/* Additional Info */}
+      {fabric.color && (
+        <div style={{ marginBottom: 6 }}>
+          <Text type="secondary">Color: </Text>
+          <Text strong>{fabric.color}</Text>
+        </div>
+      )}
 
+      {/* Description if available */}
+      {fabric.description && (
+        <Text type="secondary" style={{ fontSize: 13, display: "block", marginBottom: 8 }}>
+          {fabric.description}
+        </Text>
+      )}
+
+      {/* Price */}
       <Title level={5} style={{ color: "#1677ff", margin: 0 }}>
         ₹{fabric.price}
       </Title>
+
+      {/* Custom pricing note */}
+      {(fabric.type === "fabric" || fabric.type === "custom") && (
+        <Text type="secondary" style={{ fontSize: 12, display: "block", marginTop: 4 }}>
+          Price varies by fabric selection
+        </Text>
+      )}
     </Card>
   );
 }
