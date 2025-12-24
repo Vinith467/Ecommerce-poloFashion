@@ -1,7 +1,7 @@
 import React from "react";
 import { Card, Badge, Carousel, Typography, Space } from "antd";
 
-const { Title, Text, Paragraph } = Typography;
+const { Title, Text} = Typography;
 
 export default function ProductCard({ product, onClick }) {
   return (
@@ -67,16 +67,6 @@ export default function ProductCard({ product, onClick }) {
           <Badge color="blue" text="Custom" />
         )}
       </Space>
-
-      {/* DESCRIPTION */}
-      <Paragraph
-        type="secondary"
-        ellipsis={{ rows: 2 }}
-        style={{ marginTop: 8 }}
-      >
-        {product.description}
-      </Paragraph>
-
       {/* BRAND */}
       {product.brand && (
         <Text type="secondary">
