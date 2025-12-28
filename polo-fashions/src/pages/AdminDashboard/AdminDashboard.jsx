@@ -99,9 +99,16 @@ export default function AdminDashboard() {
   };
 
   const handleViewImage = (imageUrl) => {
+      console.log("🖼️ Viewing image:", imageUrl);
+      if (!imageUrl) {
+    message.error("No image URL provided");
+    return;
+  }
+
     setSelectedImage(imageUrl);
     setShowImageModal(true);
   };
+  
 
   // Generate table columns with handlers
   const bookingColumns = getBookingColumns(handleUpdateBookingStatus);
