@@ -7,6 +7,7 @@ import {
   UploadOutlined,
   EyeOutlined,
 } from "@ant-design/icons";
+import { normalizeImageUrl } from "../../utils/imageUtils"; // ✅ ADD THIS IMPORT
 
 export default function MobileCustomerTable({
   customers,
@@ -77,9 +78,9 @@ export default function MobileCustomerTable({
                 <Button
                   icon={<EyeOutlined />}
                   onClick={() => {
-                    const imageUrl = customer.measurement_photo.startsWith("http")
-                      ? customer.measurement_photo
-                      : `http://127.0.0.1:8000${customer.measurement_photo}`;
+                    // ✅ USE normalizeImageUrl INSTEAD OF MANUAL URL CONSTRUCTION
+                    const imageUrl = normalizeImageUrl(customer.measurement_photo);
+                    console.log("📸 Opening image:", imageUrl);
                     onViewImage(imageUrl);
                   }}
                   className="mobile-action-btn"

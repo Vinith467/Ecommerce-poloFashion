@@ -5,6 +5,7 @@ import {
   ClockCircleOutlined,
   UploadOutlined,
 } from "@ant-design/icons";
+import { normalizeImageUrl } from "../../utils/imageUtils";
 
 const ORDER_STATUS_LABELS = {
   placed: "Placed",
@@ -215,9 +216,8 @@ export const getCustomerColumns = (
         <Button
           size="small"
           onClick={() => {
-            const imageUrl = user.measurement_photo.startsWith("http")
-              ? user.measurement_photo
-              : `http://127.0.0.1:8000${user.measurement_photo}`;
+            const imageUrl = normalizeImageUrl(user.measurement_photo);
+            console.log("📸 Opening image from desktop table:", imageUrl);
             setSelectedImage(imageUrl);
             setShowImageModal(true);
           }}

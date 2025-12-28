@@ -1,3 +1,4 @@
+// src/pages/AdminDashboard/ImageModal.jsx
 import React from "react";
 import { Modal, Spin, Alert } from "antd";
 import { EyeOutlined } from "@ant-design/icons";
@@ -13,20 +14,22 @@ export default function ImageModal({
 
   React.useEffect(() => {
     if (showImageModal) {
+      console.log("🖼️ ImageModal opened with URL:", selectedImage); // ✅ DEBUG LOG
       setLoading(true);
       setError(false);
     }
   }, [showImageModal, selectedImage]);
 
   const handleImageLoad = () => {
+    console.log("✅ Image loaded successfully"); // ✅ DEBUG LOG
     setLoading(false);
     setError(false);
   };
 
   const handleImageError = () => {
+    console.error("❌ Failed to load image:", selectedImage); // ✅ DEBUG LOG
     setLoading(false);
     setError(true);
-    console.error("❌ Failed to load image:", selectedImage);
   };
 
   return (
@@ -40,6 +43,7 @@ export default function ImageModal({
       open={showImageModal}
       footer={null}
       onCancel={() => {
+        console.log("🚪 Closing image modal"); // ✅ DEBUG LOG
         setShowImageModal(false);
         setSelectedImage(null);
         setLoading(true);
@@ -85,7 +89,21 @@ export default function ImageModal({
           {error && (
             <Alert
               message="Failed to Load Image"
-              description={`Could not load image from: ${selectedImage}`}
+              description={
+                <div>
+                  <p>Could not load image from:</p>
+                  <code style={{ 
+                    display: 'block', 
+                    marginTop: 8, 
+                    padding: 8, 
+                    background: '#f5f5f5',
+                    borderRadius: 4,
+                    wordBreak: 'break-all',
+                  }}>
+                    {selectedImage}
+                  </code>
+                </div>
+              }
               type="error"
               showIcon
               style={{ marginBottom: 16 }}
