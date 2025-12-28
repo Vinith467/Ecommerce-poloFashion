@@ -1,19 +1,27 @@
 import React, { useState } from "react";
-import { message } from "antd";
+import { message, Table, Tabs, Card, Empty } from "antd";
 import { useAuth } from "../../context/AuthContext";
 import { useNavigate } from "react-router-dom";
 
 // Import separated components
 import DashboardHeader from "./DashboardHeader";
 import StatsCards from "./StatsCards";
-import DashboardTabs from "./DashboardTabs";
 import MeasurementModal from "./MeasurementModal";
 import ImageModal from "./ImageModal";
+
+// Import mobile components
+import MobileBookingTable from "./MobileBookingTable";
+import MobileCustomerTable from "./MobileCustomerTable";
+import MobileOrderTable from "./MobileOrderTable";
+
 import {
   getBookingColumns,
   getCustomerColumns,
   getOrderColumns,
 } from "./tableColumns";
+
+// Import CSS
+import "./AdminDashboard.css";
 
 export default function AdminDashboard() {
   const {
@@ -90,6 +98,11 @@ export default function AdminDashboard() {
     }
   };
 
+  const handleViewImage = (imageUrl) => {
+    setSelectedImage(imageUrl);
+    setShowImageModal(true);
+  };
+
   // Generate table columns with handlers
   const bookingColumns = getBookingColumns(handleUpdateBookingStatus);
   const customerColumns = getCustomerColumns(
@@ -100,7 +113,7 @@ export default function AdminDashboard() {
   const orderColumns = getOrderColumns(handleOrderStatusUpdate, navigate);
 
   return (
-    <div style={{ padding: 24, background: "#f0f2f5", minHeight: "100vh" }}>
+    <div className="admin-dashboard-container">
       <DashboardHeader />
 
       <StatsCards
@@ -110,14 +123,109 @@ export default function AdminDashboard() {
         orders={orders}
       />
 
-      <DashboardTabs
-        bookings={bookings}
-        customerUsers={customerUsers}
-        orders={orders}
-        bookingColumns={bookingColumns}
-        customerColumns={customerColumns}
-        orderColumns={orderColumns}
-      />
+      {/* TABS WITH RESPONSIVE TABLES */}
+      <Card className="dashboard-tabs">
+        <Tabs
+          defaultActiveKey="bookings"
+          items={[
+            {
+              key: "bookings",
+              label: `📅 Bookings (${(bookings || []).length})`,
+              children:
+                bookings.length === 0 ? (
+                  <Empty
+                    description="No bookings yet"
+                    image={Empty.PRESENTED_IMAGE_SIMPLE}
+                    className="empty-state-mobile"
+                  />
+                ) : (
+                  <>
+                    {/* DESKTOP TABLE */}
+                    <div className="desktop-table-view">
+                      <Table
+                        rowKey="id"
+                        columns={bookingColumns}
+                        dataSource={bookings}
+                        pagination={{ pageSize: 10 }}
+                        scroll={{ x: 1000 }}
+                      />
+                    </div>
+
+                    {/* MOBILE CARDS */}
+                    <MobileBookingTable
+                      bookings={bookings}
+                      onUpdateStatus={handleUpdateBookingStatus}
+                    />
+                  </>
+                ),
+            },
+            {
+              key: "customers",
+              label: `👥 Customers (${customerUsers.length})`,
+              children:
+                customerUsers.length === 0 ? (
+                  <Empty
+                    description="No customers yet"
+                    image={Empty.PRESENTED_IMAGE_SIMPLE}
+                    className="empty-state-mobile"
+                  />
+                ) : (
+                  <>
+                    {/* DESKTOP TABLE */}
+                    <div className="desktop-table-view">
+                      <Table
+                        rowKey="id"
+                        columns={customerColumns}
+                        dataSource={customerUsers}
+                        pagination={{ pageSize: 10 }}
+                        scroll={{ x: 1000 }}
+                      />
+                    </div>
+
+                    {/* MOBILE CARDS */}
+                    <MobileCustomerTable
+                      customers={customerUsers}
+                      onOpenMeasurement={handleOpenMeasurementModal}
+                      onViewImage={handleViewImage}
+                    />
+                  </>
+                ),
+            },
+            {
+              key: "orders",
+              label: `🛍️ Orders (${(orders || []).length})`,
+              children:
+                orders.length === 0 ? (
+                  <Empty
+                    description="No orders yet"
+                    image={Empty.PRESENTED_IMAGE_SIMPLE}
+                    className="empty-state-mobile"
+                  />
+                ) : (
+                  <>
+                    {/* DESKTOP TABLE */}
+                    <div className="desktop-table-view">
+                      <Table
+                        rowKey="id"
+                        columns={orderColumns}
+                        dataSource={orders}
+                        pagination={{ pageSize: 10 }}
+                        scroll={{ x: 1200 }}
+                      />
+                    </div>
+
+                    {/* MOBILE CARDS */}
+                    <MobileOrderTable
+                      orders={orders}
+                      onUpdateStatus={handleOrderStatusUpdate}
+                      onNavigate={navigate}
+                    />
+                  </>
+                ),
+            },
+          ]}
+        />
+      </Card>
 
       <MeasurementModal
         showMeasurementModal={showMeasurementModal}

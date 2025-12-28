@@ -1,0 +1,573 @@
+/* ================================================
+   ADMIN DASHBOARD - MOBILE RESPONSIVE STYLES
+================================================ */
+
+/* ===============================
+   BASE CONTAINER
+================================ */
+.admin-dashboard-container {
+  padding: 24px;
+  background: #f0f2f5;
+  min-height: 100vh;
+}
+
+@media (max-width: 768px) {
+  .admin-dashboard-container {
+    padding: 12px;
+  }
+}
+
+/* ===============================
+   DASHBOARD HEADER
+================================ */
+.admin-header {
+  margin-bottom: 24px;
+}
+
+.admin-header h1 {
+  font-size: 28px;
+  font-weight: 700;
+  margin: 0;
+}
+
+.admin-header p {
+  color: #666;
+  margin-top: 8px;
+}
+
+@media (max-width: 768px) {
+  .admin-header h1 {
+    font-size: 22px;
+  }
+  
+  .admin-header p {
+    font-size: 14px;
+  }
+}
+
+/* ===============================
+   STATS CARDS - MOBILE RESPONSIVE
+================================ */
+.stats-row {
+  margin-bottom: 24px;
+}
+
+.stat-card {
+  height: 100%;
+  border-radius: 8px;
+}
+
+@media (max-width: 576px) {
+  .stats-row .ant-col {
+    margin-bottom: 12px;
+  }
+  
+  .stat-card .ant-statistic-title {
+    font-size: 13px;
+  }
+  
+  .stat-card .ant-statistic-content {
+    font-size: 20px;
+  }
+}
+
+/* ===============================
+   TABS - MOBILE OPTIMIZATION
+================================ */
+.dashboard-tabs {
+  background: white;
+  border-radius: 8px;
+  padding: 16px;
+}
+
+@media (max-width: 768px) {
+  .dashboard-tabs {
+    padding: 8px;
+  }
+  
+  .dashboard-tabs .ant-tabs-nav {
+    margin-bottom: 12px;
+  }
+  
+  .dashboard-tabs .ant-tabs-tab {
+    padding: 8px 12px;
+    font-size: 13px;
+  }
+  
+  /* Make tabs scrollable on mobile */
+  .dashboard-tabs .ant-tabs-nav-list {
+    overflow-x: auto;
+    white-space: nowrap;
+  }
+}
+
+/* ===============================
+   DESKTOP TABLE VIEW
+================================ */
+.desktop-table-view {
+  display: block;
+}
+
+.mobile-cards-view {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  .desktop-table-view {
+    display: none;
+  }
+  
+  .mobile-cards-view {
+    display: block;
+  }
+}
+
+/* ===============================
+   MOBILE CARDS - BOOKINGS
+================================ */
+.mobile-booking-card {
+  background: white;
+  border: 1px solid #e8e8e8;
+  border-radius: 8px;
+  padding: 16px;
+  margin-bottom: 12px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.booking-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.booking-id {
+  font-weight: 600;
+  font-size: 16px;
+  color: #1890ff;
+}
+
+.booking-card-body {
+  display: grid;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.booking-info-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 4px 0;
+}
+
+.booking-label {
+  font-size: 13px;
+  color: #666;
+  font-weight: 500;
+}
+
+.booking-value {
+  font-size: 14px;
+  color: #333;
+  font-weight: 600;
+}
+
+.booking-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.booking-actions .ant-btn {
+  flex: 1;
+  min-width: 100px;
+}
+
+/* ===============================
+   MOBILE CARDS - CUSTOMERS
+================================ */
+.mobile-customer-card {
+  background: white;
+  border: 1px solid #e8e8e8;
+  border-radius: 8px;
+  padding: 16px;
+  margin-bottom: 12px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.customer-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 12px;
+}
+
+.customer-main-info {
+  flex: 1;
+}
+
+.customer-username {
+  font-weight: 600;
+  font-size: 16px;
+  color: #333;
+  margin-bottom: 4px;
+}
+
+.customer-email {
+  font-size: 13px;
+  color: #666;
+}
+
+.customer-card-body {
+  display: grid;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.customer-info-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 6px 0;
+  border-bottom: 1px solid #f5f5f5;
+}
+
+.customer-info-item:last-child {
+  border-bottom: none;
+}
+
+.customer-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.customer-actions .ant-btn {
+  font-size: 13px;
+  padding: 8px 12px;
+  height: auto;
+}
+
+/* ===============================
+   MOBILE CARDS - ORDERS
+================================ */
+.mobile-order-card {
+  background: white;
+  border: 1px solid #e8e8e8;
+  border-radius: 8px;
+  padding: 16px;
+  margin-bottom: 12px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.order-card-header {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 12px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.order-id-mobile {
+  font-weight: 600;
+  font-size: 16px;
+  color: #1890ff;
+  min-width: 50px;
+}
+
+.order-product-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.order-product-name {
+  font-weight: 600;
+  font-size: 15px;
+  color: #333;
+  margin-bottom: 4px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.order-customer-name {
+  font-size: 13px;
+  color: #666;
+}
+
+.order-card-details {
+  display: grid;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.order-detail-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 4px 0;
+}
+
+.order-detail-label {
+  font-size: 13px;
+  color: #666;
+}
+
+.order-detail-value {
+  font-size: 14px;
+  color: #333;
+  font-weight: 600;
+}
+
+.order-status-section {
+  margin-bottom: 12px;
+  padding: 12px;
+  background: #f5f5f5;
+  border-radius: 6px;
+}
+
+.order-status-section .ant-select {
+  width: 100%;
+  margin-top: 8px;
+}
+
+/* ===============================
+   MODALS - MOBILE OPTIMIZATION
+================================ */
+@media (max-width: 768px) {
+  .ant-modal {
+    max-width: calc(100vw - 16px) !important;
+    margin: 8px auto !important;
+  }
+  
+  .ant-modal-content {
+    border-radius: 8px;
+  }
+  
+  .ant-modal-header {
+    padding: 16px;
+  }
+  
+  .ant-modal-body {
+    padding: 16px;
+    max-height: calc(100vh - 200px);
+    overflow-y: auto;
+  }
+  
+  .ant-modal-footer {
+    padding: 12px 16px;
+  }
+  
+  .ant-modal-footer .ant-btn {
+    min-width: auto;
+  }
+}
+
+/* ===============================
+   MEASUREMENT MODAL - MOBILE
+================================ */
+.measurement-modal-content {
+  padding: 12px 0;
+}
+
+.measurement-modal-content .ant-upload {
+  width: 100%;
+}
+
+.measurement-modal-content .ant-btn {
+  width: 100%;
+  height: 48px;
+  font-size: 15px;
+}
+
+@media (max-width: 576px) {
+  .measurement-modal-content .ant-alert {
+    font-size: 13px;
+  }
+}
+
+/* ===============================
+   IMAGE MODAL - MOBILE
+================================ */
+@media (max-width: 768px) {
+  .ant-modal.image-modal .ant-modal-body {
+    padding: 8px;
+  }
+  
+  .ant-modal.image-modal img {
+    max-height: 70vh;
+    object-fit: contain;
+  }
+}
+
+/* ===============================
+   ACTION BUTTONS - TOUCH FRIENDLY
+================================ */
+@media (max-width: 768px) {
+  .mobile-action-btn {
+    min-height: 44px;
+    font-size: 14px;
+    padding: 8px 16px;
+  }
+  
+  .ant-btn-sm.mobile-action-btn {
+    min-height: 38px;
+    font-size: 13px;
+  }
+}
+
+/* ===============================
+   DESCRIPTIONS - MOBILE
+================================ */
+@media (max-width: 768px) {
+  .ant-descriptions-item-label {
+    font-size: 12px;
+    padding: 8px 12px;
+  }
+  
+  .ant-descriptions-item-content {
+    font-size: 13px;
+    padding: 8px 12px;
+  }
+}
+
+/* ===============================
+   EMPTY STATES
+================================ */
+.empty-state-mobile {
+  padding: 40px 20px;
+  text-align: center;
+}
+
+@media (max-width: 576px) {
+  .empty-state-mobile {
+    padding: 24px 12px;
+  }
+  
+  .empty-state-mobile .ant-empty-description {
+    font-size: 13px;
+  }
+}
+
+/* ===============================
+   LOADING STATES
+================================ */
+.mobile-loading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 200px;
+  padding: 40px 20px;
+}
+
+/* ===============================
+   UTILITY CLASSES
+================================ */
+.mobile-only {
+  display: none;
+}
+
+.desktop-only {
+  display: block;
+}
+
+@media (max-width: 768px) {
+  .mobile-only {
+    display: block;
+  }
+  
+  .desktop-only {
+    display: none;
+  }
+}
+
+.mobile-text-truncate {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+@media (max-width: 576px) {
+  .mobile-text-small {
+    font-size: 12px;
+  }
+  
+  .mobile-text-medium {
+    font-size: 14px;
+  }
+}
+
+/* ===============================
+   SCROLLABLE CONTAINERS
+================================ */
+.mobile-scroll-container {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+@media (max-width: 768px) {
+  .mobile-scroll-container::-webkit-scrollbar {
+    height: 4px;
+  }
+  
+  .mobile-scroll-container::-webkit-scrollbar-thumb {
+    background: #d9d9d9;
+    border-radius: 4px;
+  }
+}
+
+/* ===============================
+   SPACING ADJUSTMENTS
+================================ */
+@media (max-width: 768px) {
+  .ant-card {
+    margin-bottom: 12px;
+  }
+  
+  .ant-card-head {
+    padding: 12px 16px;
+    font-size: 15px;
+  }
+  
+  .ant-card-body {
+    padding: 12px;
+  }
+  
+  .ant-divider {
+    margin: 12px 0;
+  }
+}
+
+/* ===============================
+   TAG ADJUSTMENTS
+================================ */
+@media (max-width: 576px) {
+  .ant-tag {
+    font-size: 11px;
+    padding: 2px 8px;
+    line-height: 18px;
+  }
+}
+
+/* ===============================
+   FORM ELEMENTS - MOBILE
+================================ */
+@media (max-width: 768px) {
+  .ant-form-item {
+    margin-bottom: 16px;
+  }
+  
+  .ant-input,
+  .ant-select-selector,
+  .ant-picker {
+    font-size: 16px; /* Prevents iOS zoom */
+    height: 44px;
+  }
+  
+  .ant-btn-lg {
+    height: 48px;
+    font-size: 16px;
+  }
+}
