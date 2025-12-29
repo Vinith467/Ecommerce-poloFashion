@@ -5,6 +5,47 @@ import {
   CameraOutlined,
 } from "@ant-design/icons";
 
+/**
+ * Compress image using canvas (for large camera images)
+ */
+const compressImage = (file) => {
+  return new Promise((resolve) => {
+    const reader = new FileReader();
+    const img = new Image();
+
+    reader.onload = (e) => {
+      img.src = e.target.result;
+    };
+
+    img.onload = () => {
+      const canvas = document.createElement("canvas");
+      const ctx = canvas.getContext("2d");
+
+      const MAX_WIDTH = 1280;
+      const scale = Math.min(1, MAX_WIDTH / img.width);
+
+      canvas.width = img.width * scale;
+      canvas.height = img.height * scale;
+
+      ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+
+      canvas.toBlob(
+        (blob) => {
+          const compressedFile = new File([blob], file.name, {
+            type: "image/jpeg",
+            lastModified: Date.now(),
+          });
+          resolve(compressedFile);
+        },
+        "image/jpeg",
+        0.7 // quality (70%)
+      );
+    };
+
+    reader.readAsDataURL(file);
+  });
+};
+
 export default function MeasurementModal({
   showMeasurementModal,
   setShowMeasurementModal,
@@ -17,7 +58,7 @@ export default function MeasurementModal({
   const fileInputRef = useRef(null);
   const cameraInputRef = useRef(null);
 
-  const handleFileSelect = (event) => {
+  const handleFileSelect = async (event) => {
     const file = event.target.files[0];
     if (!file) return;
 
@@ -26,12 +67,22 @@ export default function MeasurementModal({
       return;
     }
 
+    let finalFile = file;
+
+    // 📸 Compress if file is larger than 5MB (camera images)
     if (file.size / 1024 / 1024 > 5) {
-      message.error("Image must be smaller than 5MB");
+      message.loading("Compressing image...", 0);
+      finalFile = await compressImage(file);
+      message.destroy();
+    }
+
+    // Final safety check
+    if (finalFile.size / 1024 / 1024 > 5) {
+      message.error("Image is still larger than 5MB after compression");
       return;
     }
 
-    setMeasurements(file);
+    setMeasurements(finalFile);
   };
 
   return (
@@ -46,9 +97,9 @@ export default function MeasurementModal({
       confirmLoading={uploading}
       okButtonProps={{ disabled: !measurements }}
       okText="Save"
+      centered
     >
       <Space direction="vertical" style={{ width: "100%" }} size="middle">
-
         {selectedUser?.measurement_photo && (
           <Alert
             type="info"
@@ -57,7 +108,7 @@ export default function MeasurementModal({
           />
         )}
 
-        {/* 📁 Upload from Gallery */}
+        {/* 📁 Upload from device */}
         <Button
           icon={<UploadOutlined />}
           block
@@ -66,7 +117,7 @@ export default function MeasurementModal({
           Upload from Device
         </Button>
 
-        {/* 📸 Capture from Camera */}
+        {/* 📸 Capture from camera */}
         <Button
           icon={<CameraOutlined />}
           block
@@ -75,7 +126,7 @@ export default function MeasurementModal({
           Capture Using Camera
         </Button>
 
-        {/* Hidden file input */}
+        {/* Hidden inputs */}
         <input
           ref={fileInputRef}
           type="file"
@@ -84,7 +135,6 @@ export default function MeasurementModal({
           onChange={handleFileSelect}
         />
 
-        {/* Hidden camera input */}
         <input
           ref={cameraInputRef}
           type="file"
