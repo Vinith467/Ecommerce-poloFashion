@@ -8,8 +8,7 @@ from .serializers import OrderSerializer
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework import status
-from .utils import ORDER_STATUS_FLOW
-
+from .utils import get_valid_next_statuses
 
 # orders/views.py
 class OrderViewSet(viewsets.ModelViewSet):
@@ -34,7 +33,7 @@ class OrderViewSet(viewsets.ModelViewSet):
                 status=status.HTTP_400_BAD_REQUEST
             )
 
-        allowed_next = ORDER_STATUS_FLOW.get(order.status, [])
+        allowed_next = get_valid_next_statuses(order)
 
         # 🚫 Rental-only protection
         if new_status in ["returned", "deposit_refunded"] and order.rental_days == 0:
@@ -47,7 +46,9 @@ class OrderViewSet(viewsets.ModelViewSet):
         if new_status not in allowed_next:
             return Response(
                 {
-                    "error": f"Invalid status transition from '{order.status}' to '{new_status}'"
+                    "error": f"Invalid status transition from '{order.status}' to '{new_status}'",
+                    "allowed_statuses": allowed_next,
+                    "order_type": order.order_type,
                 },
                 status=status.HTTP_400_BAD_REQUEST
             )
@@ -59,7 +60,9 @@ class OrderViewSet(viewsets.ModelViewSet):
             {
                 "success": True,
                 "order_id": order.id,
-                "new_status": new_status
+                "new_status": new_status,
+                "next_allowed_statuses": get_valid_next_statuses(order)
+
             },
             status=status.HTTP_200_OK
         )
