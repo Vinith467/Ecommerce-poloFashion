@@ -12,32 +12,25 @@ import {
   Space,
   Image,
 } from "antd";
-import { EyeOutlined } from "@ant-design/icons";
-import "./UserDashboard.css";
 import {
+  EyeOutlined,
   UserOutlined,
   CalendarOutlined,
   ShoppingOutlined,
   CheckCircleOutlined,
   ClockCircleOutlined,
 } from "@ant-design/icons";
+
+import "./UserDashboard.css";
 import { useAuth } from "../context/AuthContext";
 import { Link, useNavigate } from "react-router-dom";
 import { getOrderImage } from "../utils/imageUtils";
-const STATUS_COLORS = {
-  placed: "default",
-  processing: "blue",
-  stitching: "purple",
-  buttoning: "cyan",
-  ironing: "gold",
-  ready_for_pickup: "orange",
-  picked_up: "green",
-  returned: "volcano",
-  deposit_refunded: "lime",
-  cancelled: "red",
-};
 
-const normalizeStatus = (status) => (status ? status.toLowerCase() : "");
+// ✅ SINGLE SOURCE OF TRUTH
+import {
+  ORDER_STATUS_CONFIG,
+  normalizeStatus,
+} from "../constants/orderStatus";
 
 export default function UserDashboard() {
   const navigate = useNavigate();
@@ -48,19 +41,18 @@ export default function UserDashboard() {
 
   const formatDate = (dateStr) => {
     if (!dateStr) return "";
-    const date = new Date(dateStr);
-    return date.toLocaleDateString("en-IN", {
+    return new Date(dateStr).toLocaleDateString("en-IN", {
       year: "numeric",
       month: "short",
       day: "numeric",
     });
   };
 
-  // ✅ Handler for viewing order details
   const handleViewOrder = (orderId) => {
     navigate(`/orders/${orderId}`);
   };
 
+  /* ================= BOOKINGS ================= */
   const bookingColumns = [
     {
       title: "Booking ID",
@@ -101,6 +93,7 @@ export default function UserDashboard() {
     },
   ];
 
+  /* ================= ORDERS ================= */
   const ORDER_TYPE_COLORS = {
     "ready-made": "green",
     custom: "blue",
@@ -120,7 +113,6 @@ export default function UserDashboard() {
     },
     {
       title: "Image",
-      key: "image",
       render: (_, order) => (
         <Image
           src={getOrderImage(order)}
@@ -143,15 +135,13 @@ export default function UserDashboard() {
     {
       title: "Type",
       dataIndex: "product_type",
-      render: (type) => {
-        const color = ORDER_TYPE_COLORS[type] || "default";
-        return <Tag color={color}>{type?.toUpperCase().replace("-", " ")}</Tag>;
-      },
+      render: (type) => (
+        <Tag color={ORDER_TYPE_COLORS[type] || "default"}>
+          {type?.toUpperCase().replace("-", " ")}
+        </Tag>
+      ),
     },
-    {
-      title: "Qty",
-      dataIndex: "quantity",
-    },
+    { title: "Qty", dataIndex: "quantity" },
     {
       title: "Total",
       dataIndex: "total_price",
@@ -167,9 +157,11 @@ export default function UserDashboard() {
       dataIndex: "status",
       render: (status) => {
         const normalized = normalizeStatus(status);
+        const config = ORDER_STATUS_CONFIG[normalized];
+
         return (
-          <Tag color={STATUS_COLORS[normalized] || "blue"}>
-            {normalized.replace("_", " ").toUpperCase()}
+          <Tag color={config?.color || "blue"} icon={config?.icon}>
+            {config?.label || status}
           </Tag>
         );
       },
@@ -182,8 +174,9 @@ export default function UserDashboard() {
         <UserOutlined /> My Dashboard
       </h2>
 
+      {/* ================= TOP CARDS ================= */}
       <Row gutter={16} style={{ marginBottom: 24 }}>
-        <Col xs={24} sm={24} md={8}>
+        <Col xs={24} md={8}>
           <Card title="Profile Information">
             <p>
               <strong>Name:</strong> {currentUser?.username}
@@ -197,7 +190,7 @@ export default function UserDashboard() {
           </Card>
         </Col>
 
-        <Col xs={24} sm={12} md={8}>
+        <Col xs={24} md={8}>
           <Card title="Measurement Status">
             {currentUser?.measurement_status === "completed" ? (
               <Space direction="vertical">
@@ -217,7 +210,7 @@ export default function UserDashboard() {
           </Card>
         </Col>
 
-        <Col xs={24} sm={12} md={8}>
+        <Col xs={24} md={8}>
           <Card title="Quick Stats">
             <Statistic
               title="Bookings"
@@ -233,6 +226,7 @@ export default function UserDashboard() {
         </Col>
       </Row>
 
+      {/* ================= BOOKINGS ================= */}
       <Card title="My Appointments" style={{ marginBottom: 24 }}>
         {userBookings.length === 0 ? (
           <Empty description="No appointments yet" />
@@ -246,6 +240,7 @@ export default function UserDashboard() {
         )}
       </Card>
 
+      {/* ================= ORDERS ================= */}
       <Card title="My Orders">
         {userOrders.length === 0 ? (
           <Empty description="No orders placed yet">
@@ -255,7 +250,7 @@ export default function UserDashboard() {
           </Empty>
         ) : (
           <>
-            {/* ✅ DESKTOP TABLE VIEW */}
+            {/* DESKTOP */}
             <div className="desktop-orders-table">
               <Table
                 rowKey="id"
@@ -265,43 +260,47 @@ export default function UserDashboard() {
               />
             </div>
 
-            {/* ✅ MOBILE CARD VIEW */}
+            {/* MOBILE */}
             <div className="mobile-orders-table">
-              {userOrders.map((order) => (
-                <div key={order.id} className="mobile-order-card">
-                  <div className="mobile-order-row">
-                    <div className="order-id-mobile">#{order.id}</div>
-                    <Image
-                      src={getOrderImage(order)}
-                      alt={order.product_name}
-                      className="order-image-mobile"
-                      width={60}
-                      height={60}
-                      style={{ objectFit: "cover", borderRadius: 6 }}
-                      fallback="https://via.placeholder.com/60?text=No+Image"
-                      preview={false}
-                    />
-                    <div className="order-status-mobile">
-                      {(() => {
-                        const normalized = normalizeStatus(order.status);
-                        return (
-                          <Tag color={STATUS_COLORS[normalized] || "blue"}>
-                            {normalized.replace("_", " ").toUpperCase()}
-                          </Tag>
-                        );
-                      })()}
-                    </div>
-                  </div>
+              {userOrders.map((order) => {
+                const normalized = normalizeStatus(order.status);
+                const config = ORDER_STATUS_CONFIG[normalized];
 
-                  {/* ✅ VIEW ORDER SUMMARY BUTTON */}
-                  <button
-                    className="view-order-btn-mobile"
-                    onClick={() => handleViewOrder(order.id)}
-                  >
-                    <EyeOutlined /> View Order Summary
-                  </button>
-                </div>
-              ))}
+                return (
+                  <div key={order.id} className="mobile-order-card">
+                    <div className="mobile-order-row">
+                      <div className="order-id-mobile">#{order.id}</div>
+
+                      <Image
+                        src={getOrderImage(order)}
+                        alt={order.product_name}
+                        className="order-image-mobile"
+                        width={60}
+                        height={60}
+                        style={{ objectFit: "cover", borderRadius: 6 }}
+                        fallback="https://via.placeholder.com/60?text=No+Image"
+                        preview={false}
+                      />
+
+                      <div className="order-status-mobile">
+                        <Tag
+                          color={config?.color || "blue"}
+                          icon={config?.icon}
+                        >
+                          {config?.label || order.status}
+                        </Tag>
+                      </div>
+                    </div>
+
+                    <button
+                      className="view-order-btn-mobile"
+                      onClick={() => handleViewOrder(order.id)}
+                    >
+                      <EyeOutlined /> View Order Summary
+                    </button>
+                  </div>
+                );
+              })}
             </div>
           </>
         )}

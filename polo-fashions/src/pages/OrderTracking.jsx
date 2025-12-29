@@ -10,16 +10,19 @@ import {
   Tag,
   Button,
 } from "antd";
-
+import {
+  ArrowLeftOutlined,
+  CheckCircleFilled,
+} from "@ant-design/icons";
 import { useParams, useNavigate } from "react-router-dom";
-import { ArrowLeftOutlined } from "@ant-design/icons";
 import { useAuth } from "../context/AuthContext";
 import { getOrderImage } from "../utils/imageUtils";
+import {
+  ORDER_STATUS_CONFIG,
+  normalizeStatus,
+} from "../constants/orderStatus";
 
 const { Title, Text } = Typography;
-
-/* ================== HELPERS ================== */
-const normalizeStatus = (status) => (status ? status.toLowerCase() : "");
 
 /* ================== CONSTANTS ================== */
 const ORDER_STEPS = [
@@ -33,31 +36,6 @@ const ORDER_STEPS = [
 ];
 
 const RENTAL_EXTRA_STEPS = ["returned", "deposit_refunded"];
-
-const STATUS_LABELS = {
-  placed: "Order Placed",
-  processing: "Processing",
-  stitching: "Stitching",
-  buttoning: "Buttoning",
-  ironing: "Ironing",
-  ready_for_pickup: "Ready for Pickup",
-  picked_up: "Picked Up",
-  returned: "Returned",
-  deposit_refunded: "Deposit Refunded",
-};
-
-const STATUS_COLORS = {
-  placed: "default",
-  processing: "blue",
-  stitching: "purple",
-  buttoning: "cyan",
-  ironing: "gold",
-  ready_for_pickup: "orange",
-  picked_up: "green",
-  returned: "volcano",
-  deposit_refunded: "lime",
-  cancelled: "red",
-};
 
 const getCurrentStepIndex = (order) => {
   const steps = [
@@ -83,10 +61,12 @@ export default function OrderTracking() {
 
   const currentStep = getCurrentStepIndex(order);
   const normalizedStatus = normalizeStatus(order.status);
+  const headerConfig = ORDER_STATUS_CONFIG[normalizedStatus];
 
   return (
     <div style={{ padding: 24 }}>
       <Card style={{ maxWidth: 800, margin: "auto" }}>
+        {/* BACK */}
         <Button
           shape="circle"
           icon={<ArrowLeftOutlined />}
@@ -102,6 +82,7 @@ export default function OrderTracking() {
             justifyContent: "space-between",
             flexWrap: "wrap",
             gap: 8,
+            marginBottom: 16,
           }}
         >
           <Title level={3} style={{ margin: 0 }}>
@@ -109,10 +90,11 @@ export default function OrderTracking() {
           </Title>
 
           <Tag
-            color={STATUS_COLORS[normalizedStatus] || "blue"}
-            style={{ fontSize: 13, padding: "4px 10px", fontWeight: 500 }}
+            color={headerConfig?.color}
+            icon={headerConfig?.icon}
+            style={{ fontSize: 14, padding: "4px 12px" }}
           >
-            {STATUS_LABELS[normalizedStatus] || order.status}
+            {headerConfig?.label}
           </Tag>
         </div>
 
@@ -139,32 +121,45 @@ export default function OrderTracking() {
           current={currentStep}
           items={steps.map((status, index) => {
             const normalized = normalizeStatus(status);
+            const config = ORDER_STATUS_CONFIG[normalized];
             const isCompleted = index < currentStep;
             const isCurrent = index === currentStep;
 
             return {
-              title: STATUS_LABELS[normalized] || status,
+              title: config?.label,
               icon: (
                 <div
                   style={{
-                    width: 28,
-                    height: 28,
+                    width: 46,
+                    height: 46,
                     borderRadius: "50%",
-                    background:
+                    backgroundColor:
                       isCompleted || isCurrent
-                        ? STATUS_COLORS[normalized] || "#1677ff"
+                        ? config?.color
                         : "#f0f0f0",
-                    color: isCompleted || isCurrent ? "#fff" : "#999",
+                    color:
+                      isCompleted || isCurrent ? "#fff" : "#999",
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",
-                    fontWeight: 600,
+                    fontSize: 22,
+                    boxShadow: isCurrent
+                      ? "0 0 0 5px rgba(0,0,0,0.06)"
+                      : "none",
                   }}
                 >
-                  {index + 1}
+                  {isCompleted ? (
+                    <CheckCircleFilled />
+                  ) : (
+                    config?.icon
+                  )}
                 </div>
               ),
-              status: isCompleted ? "finish" : isCurrent ? "process" : "wait",
+              status: isCompleted
+                ? "finish"
+                : isCurrent
+                ? "process"
+                : "wait",
             };
           })}
         />
@@ -173,7 +168,6 @@ export default function OrderTracking() {
 
         {/* ORDER DETAILS */}
         <Title level={4}>Order Details</Title>
-
         <Descriptions bordered column={1} size="middle">
           <Descriptions.Item label="Product">
             {order.product_name}
@@ -184,52 +178,6 @@ export default function OrderTracking() {
           <Descriptions.Item label="Order Date">
             {new Date(order.order_date).toLocaleDateString("en-IN")}
           </Descriptions.Item>
-
-          {order.size && (
-            <Descriptions.Item label="Size">
-              <Tag color="blue">{order.size}</Tag>
-            </Descriptions.Item>
-          )}
-
-          {order.fabric_name && (
-            <Descriptions.Item label="Fabric">
-              {order.fabric_name}
-            </Descriptions.Item>
-          )}
-
-          {Number(order.meters) > 0 && (
-            <Descriptions.Item label="Meters">
-              {order.meters} m
-            </Descriptions.Item>
-          )}
-
-          {order.stitch_type && (
-            <Descriptions.Item label="Stitch Type">
-              {order.stitch_type.toUpperCase()}
-            </Descriptions.Item>
-          )}
-
-          {Number(order.stitching_charge) > 0 && (
-            <Descriptions.Item label="Stitching Charge">
-              ₹{order.stitching_charge}
-            </Descriptions.Item>
-          )}
-
-          {order.rental_days > 0 && (
-            <>
-              <Descriptions.Item label="Rental Days">
-                {order.rental_days} days
-              </Descriptions.Item>
-              <Descriptions.Item label="Rental Deposit">
-                ₹{order.rental_deposit}
-              </Descriptions.Item>
-            </>
-          )}
-
-          {order.notes && (
-            <Descriptions.Item label="Notes">{order.notes}</Descriptions.Item>
-          )}
-
           <Descriptions.Item label="Total Price">
             <strong>₹{order.total_price}</strong>
           </Descriptions.Item>
