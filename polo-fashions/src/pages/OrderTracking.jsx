@@ -11,17 +11,11 @@ import {
   Button,
   Grid,
 } from "antd";
-import {
-  ArrowLeftOutlined,
-  CheckCircleFilled,
-} from "@ant-design/icons";
+import { ArrowLeftOutlined, CheckCircleFilled } from "@ant-design/icons";
 import { useParams, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { getOrderImage } from "../utils/imageUtils";
-import {
-  ORDER_STATUS_CONFIG,
-  normalizeStatus,
-} from "../constants/orderStatus";
+import { ORDER_STATUS_CONFIG, normalizeStatus } from "../constants/orderStatus";
 import "../orderStatusAnimations.css";
 
 const { Title, Text } = Typography;
@@ -73,7 +67,13 @@ export default function OrderTracking() {
 
   return (
     <div style={{ padding: 24 }}>
-      <Card style={{ maxWidth: 900, margin: "auto" }}>
+      <Card
+        style={{
+          width: "100%",
+          maxWidth: 1200, // optional safety cap
+          margin: "auto",
+        }}
+      >
         {/* BACK */}
         <Button
           shape="circle"
@@ -125,6 +125,7 @@ export default function OrderTracking() {
 
         {/* STATUS STEPS */}
         <Steps
+          style={{ width: "100%" }}
           direction={isMobile ? "vertical" : "horizontal"}
           current={currentStep}
           responsive
@@ -140,19 +141,14 @@ export default function OrderTracking() {
               title: config?.label,
               icon: (
                 <div
-                  className={`step-icon ${
-                    isCurrent ? "step-current" : ""
-                  }`}
+                  className={`step-icon ${isCurrent ? "step-current" : ""}`}
                   style={{
                     width: 46,
                     height: 46,
                     borderRadius: 10, // ✅ rounded square
                     backgroundColor:
-                      isCompleted || isCurrent
-                        ? config?.color
-                        : "#f0f0f0",
-                    color:
-                      isCompleted || isCurrent ? "#fff" : "#999",
+                      isCompleted || isCurrent ? config?.color : "#f0f0f0",
+                    color: isCompleted || isCurrent ? "#fff" : "#999",
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",
@@ -166,19 +162,11 @@ export default function OrderTracking() {
                   {isCompleted ? (
                     <CheckCircleFilled />
                   ) : StepIcon ? (
-                    <StepIcon
-                      className={
-                        isCurrent ? config?.className : ""
-                      }
-                    />
+                    <StepIcon className={isCurrent ? config?.className : ""} />
                   ) : null}
                 </div>
               ),
-              status: isCompleted
-                ? "finish"
-                : isCurrent
-                ? "process"
-                : "wait",
+              status: isCompleted ? "finish" : isCurrent ? "process" : "wait",
             };
           })}
         />

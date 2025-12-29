@@ -185,19 +185,10 @@
 .icon-spin {
   animation: spin 1.2s linear infinite;
 }
-/* ===============================
-   CLEAN STEP LABEL TYPOGRAPHY
-================================ */
-.ant-steps-item-title {
-  white-space: normal;          /* allow wrapping */
-  word-break: normal;           /* prevent mid-word breaks */
-  overflow-wrap: break-word;    /* break only at spaces */
-  text-align: center;
-  line-height: 1.25;
-  max-width: 90px;              /* keeps steps aligned */
-}
-@media (min-width: 769px) {
+/* Prevent label breaking on desktop */
+@media (min-width: 768px) {
   .ant-steps-item-title {
+    white-space: nowrap;
     font-size: 13px;
   }
 }
