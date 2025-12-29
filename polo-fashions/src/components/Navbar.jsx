@@ -13,7 +13,6 @@ import { Scissors } from "lucide-react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 
-
 const { Header } = Layout;
 
 export default function NavigationBar() {
@@ -177,18 +176,19 @@ export default function NavigationBar() {
           )}
         </div>
 
-        {/* Mobile Menu Button */}
-        <Button
-          className="mobile-menu-button"
-          type="text"
-          icon={<MenuOutlined />}
-          onClick={() => setMobileMenuOpen(true)}
-          style={{
-            color: "#ffffff",
-            fontSize: 20,
-            display: "none",
-          }}
-        />
+        {/* Right Section */}
+        <div className="nav-right">
+          <Button
+            className="mobile-menu-button"
+            type="text"
+            icon={<MenuOutlined />}
+            onClick={() => setMobileMenuOpen(true)}
+            style={{
+              color: "#ffffff",
+              fontSize: 22,
+            }}
+          />
+        </div>
       </Header>
 
       {/* Mobile Drawer */}
@@ -252,6 +252,12 @@ export default function NavigationBar() {
 
       {/* Responsive Styles */}
       <style jsx>{`
+        .nav-right {
+          margin-left: auto;
+          display: flex;
+          align-items: center;
+        }
+
         @media (max-width: 768px) {
           .desktop-menu {
             display: none !important;
