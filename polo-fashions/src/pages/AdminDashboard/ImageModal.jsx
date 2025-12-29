@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Modal, Spin, Alert } from "antd";
 import { EyeOutlined } from "@ant-design/icons";
 
@@ -8,15 +8,23 @@ export default function ImageModal({
   selectedImage,
   setSelectedImage,
 }) {
-  const [imageLoaded, setImageLoaded] = useState(false);
+  const imgRef = useRef(null);
+
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
 
   useEffect(() => {
-    if (showImageModal && selectedImage) {
-      // 🔑 Reset states EVERY TIME modal opens
-      setImageLoaded(false);
-      setError(false);
-    }
+    if (!showImageModal || !selectedImage) return;
+
+    setLoading(true);
+    setError(false);
+
+    // 🔑 CRITICAL FIX: handle cached images
+    setTimeout(() => {
+      if (imgRef.current && imgRef.current.complete) {
+        setLoading(false);
+      }
+    }, 50);
   }, [showImageModal, selectedImage]);
 
   return (
@@ -30,27 +38,26 @@ export default function ImageModal({
       }
       open={showImageModal}
       footer={null}
+      centered
+      width="90%"
+      style={{ maxWidth: 1000 }}
       onCancel={() => {
         setShowImageModal(false);
         setSelectedImage(null);
-        setImageLoaded(false);
+        setLoading(true);
         setError(false);
       }}
-      width="90%"
-      style={{ maxWidth: 1000 }}
-      centered
     >
       {!selectedImage ? (
         <Alert
+          type="warning"
           message="No Image"
           description="No measurement photo available."
-          type="warning"
           showIcon
         />
       ) : (
         <div style={{ position: "relative", textAlign: "center" }}>
-          {/* ✅ Spinner ONLY if image not loaded */}
-          {!imageLoaded && !error && (
+          {loading && !error && (
             <div style={{ marginBottom: 12 }}>
               <Spin size="large" tip="Loading image..." />
             </div>
@@ -66,11 +73,14 @@ export default function ImageModal({
           )}
 
           <img
-            key={selectedImage} // 🔑 forces re-render for cached images
+            ref={imgRef}
             src={selectedImage}
             alt="Customer Measurement"
-            onLoad={() => setImageLoaded(true)}
-            onError={() => setError(true)}
+            onLoad={() => setLoading(false)}
+            onError={() => {
+              setLoading(false);
+              setError(true);
+            }}
             style={{
               width: "100%",
               maxHeight: "80vh",
