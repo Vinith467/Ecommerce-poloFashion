@@ -62,6 +62,7 @@ export default function OrderTracking() {
   const currentStep = getCurrentStepIndex(order);
   const normalizedStatus = normalizeStatus(order.status);
   const headerConfig = ORDER_STATUS_CONFIG[normalizedStatus];
+  const HeaderIcon = headerConfig?.icon;
 
   return (
     <div style={{ padding: 24 }}>
@@ -91,7 +92,7 @@ export default function OrderTracking() {
 
           <Tag
             color={headerConfig?.color}
-            icon={headerConfig?.icon}
+            icon={HeaderIcon ? <HeaderIcon /> : null}
             style={{ fontSize: 14, padding: "4px 12px" }}
           >
             {headerConfig?.label}
@@ -122,6 +123,8 @@ export default function OrderTracking() {
           items={steps.map((status, index) => {
             const normalized = normalizeStatus(status);
             const config = ORDER_STATUS_CONFIG[normalized];
+            const StepIcon = config?.icon;
+
             const isCompleted = index < currentStep;
             const isCurrent = index === currentStep;
 
@@ -150,9 +153,9 @@ export default function OrderTracking() {
                 >
                   {isCompleted ? (
                     <CheckCircleFilled />
-                  ) : (
-                    config?.icon
-                  )}
+                  ) : StepIcon ? (
+                    <StepIcon />
+                  ) : null}
                 </div>
               ),
               status: isCompleted

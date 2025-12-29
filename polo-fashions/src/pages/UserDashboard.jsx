@@ -158,9 +158,13 @@ export default function UserDashboard() {
       render: (status) => {
         const normalized = normalizeStatus(status);
         const config = ORDER_STATUS_CONFIG[normalized];
+        const Icon = config?.icon;
 
         return (
-          <Tag color={config?.color || "blue"} icon={config?.icon}>
+          <Tag
+            color={config?.color || "blue"}
+            icon={Icon ? <Icon /> : null}
+          >
             {config?.label || status}
           </Tag>
         );
@@ -265,6 +269,7 @@ export default function UserDashboard() {
               {userOrders.map((order) => {
                 const normalized = normalizeStatus(order.status);
                 const config = ORDER_STATUS_CONFIG[normalized];
+                const Icon = config?.icon;
 
                 return (
                   <div key={order.id} className="mobile-order-card">
@@ -285,7 +290,7 @@ export default function UserDashboard() {
                       <div className="order-status-mobile">
                         <Tag
                           color={config?.color || "blue"}
-                          icon={config?.icon}
+                          icon={Icon ? <Icon /> : null}
                         >
                           {config?.label || order.status}
                         </Tag>
