@@ -7,6 +7,8 @@ from rest_framework.response import Response
 from rest_framework.permissions import AllowAny, IsAuthenticated, IsAdminUser
 from rest_framework_simplejwt.views import TokenObtainPairView
 from django.contrib.auth import get_user_model
+from rest_framework.parsers import MultiPartParser, FormParser
+
 from .serializers import UserSerializer, RegisterSerializer, UpdateMeasurementSerializer
 
 User = get_user_model()
@@ -34,11 +36,18 @@ class UserViewSet(viewsets.ModelViewSet):
         serializer = self.get_serializer(request.user)
         return Response(serializer.data)
 
-    @action(detail=True, methods=['patch'], permission_classes=[IsAdminUser])
+    @action(detail=True, methods=['patch'], permission_classes=[IsAdminUser],
+    parser_classes=[MultiPartParser, FormParser],)
     def update_measurement(self, request, pk=None):
         user = self.get_object()
         serializer = UpdateMeasurementSerializer(user, data=request.data, partial=True)
         if serializer.is_valid():
             serializer.save()
-            return Response(serializer.data)
+            return Response(
+                {
+                "success": True,
+                "measurement_photo": user.measurement_photo.url if user.measurement_photo else None,
+                "measurement_status": user.measurement_status,
+                }
+            )
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

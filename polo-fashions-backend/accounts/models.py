@@ -1,5 +1,7 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
+from cloudinary.models import CloudinaryField
+
 
 class User(AbstractUser):
     ROLE_CHOICES = (
@@ -14,11 +16,13 @@ class User(AbstractUser):
         choices=(('pending', 'Pending'), ('completed', 'Completed')),
         default='pending'
     )
-    measurement_photo = models.ImageField(
-        upload_to='measurements/', 
-        blank=True, 
-        null=True
+    measurement_photo = CloudinaryField(
+    'measurement',
+    folder='measurements',
+    blank=True,
+    null=True
     )
+
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 

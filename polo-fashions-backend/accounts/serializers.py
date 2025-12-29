@@ -10,7 +10,10 @@ class UserSerializer(serializers.ModelSerializer):
     def get_measurement_photo(self, obj):
         """Return full Cloudinary URL for measurement photo"""
         if obj.measurement_photo:
-            return obj.measurement_photo.url  # ✅ Full URL
+            # ✅ This should return the full URL
+            url = obj.measurement_photo.url
+            print(f"📸 Measurement photo URL for {obj.username}: {url}")
+            return url
         return None
     
     class Meta:
