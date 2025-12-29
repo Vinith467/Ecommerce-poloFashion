@@ -34,8 +34,9 @@ export default function ImageModal({
 
   return (
     <Modal
+      className="image-modal"
       title={
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
           <EyeOutlined />
           <span>Customer Measurement Photo</span>
         </div>
@@ -56,9 +57,9 @@ export default function ImageModal({
         body: {
           padding: 20,
           minHeight: 400,
-          display: 'flex',
-          justifyContent: 'center',
-          alignItems: 'center',
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
         },
       }}
     >
@@ -70,36 +71,42 @@ export default function ImageModal({
           showIcon
         />
       ) : (
-        <div style={{ 
-          width: '100%', 
-          textAlign: 'center',
-          position: 'relative',
-        }}>
+        <div
+          style={{
+            width: "100%",
+            textAlign: "center",
+            position: "relative",
+          }}
+        >
           {loading && (
-            <div style={{ 
-              position: 'absolute',
-              top: '50%',
-              left: '50%',
-              transform: 'translate(-50%, -50%)',
-            }}>
+            <div
+              style={{
+                position: "absolute",
+                top: "50%",
+                left: "50%",
+                transform: "translate(-50%, -50%)",
+              }}
+            >
               <Spin size="large" tip="Loading image..." />
             </div>
           )}
-          
+
           {error && (
             <Alert
               message="Failed to Load Image"
               description={
                 <div>
                   <p>Could not load image from:</p>
-                  <code style={{ 
-                    display: 'block', 
-                    marginTop: 8, 
-                    padding: 8, 
-                    background: '#f5f5f5',
-                    borderRadius: 4,
-                    wordBreak: 'break-all',
-                  }}>
+                  <code
+                    style={{
+                      display: "block",
+                      marginTop: 8,
+                      padding: 8,
+                      background: "#f5f5f5",
+                      borderRadius: 4,
+                      wordBreak: "break-all",
+                    }}
+                  >
                     {selectedImage}
                   </code>
                 </div>
@@ -109,7 +116,7 @@ export default function ImageModal({
               style={{ marginBottom: 16 }}
             />
           )}
-          
+
           <img
             src={selectedImage}
             alt="Customer Measurement"
@@ -118,9 +125,9 @@ export default function ImageModal({
               height: "auto",
               maxHeight: "70vh",
               objectFit: "contain",
-              display: loading ? 'none' : 'block',
+              display: loading ? "none" : "block",
               borderRadius: 8,
-              border: '1px solid #e8e8e8',
+              border: "1px solid #e8e8e8",
             }}
             onLoad={handleImageLoad}
             onError={handleImageError}
