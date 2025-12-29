@@ -117,53 +117,55 @@ export default function OrderTracking() {
         </div>
 
         {/* STATUS STEPS */}
-        <Steps
-          direction={isMobile ? "horizontal" : "vertical"}
-          responsive
-          current={currentStep}
-          items={steps.map((status, index) => {
-            const normalized = normalizeStatus(status);
-            const config = ORDER_STATUS_CONFIG[normalized];
-            const StepIcon = config?.icon;
+        <div className="order-steps-desktop">
+          <Steps
+            direction={isMobile ? "horizontal" : "vertical"}
+            responsive
+            current={currentStep}
+            items={steps.map((status, index) => {
+              const normalized = normalizeStatus(status);
+              const config = ORDER_STATUS_CONFIG[normalized];
+              const StepIcon = config?.icon;
 
-            const isCompleted = index < currentStep;
-            const isCurrent = index === currentStep;
+              const isCompleted = index < currentStep;
+              const isCurrent = index === currentStep;
 
-            return {
-              title: config?.label,
-              icon: (
-                <div
-                  style={{
-                    width: 46,
-                    height: 46,
-                    borderRadius: 10, // ✅ rounded square
-                    backgroundColor:
-                      isCompleted || isCurrent ? config?.color : "#f0f0f0",
-                    color: isCompleted || isCurrent ? "#fff" : "#999",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    fontSize: 22,
-                    boxShadow: isCurrent
-                      ? "0 0 0 4px rgba(0,0,0,0.06)"
-                      : "none",
-                    transition: "all 0.3s ease",
-                  }}
-                >
-                  {isCompleted ? (
-                    <CheckCircleFilled />
-                  ) : (
-                    React.createElement(config.icon, {
-                      className: isCurrent ? config?.className : "",
-                    })
-                  )}
-                </div>
-              ),
+              return {
+                title: config?.label,
+                icon: (
+                  <div
+                    style={{
+                      width: 46,
+                      height: 46,
+                      borderRadius: 10, // ✅ rounded square
+                      backgroundColor:
+                        isCompleted || isCurrent ? config?.color : "#f0f0f0",
+                      color: isCompleted || isCurrent ? "#fff" : "#999",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      fontSize: 22,
+                      boxShadow: isCurrent
+                        ? "0 0 0 4px rgba(0,0,0,0.06)"
+                        : "none",
+                      transition: "all 0.3s ease",
+                    }}
+                  >
+                    {isCompleted ? (
+                      <CheckCircleFilled />
+                    ) : (
+                      React.createElement(config.icon, {
+                        className: isCurrent ? config?.className : "",
+                      })
+                    )}
+                  </div>
+                ),
 
-              status: isCompleted ? "finish" : isCurrent ? "process" : "wait",
-            };
-          })}
-        />
+                status: isCompleted ? "finish" : isCurrent ? "process" : "wait",
+              };
+            })}
+          />
+        </div>
 
         <Divider />
 
