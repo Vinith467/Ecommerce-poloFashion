@@ -185,3 +185,18 @@
 .icon-spin {
   animation: spin 1.2s linear infinite;
 }
+/* ===============================
+   FIX STEP LABEL WORD BREAK
+================================ */
+.ant-steps-item-title {
+  white-space: nowrap;        /* ⛔ no wrapping */
+  word-break: keep-all;       /* ⛔ no splitting */
+  overflow: hidden;           /* safety */
+  text-overflow: ellipsis;    /* optional if screen is very small */
+}
+@media (min-width: 769px) {
+  .ant-steps-item-title {
+    font-size: 13px;
+  }
+}
+
