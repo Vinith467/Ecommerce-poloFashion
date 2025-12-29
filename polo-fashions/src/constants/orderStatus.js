@@ -5,7 +5,7 @@ import {
   ScissorOutlined,
   ToolOutlined,
   FireOutlined,
-  ShoppingBagOutlined,
+  ShopOutlined,
   CheckCircleFilled,
 } from "@ant-design/icons";
 
@@ -47,7 +47,7 @@ export const ORDER_STATUS_CONFIG = {
   ready_for_pickup: {
     label: "Ready for Pickup",
     color: "#fa8c16",
-    icon: ShoppingBagOutlined,
+    icon: ShopOutlined,
   },
   picked_up: {
     label: "Picked Up",
