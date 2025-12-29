@@ -24,6 +24,20 @@ import {
 import { useAuth } from "../context/AuthContext";
 import { Link, useNavigate } from "react-router-dom";
 import { getOrderImage } from "../utils/imageUtils";
+const STATUS_COLORS = {
+  placed: "default",
+  processing: "blue",
+  stitching: "purple",
+  buttoning: "cyan",
+  ironing: "gold",
+  ready_for_pickup: "orange",
+  picked_up: "green",
+  returned: "volcano",
+  deposit_refunded: "lime",
+  cancelled: "red",
+};
+
+const normalizeStatus = (status) => (status ? status.toLowerCase() : "");
 
 export default function UserDashboard() {
   const navigate = useNavigate();
@@ -151,9 +165,14 @@ export default function UserDashboard() {
     {
       title: "Status",
       dataIndex: "status",
-      render: (s) => (
-        <Tag color="blue">{s.toUpperCase().replace("_", " ")}</Tag>
-      ),
+      render: (status) => {
+        const normalized = normalizeStatus(status);
+        return (
+          <Tag color={STATUS_COLORS[normalized] || "blue"}>
+            {normalized.replace("_", " ").toUpperCase()}
+          </Tag>
+        );
+      },
     },
   ];
 
@@ -263,9 +282,14 @@ export default function UserDashboard() {
                       preview={false}
                     />
                     <div className="order-status-mobile">
-                      <Tag color="blue">
-                        {order.status.toUpperCase().replace("_", " ")}
-                      </Tag>
+                      {(() => {
+                        const normalized = normalizeStatus(order.status);
+                        return (
+                          <Tag color={STATUS_COLORS[normalized] || "blue"}>
+                            {normalized.replace("_", " ").toUpperCase()}
+                          </Tag>
+                        );
+                      })()}
                     </div>
                   </div>
 

@@ -137,15 +137,36 @@ export default function OrderTracking() {
         <Steps
           direction="vertical"
           current={currentStep}
-          items={steps.map((status, index) => ({
-            title: STATUS_LABELS[status] || status,
-            status:
-              index < currentStep
-                ? "finish"
-                : index === currentStep
-                ? "process"
-                : "wait",
-          }))}
+          items={steps.map((status, index) => {
+            const normalized = normalizeStatus(status);
+            const isCompleted = index < currentStep;
+            const isCurrent = index === currentStep;
+
+            return {
+              title: STATUS_LABELS[normalized] || status,
+              icon: (
+                <div
+                  style={{
+                    width: 28,
+                    height: 28,
+                    borderRadius: "50%",
+                    background:
+                      isCompleted || isCurrent
+                        ? STATUS_COLORS[normalized] || "#1677ff"
+                        : "#f0f0f0",
+                    color: isCompleted || isCurrent ? "#fff" : "#999",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    fontWeight: 600,
+                  }}
+                >
+                  {index + 1}
+                </div>
+              ),
+              status: isCompleted ? "finish" : isCurrent ? "process" : "wait",
+            };
+          })}
         />
 
         <Divider />
@@ -206,9 +227,7 @@ export default function OrderTracking() {
           )}
 
           {order.notes && (
-            <Descriptions.Item label="Notes">
-              {order.notes}
-            </Descriptions.Item>
+            <Descriptions.Item label="Notes">{order.notes}</Descriptions.Item>
           )}
 
           <Descriptions.Item label="Total Price">
