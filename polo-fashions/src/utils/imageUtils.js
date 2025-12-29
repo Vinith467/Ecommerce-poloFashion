@@ -9,31 +9,19 @@ const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000/api'
 const BASE_URL = API_BASE_URL.replace('/api', '');
 
 export const normalizeImageUrl = (url) => {
-  if (!url) return "https://via.placeholder.com/120?text=No+Image";
-  
-  // ✅ If already a full Cloudinary URL, return as-is
-  if (url.startsWith('https://res.cloudinary.com/')) {
+  if (!url) {
+    return "https://via.placeholder.com/120?text=No+Image";
+  }
+
+  // ✅ Cloudinary or any absolute URL
+  if (url.startsWith("http")) {
     return url;
   }
-  
-  // ✅ If it's a relative Cloudinary path, it's already complete
-  // (Cloudinary stores full URLs in your database)
-  if (url.startsWith('http://') || url.startsWith('https://')) {
-    return url;
-  }
-  
-  // ✅ Handle local development /media/ paths
-  if (url.startsWith('/media/')) {
-    return `${BASE_URL}${url}`;
-  }
-  
-  // ✅ Fallback for paths without leading slash
-  if (!url.startsWith('/')) {
-    return `${BASE_URL}/media/${url}`;
-  }
-  
-  return `${BASE_URL}${url}`;
+
+  // ❌ No local media support anymore
+  return "https://via.placeholder.com/120?text=No+Image";
 };
+
 
 /**
  * Gets the first available image from an order object
@@ -41,7 +29,7 @@ export const normalizeImageUrl = (url) => {
  */
 export const getOrderImage = (order) => {
   if (!order) return "https://via.placeholder.com/120?text=No+Image";
-  
+
   let imageUrl = null;
 
   // Priority 1: Multi-image arrays
@@ -69,9 +57,9 @@ export const getOrderImage = (order) => {
  */
 export const getProductImage = (product) => {
   if (!product) return "https://via.placeholder.com/120?text=No+Image";
-  
+
   let imageUrl = null;
-  
+
   if (product.images?.length > 0) {
     imageUrl = product.images[0].image;
   } else if (product.rental_images?.length > 0) {
@@ -79,6 +67,6 @@ export const getProductImage = (product) => {
   } else {
     imageUrl = product.image;
   }
-  
+
   return normalizeImageUrl(imageUrl);
 };

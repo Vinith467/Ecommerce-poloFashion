@@ -19,6 +19,7 @@ import {
   getCustomerColumns,
   getOrderColumns,
 } from "./tableColumns";
+import { normalizeImageUrl } from "../../utils/imageUtils";
 
 // Import CSS
 import "./AdminDashboard.css";
@@ -99,24 +100,26 @@ export default function AdminDashboard() {
   };
 
   const handleViewImage = (imageUrl) => {
-      console.log("🖼️ Viewing image:", imageUrl);
-      if (!imageUrl) {
-    message.error("No image URL provided");
-    return;
-  }
+    console.log("🖼️ Viewing image (raw):", imageUrl);
 
-    setSelectedImage(imageUrl);
+    if (!imageUrl) {
+      message.error("No image URL provided");
+      return;
+    }
+
+    const finalUrl = normalizeImageUrl(imageUrl);
+    console.log("🖼️ Viewing image (final):", finalUrl);
+
+    setSelectedImage(finalUrl);
     setShowImageModal(true);
   };
-  
-
   // Generate table columns with handlers
   const bookingColumns = getBookingColumns(handleUpdateBookingStatus);
   const customerColumns = getCustomerColumns(
     handleOpenMeasurementModal,
-    setSelectedImage,
-    setShowImageModal
+    handleViewImage
   );
+
   const orderColumns = getOrderColumns(handleOrderStatusUpdate, navigate);
 
   return (

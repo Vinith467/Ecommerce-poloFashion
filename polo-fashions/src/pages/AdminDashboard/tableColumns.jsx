@@ -132,17 +132,13 @@ export const getBookingColumns = (handleUpdateBookingStatus) => [
             <Button
               size="small"
               type="primary"
-              onClick={() =>
-                handleUpdateBookingStatus(booking.id, "confirmed")
-              }
+              onClick={() => handleUpdateBookingStatus(booking.id, "confirmed")}
             >
               Confirm
             </Button>
             <Button
               size="small"
-              onClick={() =>
-                handleUpdateBookingStatus(booking.id, "completed")
-              }
+              onClick={() => handleUpdateBookingStatus(booking.id, "completed")}
             >
               Complete
             </Button>
@@ -163,11 +159,7 @@ export const getBookingColumns = (handleUpdateBookingStatus) => [
   },
 ];
 
-export const getCustomerColumns = (
-  handleOpenMeasurementModal,
-  setSelectedImage,
-  setShowImageModal
-) => [
+export const getCustomerColumns = (handleOpenMeasurementModal, onViewImage) => [
   {
     title: "ID",
     dataIndex: "id",
@@ -198,9 +190,7 @@ export const getCustomerColumns = (
       const isCompleted = user.measurement_status === "completed";
       return (
         <Tag
-          icon={
-            isCompleted ? <CheckCircleOutlined /> : <ClockCircleOutlined />
-          }
+          icon={isCompleted ? <CheckCircleOutlined /> : <ClockCircleOutlined />}
           color={isCompleted ? "green" : "orange"}
         >
           {isCompleted ? "Completed" : "Pending"}
@@ -215,12 +205,7 @@ export const getCustomerColumns = (
       user.measurement_photo ? (
         <Button
           size="small"
-          onClick={() => {
-            const imageUrl = normalizeImageUrl(user.measurement_photo);
-            console.log("📸 Opening image from desktop table:", imageUrl);
-            setSelectedImage(imageUrl);
-            setShowImageModal(true);
-          }}
+          onClick={() => onViewImage(user.measurement_photo)}
         >
           View
         </Button>

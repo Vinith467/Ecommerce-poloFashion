@@ -7,8 +7,6 @@ import {
   UploadOutlined,
   EyeOutlined,
 } from "@ant-design/icons";
-import { normalizeImageUrl } from "../../utils/imageUtils"; // ✅ ADD THIS IMPORT
-
 export default function MobileCustomerTable({
   customers,
   onOpenMeasurement,
@@ -24,16 +22,18 @@ export default function MobileCustomerTable({
             {/* HEADER */}
             <div className="customer-card-header">
               <div className="customer-main-info">
-                <div className="customer-username">
-                  {customer.username}
-                </div>
+                <div className="customer-username">{customer.username}</div>
                 <div className="customer-email mobile-text-truncate">
                   {customer.email}
                 </div>
               </div>
               <Tag
                 icon={
-                  isCompleted ? <CheckCircleOutlined /> : <ClockCircleOutlined />
+                  isCompleted ? (
+                    <CheckCircleOutlined />
+                  ) : (
+                    <ClockCircleOutlined />
+                  )
                 }
                 color={isCompleted ? "green" : "orange"}
               >
@@ -78,10 +78,7 @@ export default function MobileCustomerTable({
                 <Button
                   icon={<EyeOutlined />}
                   onClick={() => {
-                    // ✅ USE normalizeImageUrl INSTEAD OF MANUAL URL CONSTRUCTION
-                    const imageUrl = normalizeImageUrl(customer.measurement_photo);
-                    console.log("📸 Opening image:", imageUrl);
-                    onViewImage(imageUrl);
+                    onViewImage(customer.measurement_photo);
                   }}
                   className="mobile-action-btn"
                 >
