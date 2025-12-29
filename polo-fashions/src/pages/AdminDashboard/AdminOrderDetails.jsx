@@ -215,7 +215,15 @@ export default function AdminOrderDetails() {
             }
             style={{ marginBottom: 24 }}
           >
-            <Descriptions column={2} bordered>
+            <Descriptions
+              bordered
+              column={{
+                xs: 1,
+                sm: 1,
+                md: 2,
+                lg: 2,
+              }}
+            >
               <Descriptions.Item label="Order ID" span={2}>
                 <strong>#{order.id}</strong>
               </Descriptions.Item>
@@ -262,7 +270,7 @@ export default function AdminOrderDetails() {
             style={{ marginBottom: 24 }}
           >
             <Row gutter={24}>
-              <Col xs={24} md={8}>
+              <Col xs={24} sm={24} md={8}>
                 <Image
                   src={getOrderImage(order)}
                   alt={order.product_name}
@@ -276,7 +284,14 @@ export default function AdminOrderDetails() {
               </Col>
 
               <Col xs={24} md={16}>
-                <Descriptions column={1} bordered>
+                <Descriptions
+                  bordered
+                  column={{
+                    xs: 1,
+                    sm: 1,
+                    md: 1,
+                  }}
+                >
                   <Descriptions.Item label="Product Name">
                     <strong>{order.product_name || "—"}</strong>
                   </Descriptions.Item>
