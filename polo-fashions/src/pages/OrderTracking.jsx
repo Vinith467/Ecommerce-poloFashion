@@ -9,16 +9,23 @@ import {
   Divider,
   Tag,
   Button,
+  Grid,
 } from "antd";
-import { ArrowLeftOutlined, CheckCircleFilled } from "@ant-design/icons";
+import {
+  ArrowLeftOutlined,
+  CheckCircleFilled,
+} from "@ant-design/icons";
 import { useParams, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { getOrderImage } from "../utils/imageUtils";
-import { ORDER_STATUS_CONFIG, normalizeStatus } from "../constants/orderStatus";
+import {
+  ORDER_STATUS_CONFIG,
+  normalizeStatus,
+} from "../constants/orderStatus";
 import "../orderStatusAnimations.css";
 
 const { Title, Text } = Typography;
-const isMobile = window.innerWidth < 768;
+const { useBreakpoint } = Grid;
 
 /* ================== CONSTANTS ================== */
 const ORDER_STEPS = [
@@ -46,6 +53,10 @@ export default function OrderTracking() {
   const { id } = useParams();
   const { orders } = useAuth();
   const navigate = useNavigate();
+  const screens = useBreakpoint();
+
+  // ✅ Desktop = horizontal, Mobile = vertical
+  const isMobile = !screens.md;
 
   const order = orders.find((o) => o.id === Number(id));
   if (!order) return <Text>Order not found</Text>;
@@ -62,7 +73,7 @@ export default function OrderTracking() {
 
   return (
     <div style={{ padding: 24 }}>
-      <Card style={{ maxWidth: 800, margin: "auto" }}>
+      <Card style={{ maxWidth: 900, margin: "auto" }}>
         {/* BACK */}
         <Button
           shape="circle"
@@ -79,7 +90,7 @@ export default function OrderTracking() {
             justifyContent: "space-between",
             flexWrap: "wrap",
             gap: 8,
-            marginBottom: 16,
+            marginBottom: 20,
           }}
         >
           <Title level={3} style={{ margin: 0 }}>
@@ -88,11 +99,7 @@ export default function OrderTracking() {
 
           <Tag
             color={headerConfig?.color}
-            icon={
-              HeaderIcon ? (
-                <HeaderIcon className={headerConfig?.className} />
-              ) : null
-            }
+            icon={HeaderIcon ? <HeaderIcon /> : null}
             style={{ fontSize: 14, padding: "4px 12px" }}
           >
             {headerConfig?.label}
@@ -100,7 +107,7 @@ export default function OrderTracking() {
         </div>
 
         {/* PRODUCT INFO */}
-        <div style={{ display: "flex", gap: 16, marginBottom: 24 }}>
+        <div style={{ display: "flex", gap: 16, marginBottom: 32 }}>
           <Image
             width={120}
             src={getOrderImage(order)}
@@ -117,55 +124,64 @@ export default function OrderTracking() {
         </div>
 
         {/* STATUS STEPS */}
-        <div className="order-steps-desktop">
-          <Steps
-            direction={isMobile ? "horizontal" : "vertical"}
-            responsive
-            current={currentStep}
-            items={steps.map((status, index) => {
-              const normalized = normalizeStatus(status);
-              const config = ORDER_STATUS_CONFIG[normalized];
-              const StepIcon = config?.icon;
+        <Steps
+          direction={isMobile ? "vertical" : "horizontal"}
+          current={currentStep}
+          responsive
+          items={steps.map((status, index) => {
+            const normalized = normalizeStatus(status);
+            const config = ORDER_STATUS_CONFIG[normalized];
+            const StepIcon = config?.icon;
 
-              const isCompleted = index < currentStep;
-              const isCurrent = index === currentStep;
+            const isCompleted = index < currentStep;
+            const isCurrent = index === currentStep;
 
-              return {
-                title: config?.label,
-                icon: (
-                  <div
-                    style={{
-                      width: 46,
-                      height: 46,
-                      borderRadius: 10, // ✅ rounded square
-                      backgroundColor:
-                        isCompleted || isCurrent ? config?.color : "#f0f0f0",
-                      color: isCompleted || isCurrent ? "#fff" : "#999",
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      fontSize: 22,
-                      boxShadow: isCurrent
-                        ? "0 0 0 4px rgba(0,0,0,0.06)"
-                        : "none",
-                      transition: "all 0.3s ease",
-                    }}
-                  >
-                    {isCompleted ? (
-                      <CheckCircleFilled />
-                    ) : (
-                      React.createElement(config.icon, {
-                        className: isCurrent ? config?.className : "",
-                      })
-                    )}
-                  </div>
-                ),
-
-                status: isCompleted ? "finish" : isCurrent ? "process" : "wait",
-              };
-            })}
-          />
-        </div>
+            return {
+              title: config?.label,
+              icon: (
+                <div
+                  className={`step-icon ${
+                    isCurrent ? "step-current" : ""
+                  }`}
+                  style={{
+                    width: 46,
+                    height: 46,
+                    borderRadius: 10, // ✅ rounded square
+                    backgroundColor:
+                      isCompleted || isCurrent
+                        ? config?.color
+                        : "#f0f0f0",
+                    color:
+                      isCompleted || isCurrent ? "#fff" : "#999",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    fontSize: 22,
+                    boxShadow: isCurrent
+                      ? "0 0 0 4px rgba(0,0,0,0.06)"
+                      : "none",
+                    transition: "all 0.3s ease",
+                  }}
+                >
+                  {isCompleted ? (
+                    <CheckCircleFilled />
+                  ) : StepIcon ? (
+                    <StepIcon
+                      className={
+                        isCurrent ? config?.className : ""
+                      }
+                    />
+                  ) : null}
+                </div>
+              ),
+              status: isCompleted
+                ? "finish"
+                : isCurrent
+                ? "process"
+                : "wait",
+            };
+          })}
+        />
 
         <Divider />
 
