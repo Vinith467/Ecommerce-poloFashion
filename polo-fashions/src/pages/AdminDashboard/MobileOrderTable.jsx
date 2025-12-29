@@ -52,19 +52,68 @@ const formatDate = (dateStr) => {
     return dateStr;
   }
 };
+// src/pages/AdminDashboard/tableColumns.jsx
 
 const getNextStatuses = (order) => {
-  let next = ORDER_STATUS_FLOW[order.status] || [];
+  // Map backend order_type to our flow logic
+  const orderType = order.order_type;
 
-  // Rental-only protection
-  if (!order.rental_days || order.rental_days === 0) {
-    next = next.filter((s) => s !== "returned" && s !== "deposit_refunded");
+  // Rental orders
+  if (order.rental_days > 0) {
+    const RENTAL_FLOW = {
+      placed: ["processing"],
+      processing: ["ready_for_pickup"],
+      ready_for_pickup: ["picked_up"],
+      picked_up: ["returned"],
+      returned: ["deposit_refunded"],
+    };
+    return RENTAL_FLOW[order.status] || [];
   }
 
-  return next;
-};
+  // Ready-made, accessory, innerwear
+  if (["ready_made", "accessory", "innerwear"].includes(orderType)) {
+    const READYMADE_FLOW = {
+      placed: ["processing"],
+      processing: ["ready_for_pickup"],
+      ready_for_pickup: ["picked_up"],
+    };
+    return READYMADE_FLOW[order.status] || [];
+  }
 
-export default function MobileOrderTable({ orders, onUpdateStatus, onNavigate }) {
+  // Custom/Fabric with stitching
+  if (
+    orderType === "fabric_with_stitching" ||
+    (orderType === "traditional" && order.stitch_type)
+  ) {
+    const CUSTOM_FLOW = {
+      placed: ["processing"],
+      processing: ["stitching"],
+      stitching: ["buttoning"],
+      buttoning: ["ironing"],
+      ironing: ["ready_for_pickup"],
+      ready_for_pickup: ["picked_up"],
+    };
+    return CUSTOM_FLOW[order.status] || [];
+  }
+
+  // Fabric only (no stitching)
+  if (orderType === "fabric_only") {
+    const SIMPLE_FLOW = {
+      placed: ["processing"],
+      processing: ["ready_for_pickup"],
+      ready_for_pickup: ["picked_up"],
+    };
+    return SIMPLE_FLOW[order.status] || [];
+  }
+
+  // Default fallback
+  return [];
+};
+export default function MobileOrderTable({
+  orders,
+  onUpdateStatus,
+  onNavigate,
+}) {
   return (
     <div className="mobile-cards-view">
       {orders.map((order) => {
@@ -79,9 +128,7 @@ export default function MobileOrderTable({ orders, onUpdateStatus, onNavigate })
                 <div className="order-product-name" title={order.product_name}>
                   {order.product_name}
                 </div>
-                <div className="order-customer-name">
-                  {order.customer_name}
-                </div>
+                <div className="order-customer-name">{order.customer_name}</div>
               </div>
             </div>
 
@@ -94,7 +141,10 @@ export default function MobileOrderTable({ orders, onUpdateStatus, onNavigate })
 
               <div className="order-detail-row">
                 <span className="order-detail-label">Total</span>
-                <span className="order-detail-value" style={{ color: "#1677ff" }}>
+                <span
+                  className="order-detail-value"
+                  style={{ color: "#1677ff" }}
+                >
                   ₹{order.total_price}
                 </span>
               </div>

@@ -58,15 +58,62 @@ const formatDate = (dateStr) => {
   }
 };
 
-const getNextStatuses = (order) => {
-  let next = ORDER_STATUS_FLOW[order.status] || [];
+// src/pages/AdminDashboard/tableColumns.jsx
 
-  // Rental-only protection
-  if (!order.rental_days || order.rental_days === 0) {
-    next = next.filter((s) => s !== "returned" && s !== "deposit_refunded");
+const getNextStatuses = (order) => {
+  // Map backend order_type to our flow logic
+  const orderType = order.order_type;
+
+  // Rental orders
+  if (order.rental_days > 0) {
+    const RENTAL_FLOW = {
+      placed: ["processing"],
+      processing: ["ready_for_pickup"],
+      ready_for_pickup: ["picked_up"],
+      picked_up: ["returned"],
+      returned: ["deposit_refunded"],
+    };
+    return RENTAL_FLOW[order.status] || [];
   }
 
-  return next;
+  // Ready-made, accessory, innerwear
+  if (["ready_made", "accessory", "innerwear"].includes(orderType)) {
+    const READYMADE_FLOW = {
+      placed: ["processing"],
+      processing: ["ready_for_pickup"],
+      ready_for_pickup: ["picked_up"],
+    };
+    return READYMADE_FLOW[order.status] || [];
+  }
+
+  // Custom/Fabric with stitching
+  if (
+    orderType === "fabric_with_stitching" ||
+    (orderType === "traditional" && order.stitch_type)
+  ) {
+    const CUSTOM_FLOW = {
+      placed: ["processing"],
+      processing: ["stitching"],
+      stitching: ["buttoning"],
+      buttoning: ["ironing"],
+      ironing: ["ready_for_pickup"],
+      ready_for_pickup: ["picked_up"],
+    };
+    return CUSTOM_FLOW[order.status] || [];
+  }
+
+  // Fabric only (no stitching)
+  if (orderType === "fabric_only") {
+    const SIMPLE_FLOW = {
+      placed: ["processing"],
+      processing: ["ready_for_pickup"],
+      ready_for_pickup: ["picked_up"],
+    };
+    return SIMPLE_FLOW[order.status] || [];
+  }
+
+  // Default fallback
+  return [];
 };
 
 export const getBookingColumns = (handleUpdateBookingStatus) => [
