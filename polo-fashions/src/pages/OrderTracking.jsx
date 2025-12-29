@@ -18,6 +18,10 @@ import { getOrderImage } from "../utils/imageUtils";
 
 const { Title, Text } = Typography;
 
+/* ================== HELPERS ================== */
+const normalizeStatus = (status) => (status ? status.toLowerCase() : "");
+
+/* ================== CONSTANTS ================== */
 const ORDER_STEPS = [
   "placed",
   "processing",
@@ -41,6 +45,7 @@ const STATUS_LABELS = {
   returned: "Returned",
   deposit_refunded: "Deposit Refunded",
 };
+
 const STATUS_COLORS = {
   placed: "default",
   processing: "blue",
@@ -59,20 +64,17 @@ const getCurrentStepIndex = (order) => {
     ...ORDER_STEPS,
     ...(order.rental_days > 0 ? RENTAL_EXTRA_STEPS : []),
   ];
-
-  return steps.indexOf(order.status);
+  return steps.indexOf(normalizeStatus(order.status));
 };
 
+/* ================== COMPONENT ================== */
 export default function OrderTracking() {
   const { id } = useParams();
   const { orders } = useAuth();
   const navigate = useNavigate();
 
   const order = orders.find((o) => o.id === Number(id));
-
-  if (!order) {
-    return <Text>Order not found</Text>;
-  }
+  if (!order) return <Text>Order not found</Text>;
 
   const steps = [
     ...ORDER_STEPS,
@@ -80,6 +82,7 @@ export default function OrderTracking() {
   ];
 
   const currentStep = getCurrentStepIndex(order);
+  const normalizedStatus = normalizeStatus(order.status);
 
   return (
     <div style={{ padding: 24 }}>
@@ -91,6 +94,7 @@ export default function OrderTracking() {
           style={{ marginBottom: 16 }}
         />
 
+        {/* HEADER */}
         <div
           style={{
             display: "flex",
@@ -105,18 +109,14 @@ export default function OrderTracking() {
           </Title>
 
           <Tag
-            color={STATUS_COLORS[order.status] || "blue"}
-            style={{
-              fontSize: 13,
-              padding: "4px 10px",
-              fontWeight: 500,
-            }}
+            color={STATUS_COLORS[normalizedStatus] || "blue"}
+            style={{ fontSize: 13, padding: "4px 10px", fontWeight: 500 }}
           >
-            {STATUS_LABELS[order.status] || order.status}
+            {STATUS_LABELS[normalizedStatus] || order.status}
           </Tag>
         </div>
 
-        {/* Product Info */}
+        {/* PRODUCT INFO */}
         <div style={{ display: "flex", gap: 16, marginBottom: 24 }}>
           <Image
             width={120}
@@ -124,7 +124,6 @@ export default function OrderTracking() {
             alt={order.product_name}
             fallback="https://via.placeholder.com/120?text=No+Image"
           />
-
           <div>
             <Text strong>{order.product_name}</Text>
             <br />
@@ -134,12 +133,12 @@ export default function OrderTracking() {
           </div>
         </div>
 
-        {/* STATUS TRACKING */}
+        {/* STATUS STEPS */}
         <Steps
           direction="vertical"
           current={currentStep}
           items={steps.map((status, index) => ({
-            title: STATUS_LABELS[status],
+            title: STATUS_LABELS[status] || status,
             status:
               index < currentStep
                 ? "finish"
@@ -148,35 +147,29 @@ export default function OrderTracking() {
                 : "wait",
           }))}
         />
+
         <Divider />
 
+        {/* ORDER DETAILS */}
         <Title level={4}>Order Details</Title>
 
         <Descriptions bordered column={1} size="middle">
           <Descriptions.Item label="Product">
             {order.product_name}
           </Descriptions.Item>
-
           <Descriptions.Item label="Quantity">
             {order.quantity}
           </Descriptions.Item>
-
           <Descriptions.Item label="Order Date">
-            {new Date(order.order_date).toLocaleDateString("en-IN", {
-              year: "numeric",
-              month: "short",
-              day: "numeric",
-            })}
+            {new Date(order.order_date).toLocaleDateString("en-IN")}
           </Descriptions.Item>
 
-          {/* READY-MADE */}
           {order.size && (
             <Descriptions.Item label="Size">
               <Tag color="blue">{order.size}</Tag>
             </Descriptions.Item>
           )}
 
-          {/* FABRIC */}
           {order.fabric_name && (
             <Descriptions.Item label="Fabric">
               {order.fabric_name}
@@ -189,7 +182,6 @@ export default function OrderTracking() {
             </Descriptions.Item>
           )}
 
-          {/* STITCHING */}
           {order.stitch_type && (
             <Descriptions.Item label="Stitch Type">
               {order.stitch_type.toUpperCase()}
@@ -202,22 +194,21 @@ export default function OrderTracking() {
             </Descriptions.Item>
           )}
 
-          {/* RENTAL */}
           {order.rental_days > 0 && (
             <>
               <Descriptions.Item label="Rental Days">
                 {order.rental_days} days
               </Descriptions.Item>
-
               <Descriptions.Item label="Rental Deposit">
                 ₹{order.rental_deposit}
               </Descriptions.Item>
             </>
           )}
 
-          {/* NOTES */}
           {order.notes && (
-            <Descriptions.Item label="Notes">{order.notes}</Descriptions.Item>
+            <Descriptions.Item label="Notes">
+              {order.notes}
+            </Descriptions.Item>
           )}
 
           <Descriptions.Item label="Total Price">
