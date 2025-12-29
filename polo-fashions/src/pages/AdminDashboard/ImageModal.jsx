@@ -40,11 +40,8 @@ export default function ImageModal({
       centered
       styles={{
         body: {
-          padding: 20,
+          padding: 16,
           minHeight: 400,
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
         },
       }}
     >
@@ -56,23 +53,9 @@ export default function ImageModal({
           showIcon
         />
       ) : (
-        <div
-          style={{
-            width: "100%",
-            textAlign: "center",
-            position: "relative",
-          }}
-        >
+        <div style={{ width: "100%", textAlign: "center" }}>
           {loading && (
-            <div
-              style={{
-                position: "absolute",
-                top: "50%",
-                left: "50%",
-                transform: "translate(-50%, -50%)",
-                zIndex: 2,
-              }}
-            >
+            <div style={{ marginBottom: 12 }}>
               <Spin size="large" tip="Loading image..." />
             </div>
           )}
@@ -87,7 +70,7 @@ export default function ImageModal({
           )}
 
           <img
-            key={selectedImage}   // ✅ THIS IS THE MAGIC FIX
+            key={selectedImage}
             src={selectedImage}
             alt="Customer Measurement"
             onLoad={() => setLoading(false)}
@@ -97,7 +80,6 @@ export default function ImageModal({
             }}
             style={{
               width: "100%",
-              height: "auto",
               maxHeight: "80vh",
               objectFit: "contain",
               borderRadius: 8,
