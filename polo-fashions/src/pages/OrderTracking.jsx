@@ -41,6 +41,18 @@ const STATUS_LABELS = {
   returned: "Returned",
   deposit_refunded: "Deposit Refunded",
 };
+const STATUS_COLORS = {
+  placed: "default",
+  processing: "blue",
+  stitching: "purple",
+  buttoning: "cyan",
+  ironing: "gold",
+  ready_for_pickup: "orange",
+  picked_up: "green",
+  returned: "volcano",
+  deposit_refunded: "lime",
+  cancelled: "red",
+};
 
 const getCurrentStepIndex = (order) => {
   const steps = [
@@ -79,7 +91,30 @@ export default function OrderTracking() {
           style={{ marginBottom: 16 }}
         />
 
-        <Title level={3}>Order #{order.id}</Title>
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            flexWrap: "wrap",
+            gap: 8,
+          }}
+        >
+          <Title level={3} style={{ margin: 0 }}>
+            Order #{order.id}
+          </Title>
+
+          <Tag
+            color={STATUS_COLORS[order.status] || "blue"}
+            style={{
+              fontSize: 13,
+              padding: "4px 10px",
+              fontWeight: 500,
+            }}
+          >
+            {STATUS_LABELS[order.status] || order.status}
+          </Tag>
+        </div>
 
         {/* Product Info */}
         <div style={{ display: "flex", gap: 16, marginBottom: 24 }}>
