@@ -205,7 +205,7 @@ export default function AdminOrderDetails() {
       </div>
 
       <Row gutter={[24, 24]}>
-        <Col xs={24} lg={16}>
+        <Col xs={24} sm={24} md={16} lg={18}>
           <Card
             title={
               <Space>
@@ -289,7 +289,8 @@ export default function AdminOrderDetails() {
                   column={{
                     xs: 1,
                     sm: 1,
-                    md: 1,
+                    md: 2,
+                    lg: 3,
                   }}
                 >
                   <Descriptions.Item label="Product Name">
@@ -321,7 +322,7 @@ export default function AdminOrderDetails() {
           </Card>
         </Col>
 
-        <Col xs={24} lg={8}>
+        <Col xs={24} sm={24} md={8} lg={6}>
           <Card title="Order Actions" style={{ position: "sticky", top: 24 }}>
             <Space direction="vertical" style={{ width: "100%" }} size="large">
               {nextStatuses.length > 0 && (
