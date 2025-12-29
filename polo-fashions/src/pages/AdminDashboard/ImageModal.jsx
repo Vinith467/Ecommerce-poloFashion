@@ -123,11 +123,12 @@ export default function ImageModal({
             style={{
               width: "100%",
               height: "auto",
-              maxHeight: "70vh",
+              maxHeight: "80vh",
               objectFit: "contain",
               display: loading ? "none" : "block",
               borderRadius: 8,
               border: "1px solid #e8e8e8",
+               cursor: "zoom-in",
             }}
             onLoad={handleImageLoad}
             onError={handleImageError}
