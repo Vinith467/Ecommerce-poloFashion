@@ -1,4 +1,3 @@
-// src/pages/AdminDashboard/ImageModal.jsx
 import React from "react";
 import { Modal, Spin, Alert } from "antd";
 import { EyeOutlined } from "@ant-design/icons";
@@ -9,28 +8,15 @@ export default function ImageModal({
   selectedImage,
   setSelectedImage,
 }) {
-  const [loading, setLoading] = React.useState(true);
+  const [loading, setLoading] = React.useState(false);
   const [error, setError] = React.useState(false);
 
   React.useEffect(() => {
-    if (showImageModal) {
-      console.log("🖼️ ImageModal opened with URL:", selectedImage); // ✅ DEBUG LOG
+    if (showImageModal && selectedImage) {
       setLoading(true);
       setError(false);
     }
   }, [showImageModal, selectedImage]);
-
-  const handleImageLoad = () => {
-    console.log("✅ Image loaded successfully"); // ✅ DEBUG LOG
-    setLoading(false);
-    setError(false);
-  };
-
-  const handleImageError = () => {
-    console.error("❌ Failed to load image:", selectedImage); // ✅ DEBUG LOG
-    setLoading(false);
-    setError(true);
-  };
 
   return (
     <Modal
@@ -44,10 +30,9 @@ export default function ImageModal({
       open={showImageModal}
       footer={null}
       onCancel={() => {
-        console.log("🚪 Closing image modal"); // ✅ DEBUG LOG
         setShowImageModal(false);
         setSelectedImage(null);
-        setLoading(true);
+        setLoading(false);
         setError(false);
       }}
       width="90%"
@@ -85,6 +70,7 @@ export default function ImageModal({
                 top: "50%",
                 left: "50%",
                 transform: "translate(-50%, -50%)",
+                zIndex: 2,
               }}
             >
               <Spin size="large" tip="Loading image..." />
@@ -94,44 +80,31 @@ export default function ImageModal({
           {error && (
             <Alert
               message="Failed to Load Image"
-              description={
-                <div>
-                  <p>Could not load image from:</p>
-                  <code
-                    style={{
-                      display: "block",
-                      marginTop: 8,
-                      padding: 8,
-                      background: "#f5f5f5",
-                      borderRadius: 4,
-                      wordBreak: "break-all",
-                    }}
-                  >
-                    {selectedImage}
-                  </code>
-                </div>
-              }
+              description={selectedImage}
               type="error"
               showIcon
-              style={{ marginBottom: 16 }}
             />
           )}
 
           <img
+            key={selectedImage}   // ✅ THIS IS THE MAGIC FIX
             src={selectedImage}
             alt="Customer Measurement"
+            onLoad={() => setLoading(false)}
+            onError={() => {
+              setLoading(false);
+              setError(true);
+            }}
             style={{
               width: "100%",
               height: "auto",
               maxHeight: "80vh",
               objectFit: "contain",
-              display: loading ? "none" : "block",
               borderRadius: 8,
               border: "1px solid #e8e8e8",
-               cursor: "zoom-in",
+              cursor: "zoom-in",
             }}
-            onLoad={handleImageLoad}
-            onError={handleImageError}
+            onClick={(e) => e.target.requestFullscreen?.()}
           />
         </div>
       )}
