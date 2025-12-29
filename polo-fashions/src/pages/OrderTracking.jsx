@@ -15,6 +15,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { getOrderImage } from "../utils/imageUtils";
 import { ORDER_STATUS_CONFIG, normalizeStatus } from "../constants/orderStatus";
+import "../orderStatusAnimations.css";
 
 const { Title, Text } = Typography;
 const isMobile = window.innerWidth < 768;
@@ -87,7 +88,11 @@ export default function OrderTracking() {
 
           <Tag
             color={headerConfig?.color}
-            icon={HeaderIcon ? <HeaderIcon /> : null}
+            icon={
+              HeaderIcon ? (
+                <HeaderIcon className={headerConfig?.className} />
+              ) : null
+            }
             style={{ fontSize: 14, padding: "4px 12px" }}
           >
             {headerConfig?.label}
@@ -147,10 +152,10 @@ export default function OrderTracking() {
                 >
                   {isCompleted ? (
                     <CheckCircleFilled />
-                  ) : config?.spin ? (
-                    React.createElement(config.icon, { spin: true })
                   ) : (
-                    React.createElement(config.icon)
+                    React.createElement(config.icon, {
+                      className: isCurrent ? config?.className : "",
+                    })
                   )}
                 </div>
               ),
