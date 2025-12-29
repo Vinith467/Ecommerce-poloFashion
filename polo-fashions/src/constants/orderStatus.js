@@ -28,6 +28,7 @@ export const ORDER_STATUS_CONFIG = {
     label: "Processing",
     color: "#1890ff",
     icon: SyncOutlined,
+    spin: true, // ✅ animate
   },
   stitching: {
     label: "Stitching",

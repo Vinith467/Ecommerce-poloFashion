@@ -132,3 +132,20 @@
   background: #fff1f0;
   color: #f5222d;
 }
+/* Active / completed connector */
+.ant-steps-item-finish
+  .ant-steps-item-tail::after {
+  background-color: currentColor !important;
+}
+
+/* Current step connector */
+.ant-steps-item-process
+  .ant-steps-item-tail::after {
+  background-color: #1677ff !important;
+}
+
+/* Pending connector */
+.ant-steps-item-wait
+  .ant-steps-item-tail::after {
+  background-color: #e5e7eb !important;
+}

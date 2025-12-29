@@ -10,19 +10,14 @@ import {
   Tag,
   Button,
 } from "antd";
-import {
-  ArrowLeftOutlined,
-  CheckCircleFilled,
-} from "@ant-design/icons";
+import { ArrowLeftOutlined, CheckCircleFilled } from "@ant-design/icons";
 import { useParams, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { getOrderImage } from "../utils/imageUtils";
-import {
-  ORDER_STATUS_CONFIG,
-  normalizeStatus,
-} from "../constants/orderStatus";
+import { ORDER_STATUS_CONFIG, normalizeStatus } from "../constants/orderStatus";
 
 const { Title, Text } = Typography;
+const isMobile = window.innerWidth < 768;
 
 /* ================== CONSTANTS ================== */
 const ORDER_STEPS = [
@@ -118,7 +113,8 @@ export default function OrderTracking() {
 
         {/* STATUS STEPS */}
         <Steps
-          direction="vertical"
+          direction={isMobile ? "horizontal" : "vertical"}
+          responsive
           current={currentStep}
           items={steps.map((status, index) => {
             const normalized = normalizeStatus(status);
@@ -135,39 +131,50 @@ export default function OrderTracking() {
                   style={{
                     width: 46,
                     height: 46,
-                    borderRadius: "50%",
+                    borderRadius: 10, // ✅ rounded square
                     backgroundColor:
-                      isCompleted || isCurrent
-                        ? config?.color
-                        : "#f0f0f0",
-                    color:
-                      isCompleted || isCurrent ? "#fff" : "#999",
+                      isCompleted || isCurrent ? config?.color : "#f0f0f0",
+                    color: isCompleted || isCurrent ? "#fff" : "#999",
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",
                     fontSize: 22,
                     boxShadow: isCurrent
-                      ? "0 0 0 5px rgba(0,0,0,0.06)"
+                      ? "0 0 0 4px rgba(0,0,0,0.06)"
                       : "none",
+                    transition: "all 0.3s ease",
                   }}
                 >
                   {isCompleted ? (
                     <CheckCircleFilled />
-                  ) : StepIcon ? (
-                    <StepIcon />
-                  ) : null}
+                  ) : config?.spin ? (
+                    React.createElement(config.icon, { spin: true })
+                  ) : (
+                    React.createElement(config.icon)
+                  )}
                 </div>
               ),
-              status: isCompleted
-                ? "finish"
-                : isCurrent
-                ? "process"
-                : "wait",
+
+              status: isCompleted ? "finish" : isCurrent ? "process" : "wait",
             };
           })}
         />
 
         <Divider />
+
+        <Title level={5}>Status Legend</Title>
+        <div style={{ display: "flex", flexWrap: "wrap", gap: 12 }}>
+          {Object.entries(ORDER_STATUS_CONFIG).map(([key, cfg]) => (
+            <Tag
+              key={key}
+              color={cfg.color}
+              icon={React.createElement(cfg.icon)}
+              style={{ padding: "6px 10px" }}
+            >
+              {cfg.label}
+            </Tag>
+          ))}
+        </div>
 
         {/* ORDER DETAILS */}
         <Title level={4}>Order Details</Title>
