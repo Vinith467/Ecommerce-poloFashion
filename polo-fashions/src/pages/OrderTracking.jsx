@@ -162,20 +162,6 @@ export default function OrderTracking() {
 
         <Divider />
 
-        <Title level={5}>Status Legend</Title>
-        <div style={{ display: "flex", flexWrap: "wrap", gap: 12 }}>
-          {Object.entries(ORDER_STATUS_CONFIG).map(([key, cfg]) => (
-            <Tag
-              key={key}
-              color={cfg.color}
-              icon={React.createElement(cfg.icon)}
-              style={{ padding: "6px 10px" }}
-            >
-              {cfg.label}
-            </Tag>
-          ))}
-        </div>
-
         {/* ORDER DETAILS */}
         <Title level={4}>Order Details</Title>
         <Descriptions bordered column={1} size="middle">
