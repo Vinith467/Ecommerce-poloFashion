@@ -580,3 +580,29 @@
   border: 2px solid #1677ff;
   background: #f0f7ff;
 }
+.stat-card {
+  height: 100%;
+  border-radius: 10px;
+}
+
+.stat-card .ant-statistic-title {
+  font-size: 14px;
+}
+
+.stat-card .ant-statistic-content {
+  font-size: 20px;
+}
+
+.stat-card.clickable {
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.stat-card.clickable:hover {
+  background: #fafafa;
+}
+
+.stat-card.active {
+  border: 2px solid #1677ff;
+  background: #f0f7ff;
+}

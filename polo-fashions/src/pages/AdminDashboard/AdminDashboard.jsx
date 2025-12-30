@@ -25,7 +25,6 @@ import { normalizeImageUrl } from "../../utils/imageUtils";
 import "./AdminDashboard.css";
 
 export default function AdminDashboard() {
-  const [activeOrderStatus, setActiveOrderStatus] = useState("all");
   const {
     users,
     bookings,
@@ -42,6 +41,8 @@ export default function AdminDashboard() {
   const [uploading, setUploading] = useState(false);
   const [showImageModal, setShowImageModal] = useState(false);
   const [selectedImage, setSelectedImage] = useState(null);
+  const [activeTab, setActiveTab] = useState("bookings");
+  const [activeOrderStatus, setActiveOrderStatus] = useState("all");
 
   // ✅ FIX: Filter customer users safely
   const customerUsers = (users || []).filter((u) => u.role === "customer");
@@ -135,6 +136,7 @@ export default function AdminDashboard() {
         customerUsers={customerUsers}
         pendingBookings={pendingBookings}
         orders={orders}
+        showOrderStatusFilters={activeTab === "orders"}
         activeOrderStatus={activeOrderStatus}
         onStatusSelect={setActiveOrderStatus}
       />
@@ -143,6 +145,12 @@ export default function AdminDashboard() {
       <Card className="dashboard-tabs">
         <Tabs
           defaultActiveKey="bookings"
+          onChange={(key) => {
+            setActiveTab(key);
+            if (key !== "orders") {
+              setActiveOrderStatus("all");
+            }
+          }}
           items={[
             {
               key: "bookings",
