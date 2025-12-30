@@ -571,3 +571,12 @@
     font-size: 16px;
   }
 }
+.status-card {
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.status-card.active {
+  border: 2px solid #1677ff;
+  background: #f0f7ff;
+}

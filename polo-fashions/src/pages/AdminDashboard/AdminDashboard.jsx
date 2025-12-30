@@ -25,6 +25,7 @@ import { normalizeImageUrl } from "../../utils/imageUtils";
 import "./AdminDashboard.css";
 
 export default function AdminDashboard() {
+  const [activeOrderStatus, setActiveOrderStatus] = useState("all");
   const {
     users,
     bookings,
@@ -50,6 +51,10 @@ export default function AdminDashboard() {
   const processingOrders = (orders || []).filter(
     (o) => o.status === "processing"
   );
+  const filteredOrders =
+    activeOrderStatus === "all"
+      ? orders
+      : orders.filter((o) => o.status === activeOrderStatus);
 
   const handleOpenMeasurementModal = (user) => {
     setSelectedUser(user);
@@ -129,8 +134,9 @@ export default function AdminDashboard() {
       <StatsCards
         customerUsers={customerUsers}
         pendingBookings={pendingBookings}
-        processingOrders={processingOrders}
         orders={orders}
+        activeOrderStatus={activeOrderStatus}
+        onStatusSelect={setActiveOrderStatus}
       />
 
       {/* TABS WITH RESPONSIVE TABLES */}
@@ -218,7 +224,7 @@ export default function AdminDashboard() {
                       <Table
                         rowKey="id"
                         columns={orderColumns}
-                        dataSource={orders}
+                        dataSource={filteredOrders}
                         pagination={{ pageSize: 10 }}
                         scroll={{ x: 1200 }}
                       />
@@ -226,7 +232,7 @@ export default function AdminDashboard() {
 
                     {/* MOBILE CARDS */}
                     <MobileOrderTable
-                      orders={orders}
+                      orders={filteredOrders}
                       onUpdateStatus={handleOrderStatusUpdate}
                       onNavigate={navigate}
                     />
