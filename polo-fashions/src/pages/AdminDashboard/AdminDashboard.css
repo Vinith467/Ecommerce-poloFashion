@@ -593,16 +593,22 @@
   box-shadow: 0 8px 20px rgba(22, 119, 255, 0.15);
 }
 /* ===============================
-   MOBILE SPACING FIX – TOP STATS
+   MOBILE SPACING FIX – TOP STATS ONLY
 ================================ */
 @media (max-width: 768px) {
-  /* Increase spacing between top stat cards */
-  .admin-dashboard-container .ant-row:first-of-type .ant-col {
-    margin-bottom: 20px;
+  /* Target ONLY the first stats section */
+  .admin-dashboard-container > .ant-row {
+    margin-bottom: 32px;
   }
 
-  /* Slightly increase card padding for mobile comfort */
+  /* Increase vertical spacing between the 3 top cards */
+  .admin-dashboard-container > .ant-row .ant-col {
+    margin-bottom: 24px;
+  }
+
+  /* Comfortable padding for mobile */
   .stat-card {
-    padding: 20px 16px;
+    padding: 22px 18px;
   }
 }
+
