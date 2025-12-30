@@ -571,38 +571,24 @@
     font-size: 16px;
   }
 }
-.status-card {
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.status-card.active {
-  border: 2px solid #1677ff;
-  background: #f0f7ff;
-}
 .stat-card {
   height: 100%;
-  border-radius: 10px;
-}
-
-.stat-card .ant-statistic-title {
-  font-size: 14px;
-}
-
-.stat-card .ant-statistic-content {
-  font-size: 20px;
+  border-radius: 12px;
+  cursor: default;
+  transition: all 0.25s ease;
 }
 
 .stat-card.clickable {
   cursor: pointer;
-  transition: all 0.2s ease;
 }
 
 .stat-card.clickable:hover {
-  background: #fafafa;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
 }
 
 .stat-card.active {
   border: 2px solid #1677ff;
   background: #f0f7ff;
+  box-shadow: 0 8px 20px rgba(22, 119, 255, 0.15);
 }
