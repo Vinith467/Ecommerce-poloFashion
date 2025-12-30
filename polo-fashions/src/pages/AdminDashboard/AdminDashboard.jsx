@@ -3,13 +3,11 @@ import { message, Table, Tabs, Card, Empty } from "antd";
 import { useAuth } from "../../context/AuthContext";
 import { useNavigate } from "react-router-dom";
 
-// Import separated components
 import DashboardHeader from "./DashboardHeader";
 import StatsCards from "./StatsCards";
 import MeasurementModal from "./MeasurementModal";
 import ImageModal from "./ImageModal";
 
-// Import mobile components
 import MobileBookingTable from "./MobileBookingTable";
 import MobileCustomerTable from "./MobileCustomerTable";
 import MobileOrderTable from "./MobileOrderTable";
@@ -21,7 +19,6 @@ import {
 } from "./tableColumns";
 import { normalizeImageUrl } from "../../utils/imageUtils";
 
-// Import CSS
 import "./AdminDashboard.css";
 
 export default function AdminDashboard() {
@@ -33,29 +30,61 @@ export default function AdminDashboard() {
     updateUserMeasurement,
     updateOrderStatus,
   } = useAuth();
+
   const navigate = useNavigate();
+
+  const [searchText, setSearchText] = useState("");
+  const [activeTab, setActiveTab] = useState("bookings");
+  const [activeOrderStatus, setActiveOrderStatus] = useState("all");
 
   const [showMeasurementModal, setShowMeasurementModal] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
   const [measurements, setMeasurements] = useState(null);
   const [uploading, setUploading] = useState(false);
+
   const [showImageModal, setShowImageModal] = useState(false);
   const [selectedImage, setSelectedImage] = useState(null);
-  const [activeTab, setActiveTab] = useState("bookings");
-  const [activeOrderStatus, setActiveOrderStatus] = useState("all");
 
-  // ✅ FIX: Filter customer users safely
-  const customerUsers = (users || []).filter((u) => u.role === "customer");
+  /* ================= SEARCH HELPER ================= */
+  const matchesSearch = (text) => {
+    if (!searchText) return true;
+    return text?.toString().toLowerCase().includes(searchText.toLowerCase());
+  };
+
+  /* ================= FILTERED DATA ================= */
+
+  const customerUsers = (users || [])
+    .filter((u) => u.role === "customer")
+    .filter(
+      (u) =>
+        matchesSearch(u.username) ||
+        matchesSearch(u.phone) ||
+        matchesSearch(u.email)
+    );
+
   const pendingBookings = (bookings || []).filter(
     (b) => b.status === "pending"
   );
-  const processingOrders = (orders || []).filter(
-    (o) => o.status === "processing"
+
+  const filteredBookings = (bookings || []).filter(
+    (b) =>
+      matchesSearch(b.user_name) ||
+      matchesSearch(b.phone)
   );
-  const filteredOrders =
+
+  const statusFilteredOrders =
     activeOrderStatus === "all"
       ? orders
-      : orders.filter((o) => o.status === activeOrderStatus);
+      : (orders || []).filter((o) => o.status === activeOrderStatus);
+
+  const filteredOrders = statusFilteredOrders.filter(
+    (o) =>
+      matchesSearch(o.id) ||
+      matchesSearch(o.customer_name) ||
+      matchesSearch(o.phone)
+  );
+
+  /* ================= HANDLERS ================= */
 
   const handleOpenMeasurementModal = (user) => {
     setSelectedUser(user);
@@ -65,7 +94,7 @@ export default function AdminDashboard() {
 
   const handleSaveMeasurements = async () => {
     if (!measurements) {
-      message.error("Please select a file to upload");
+      message.error("Please select a file");
       return;
     }
 
@@ -77,60 +106,61 @@ export default function AdminDashboard() {
     setUploading(false);
 
     if (result.success) {
-      message.success("Measurements updated successfully!");
+      message.success("Measurements updated");
       setShowMeasurementModal(false);
-      setMeasurements(null);
     } else {
-      message.error("Failed to update measurements");
+      message.error("Update failed");
     }
   };
 
-  const handleUpdateBookingStatus = async (bookingId, newStatus) => {
-    const result = await updateBookingStatus(bookingId, newStatus);
-    if (result.success) {
-      message.success(`Booking ${newStatus}!`);
-    } else {
-      message.error("Failed to update booking");
-    }
+  const handleUpdateBookingStatus = async (id, status) => {
+    const result = await updateBookingStatus(id, status);
+    result.success
+      ? message.success("Booking updated")
+      : message.error("Update failed");
   };
 
-  const handleOrderStatusUpdate = async (orderId, newStatus) => {
+  const handleOrderStatusUpdate = async (id, status) => {
     try {
-      await updateOrderStatus(orderId, newStatus);
-      message.success("Order status updated successfully");
-    } catch (err) {
-      message.error(
-        err?.response?.data?.error || "Failed to update order status"
-      );
+      await updateOrderStatus(id, status);
+      message.success("Order updated");
+    } catch {
+      message.error("Update failed");
     }
   };
 
-  const handleViewImage = (imageUrl) => {
-    console.log("🖼️ Viewing image (raw):", imageUrl);
-
-    if (!imageUrl) {
-      message.error("No image URL provided");
-      return;
-    }
-
-    const finalUrl = normalizeImageUrl(imageUrl);
-    console.log("🖼️ Viewing image (final):", finalUrl);
-
-    setSelectedImage(finalUrl);
+  const handleViewImage = (url) => {
+    if (!url) return message.error("No image");
+    setSelectedImage(normalizeImageUrl(url));
     setShowImageModal(true);
   };
-  // Generate table columns with handlers
+
   const bookingColumns = getBookingColumns(handleUpdateBookingStatus);
   const customerColumns = getCustomerColumns(
     handleOpenMeasurementModal,
     handleViewImage
   );
-
   const orderColumns = getOrderColumns(handleOrderStatusUpdate, navigate);
 
   return (
     <div className="admin-dashboard-container">
       <DashboardHeader />
+
+      {/* GLOBAL SEARCH */}
+      <Card style={{ marginBottom: 20 }}>
+        <input
+          value={searchText}
+          onChange={(e) => setSearchText(e.target.value)}
+          placeholder="Search by customer name, phone number, or order ID..."
+          style={{
+            width: "100%",
+            padding: "10px 14px",
+            fontSize: 15,
+            borderRadius: 6,
+            border: "1px solid #d9d9d9",
+          }}
+        />
+      </Card>
 
       <StatsCards
         customerUsers={customerUsers}
@@ -141,111 +171,75 @@ export default function AdminDashboard() {
         onStatusSelect={setActiveOrderStatus}
       />
 
-      {/* TABS WITH RESPONSIVE TABLES */}
       <Card className="dashboard-tabs">
         <Tabs
           defaultActiveKey="bookings"
           onChange={(key) => {
             setActiveTab(key);
-            if (key !== "orders") {
-              setActiveOrderStatus("all");
-            }
+            if (key !== "orders") setActiveOrderStatus("all");
           }}
           items={[
             {
               key: "bookings",
-              label: `📅 Bookings (${(bookings || []).length})`,
-              children:
-                bookings.length === 0 ? (
-                  <Empty
-                    description="No bookings yet"
-                    image={Empty.PRESENTED_IMAGE_SIMPLE}
-                    className="empty-state-mobile"
-                  />
-                ) : (
-                  <>
-                    {/* DESKTOP TABLE */}
-                    <div className="desktop-table-view">
-                      <Table
-                        rowKey="id"
-                        columns={bookingColumns}
-                        dataSource={bookings}
-                        pagination={{ pageSize: 10 }}
-                        scroll={{ x: 1000 }}
-                      />
-                    </div>
-
-                    {/* MOBILE CARDS */}
-                    <MobileBookingTable
-                      bookings={bookings}
-                      onUpdateStatus={handleUpdateBookingStatus}
+              label: `📅 Bookings (${filteredBookings.length})`,
+              children: (
+                <>
+                  <div className="desktop-table-view">
+                    <Table
+                      rowKey="id"
+                      columns={bookingColumns}
+                      dataSource={filteredBookings}
+                      pagination={{ pageSize: 10 }}
                     />
-                  </>
-                ),
+                  </div>
+                  <MobileBookingTable
+                    bookings={filteredBookings}
+                    onUpdateStatus={handleUpdateBookingStatus}
+                  />
+                </>
+              ),
             },
             {
               key: "customers",
               label: `👥 Customers (${customerUsers.length})`,
-              children:
-                customerUsers.length === 0 ? (
-                  <Empty
-                    description="No customers yet"
-                    image={Empty.PRESENTED_IMAGE_SIMPLE}
-                    className="empty-state-mobile"
-                  />
-                ) : (
-                  <>
-                    {/* DESKTOP TABLE */}
-                    <div className="desktop-table-view">
-                      <Table
-                        rowKey="id"
-                        columns={customerColumns}
-                        dataSource={customerUsers}
-                        pagination={{ pageSize: 10 }}
-                        scroll={{ x: 1000 }}
-                      />
-                    </div>
-
-                    {/* MOBILE CARDS */}
-                    <MobileCustomerTable
-                      customers={customerUsers}
-                      onOpenMeasurement={handleOpenMeasurementModal}
-                      onViewImage={handleViewImage}
+              children: (
+                <>
+                  <div className="desktop-table-view">
+                    <Table
+                      rowKey="id"
+                      columns={customerColumns}
+                      dataSource={customerUsers}
+                      pagination={{ pageSize: 10 }}
                     />
-                  </>
-                ),
+                  </div>
+                  <MobileCustomerTable
+                    customers={customerUsers}
+                    onOpenMeasurement={handleOpenMeasurementModal}
+                    onViewImage={handleViewImage}
+                  />
+                </>
+              ),
             },
             {
               key: "orders",
-              label: `🛍️ Orders (${(orders || []).length})`,
-              children:
-                orders.length === 0 ? (
-                  <Empty
-                    description="No orders yet"
-                    image={Empty.PRESENTED_IMAGE_SIMPLE}
-                    className="empty-state-mobile"
-                  />
-                ) : (
-                  <>
-                    {/* DESKTOP TABLE */}
-                    <div className="desktop-table-view">
-                      <Table
-                        rowKey="id"
-                        columns={orderColumns}
-                        dataSource={filteredOrders}
-                        pagination={{ pageSize: 10 }}
-                        scroll={{ x: 1200 }}
-                      />
-                    </div>
-
-                    {/* MOBILE CARDS */}
-                    <MobileOrderTable
-                      orders={filteredOrders}
-                      onUpdateStatus={handleOrderStatusUpdate}
-                      onNavigate={navigate}
+              label: `🛍️ Orders (${filteredOrders.length})`,
+              children: (
+                <>
+                  <div className="desktop-table-view">
+                    <Table
+                      rowKey="id"
+                      columns={orderColumns}
+                      dataSource={filteredOrders}
+                      pagination={{ pageSize: 10 }}
                     />
-                  </>
-                ),
+                  </div>
+                  <MobileOrderTable
+                    orders={filteredOrders}
+                    onUpdateStatus={handleOrderStatusUpdate}
+                    onNavigate={navigate}
+                  />
+                </>
+              ),
             },
           ]}
         />
@@ -265,7 +259,6 @@ export default function AdminDashboard() {
         showImageModal={showImageModal}
         setShowImageModal={setShowImageModal}
         selectedImage={selectedImage}
-        setSelectedImage={setSelectedImage}
       />
     </div>
   );
