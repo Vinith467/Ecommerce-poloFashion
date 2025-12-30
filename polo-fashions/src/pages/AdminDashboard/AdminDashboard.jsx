@@ -67,9 +67,7 @@ export default function AdminDashboard() {
   );
 
   const filteredBookings = (bookings || []).filter(
-    (b) =>
-      matchesSearch(b.user_name) ||
-      matchesSearch(b.phone)
+    (b) => matchesSearch(b.user_name) || matchesSearch(b.phone)
   );
 
   const statusFilteredOrders =
@@ -146,6 +144,14 @@ export default function AdminDashboard() {
     <div className="admin-dashboard-container">
       <DashboardHeader />
 
+      <StatsCards
+        customerUsers={customerUsers}
+        pendingBookings={pendingBookings}
+        orders={orders}
+        showOrderStatusFilters={activeTab === "orders"}
+        activeOrderStatus={activeOrderStatus}
+        onStatusSelect={setActiveOrderStatus}
+      />
       {/* GLOBAL SEARCH */}
       <Card style={{ marginBottom: 20 }}>
         <input
@@ -161,15 +167,6 @@ export default function AdminDashboard() {
           }}
         />
       </Card>
-
-      <StatsCards
-        customerUsers={customerUsers}
-        pendingBookings={pendingBookings}
-        orders={orders}
-        showOrderStatusFilters={activeTab === "orders"}
-        activeOrderStatus={activeOrderStatus}
-        onStatusSelect={setActiveOrderStatus}
-      />
 
       <Card className="dashboard-tabs">
         <Tabs
