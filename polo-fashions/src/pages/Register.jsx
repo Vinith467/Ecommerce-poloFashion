@@ -1,14 +1,5 @@
 import React, { useState } from "react";
-import {
-  Row,
-  Col,
-  Card,
-  Form,
-  Input,
-  Button,
-  Alert,
-  Typography,
-} from "antd";
+import { Row, Col, Card, Form, Input, Button, Alert, Typography } from "antd";
 import {
   UserAddOutlined,
   MailOutlined,
@@ -35,47 +26,58 @@ export default function Register() {
     setSuccess("");
     setLoading(true);
 
-    // Extra safety (even though AntD validates)
-    if (values.password !== values.confirmPassword) {
-      setError("Passwords do not match");
-      setLoading(false);
-      return;
+    try {
+      // Extra safety
+      if (values.password !== values.confirmPassword) {
+        setError("Passwords do not match");
+        return;
+      }
+
+      // Split name
+      const nameParts = values.name.trim().split(" ");
+      const firstName = nameParts[0] || "";
+      const lastName = nameParts.slice(1).join(" ") || "";
+
+      const result = await register({
+        username: values.email.trim().split("@")[0],
+        email: values.email.trim(),
+        phone: values.phone.trim(),
+        password: values.password,
+        password2: values.confirmPassword,
+        first_name: firstName,
+        last_name: lastName,
+      });
+
+      if (result.success) {
+        setSuccess(result.message || "Registration successful");
+        form.resetFields(); // ✅ reset form
+        setTimeout(() => navigate("/login"), 2000);
+      } else {
+        if (typeof result.message === "object") {
+          const firstError = Object.values(result.message)
+            .flat()
+            .join(" ");
+          setError(firstError);
+        } else {
+          setError(result.message || "Registration failed");
+        }
+      }
+    } catch (err) {
+      setError("Something went wrong. Please try again.");
+    } finally {
+      setLoading(false); // ✅ IMPORTANT FIX
     }
-
-    // Split name (UNCHANGED LOGIC)
-    const nameParts = values.name.trim().split(" ");
-    const firstName = nameParts[0] || "";
-    const lastName = nameParts.slice(1).join(" ") || "";
-
-    const result = await register({
-      username: values.email.split("@")[0],
-      email: values.email,
-      phone: values.phone,
-      password: values.password,
-      password2: values.confirmPassword,
-      first_name: firstName,
-      last_name: lastName,
-    });
-
-    if (result.success) {
-      setSuccess(result.message);
-      setTimeout(() => navigate("/login"), 2000);
-    } else {
-      setError(result.message);
-    }
-
-    setLoading(false);
   };
 
   return (
     <Row
-  justify="center"
-  style={{
-    padding: "24px 12px",
-    minHeight: "calc(100vh - 64px)",
-    alignItems: "center",
-  }}
->
+      justify="center"
+      style={{
+        padding: "24px 12px",
+        minHeight: "calc(100vh - 64px)",
+        alignItems: "center",
+      }}
+    >
       <Col xs={24} sm={22} md={16} lg={12} xl={10}>
         <Card>
           <div style={{ textAlign: "center", marginBottom: 24 }}>
@@ -89,11 +91,7 @@ export default function Register() {
           {error && <Alert type="error" showIcon message={error} />}
           {success && <Alert type="success" showIcon message={success} />}
 
-          <Form
-            form={form}
-            layout="vertical"
-            onFinish={handleSubmit}
-          >
+          <Form form={form} layout="vertical" onFinish={handleSubmit}>
             <Form.Item
               label="Full Name"
               name="name"
@@ -132,7 +130,11 @@ export default function Register() {
               name="password"
               rules={[
                 { required: true, message: "Enter password" },
-                { min: 6, message: "Minimum 6 characters required" },
+                { min: 8, message: "Password must be at least 8 characters" },
+                {
+                  pattern: /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d@$!%*#?&]{8,}$/,
+                  message: "Password must contain letters and numbers",
+                },
               ]}
               hasFeedback
             >
@@ -175,10 +177,7 @@ export default function Register() {
           <div style={{ textAlign: "center", marginTop: 16 }}>
             <Text type="secondary">
               Already have an account?{" "}
-              <Button
-                type="link"
-                onClick={() => navigate("/login")}
-              >
+              <Button type="link" onClick={() => navigate("/login")}>
                 Login here
               </Button>
             </Text>
