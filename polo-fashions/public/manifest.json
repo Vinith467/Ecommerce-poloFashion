@@ -4,8 +4,6 @@
   "description": "Custom tailoring and premium ready-made traditional wear",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#003366",
-  "theme_color": "#003366",
   "icons": [
     {
       "src": "/new-icon.jpg",
